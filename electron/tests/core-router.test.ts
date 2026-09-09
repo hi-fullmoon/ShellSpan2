@@ -8,6 +8,7 @@ import {
   parseBackendConfig,
   parseCanaryMode,
   stageThreeNodeDomains,
+  stageFourNodeDomains,
   stageTwoNodeDomains,
 } from '../core-router.ts';
 import type { BackendKind, CoreBackendEvents, CoreRequestType } from '../core-backend.ts';
@@ -123,11 +124,32 @@ test('all Stage 3 commands default to Node with whole-domain rollback', async ()
   await defaults.stop();
 
   const routes = parseBackendConfig(
-    stageThreeNodeDomains.map((domain) => `${domain}:rust`).join(','),
+    [...stageThreeNodeDomains, ...stageFourNodeDomains].map((domain) => `${domain}:rust`).join(','),
   );
   const rollback = new CoreBackendRouter(new FakeBackend('rust'), new FakeBackend('node'), routes);
   for (const command of commands) assert.equal(rollback.backendFor(command.name).kind, 'rust');
   await rollback.stop();
+});
+
+test('all 40 Stage 4 commands share Node connection and credential ownership', async () => {
+  const rust = new FakeBackend('rust');
+  const node = new FakeBackend('node');
+  const router = new CoreBackendRouter(rust, node, parseBackendConfig());
+  const commands = [...commandMetadata.values()].filter((command) =>
+    (stageFourNodeDomains as readonly string[]).includes(command.domain),
+  );
+  assert.equal(commands.length, 40);
+  for (const command of commands) assert.equal(router.backendFor(command.name), node);
+  await router.stop();
+  assert.throws(
+    () =>
+      new CoreBackendRouter(
+        new FakeBackend('rust'),
+        new FakeBackend('node'),
+        parseBackendConfig('terminal:rust'),
+      ),
+    /selected together/,
+  );
 });
 
 test('a stateful domain routes all commands to one backend', async () => {

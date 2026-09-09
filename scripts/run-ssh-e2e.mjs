@@ -9,6 +9,18 @@ const imageName = process.env.SHELLSPAN_E2E_IMAGE || 'shellspan-ssh-e2e:local';
 const testFilter = process.argv.includes('--agent-native')
   ? 'isolated_ssh_sftp_end_to_end_agent_native_files'
   : 'isolated_ssh_sftp_end_to_end';
+const fixtureEnv = {
+  ...process.env,
+  SHELLSPAN_E2E_SSH_FIXTURE: '1',
+  SHELLSPAN_E2E_SSH_HOST: '127.0.0.1',
+  SHELLSPAN_E2E_SSH_PORT: process.env.SHELLSPAN_E2E_SSH_PORT || '22222',
+  SHELLSPAN_E2E_SSH_USERNAME: 'shellspan',
+  SHELLSPAN_E2E_SSH_PASSWORD: 'shellspan-e2e',
+  SHELLSPAN_E2E_SSH_JUMP_HOST: '127.0.0.1',
+  SHELLSPAN_E2E_SSH_JUMP_PORT: process.env.SHELLSPAN_E2E_SSH_JUMP_PORT || '22223',
+  SHELLSPAN_E2E_SSH_JUMP_TARGET_HOST: 'ssh',
+  SHELLSPAN_E2E_SSH_JUMP_TARGET_PORT: '22',
+};
 
 function run(command, args, options = {}) {
   const result = spawnSync(command, args, {
@@ -55,21 +67,11 @@ try {
       '--nocapture',
       '--test-threads=1',
     ],
-    {
-      env: {
-        ...process.env,
-        SHELLSPAN_E2E_SSH_FIXTURE: '1',
-        SHELLSPAN_E2E_SSH_HOST: '127.0.0.1',
-        SHELLSPAN_E2E_SSH_PORT: process.env.SHELLSPAN_E2E_SSH_PORT || '22222',
-        SHELLSPAN_E2E_SSH_USERNAME: 'shellspan',
-        SHELLSPAN_E2E_SSH_PASSWORD: 'shellspan-e2e',
-        SHELLSPAN_E2E_SSH_JUMP_HOST: '127.0.0.1',
-        SHELLSPAN_E2E_SSH_JUMP_PORT: process.env.SHELLSPAN_E2E_SSH_JUMP_PORT || '22223',
-        SHELLSPAN_E2E_SSH_JUMP_TARGET_HOST: 'ssh',
-        SHELLSPAN_E2E_SSH_JUMP_TARGET_PORT: '22',
-      },
-    },
+    { env: fixtureEnv },
   );
+  if (!process.argv.includes('--agent-native')) {
+    run(process.execPath, ['scripts/stage4-ssh-smoke.ts'], { env: fixtureEnv });
+  }
 } catch (error) {
   failure = error;
 } finally {

@@ -276,6 +276,19 @@ export class CredentialManager {
   testRawRead(service: string, account: string) {
     return this.store.testRawGet(service, account);
   }
+
+  profilePassword(profileId: string) {
+    return this.store.get(this.passwordService, profileId);
+  }
+
+  profileSecret(profileId: string, kind: string) {
+    return this.store.get(this.profileSecretService, this.secretAccount(profileId, kind));
+  }
+
+  async privateKey(id: string) {
+    const key = await this.retrieveKey(id);
+    return key?.privateKey;
+  }
 }
 
 export const credentialCommands = new Set([

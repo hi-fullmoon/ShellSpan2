@@ -21,7 +21,13 @@
 
 阶段 3 已于 2026-09-09 完成。`storage` 与 `credentials` 两个完整领域的 29 个命令已
 默认切换到 Node；SQLite v1–v7、恢复、CAS、旧系统凭据命名和内联 API Key 迁移证据
-记录在 `docs/migration/stage-3-completion.md`。SSH/SFTP/PTY 仍由 Rust 独占，尚未进入阶段 4。
+记录在 `docs/migration/stage-3-completion.md`。
+
+阶段 4 已于 2026-09-09 完成实现与本地验收。`host-trust`、`terminal`、`remote-fs`、
+`remote-health` 和 `port-forward` 五个完整领域的 40 个命令已默认切换到 Node；直连、
+跳板、主机信任、PTY、SFTP、端口转发、远程健康、取消、异常退出清理、Ubuntu 隔离
+E2E 和 macOS 打包证据记录在 `docs/migration/stage-4-completion.md`。Windows ConPTY
+实机验收由新增的 `windows-2025` 必过 CI 门禁执行；阶段 5 尚未开始。
 
 TypeScript 桌面类型、命令清单和事件清单现在从 Schema v1 生成；Electron 主进程使用同一 Schema 执行 Ajv 深层参数校验。常规契约生成与检查不再解析 Rust 源码。
 

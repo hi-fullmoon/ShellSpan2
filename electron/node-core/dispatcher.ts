@@ -106,6 +106,157 @@ export async function dispatchNodeCommand(command: string, args: object, context
     return context.state.credentials.command(command, args as Record<string, unknown>);
   }
   switch (command) {
+    case 'check_host_key': {
+      if (!context.state.hostTrust) throw new Error('Host trust backend is not active');
+      const request = (args as { request: { host: string; port: number } }).request;
+      return context.state.hostTrust.check(request.host, request.port, context.signal);
+    }
+    case 'trust_host': {
+      if (!context.state.hostTrust) throw new Error('Host trust backend is not active');
+      const request = (
+        args as { request: { host: string; port: number; expectedFingerprint: string } }
+      ).request;
+      return context.state.hostTrust.trust(request.host, request.port, request.expectedFingerprint);
+    }
+    case 'list_known_hosts':
+      if (!context.state.hostTrust) throw new Error('Host trust backend is not active');
+      return context.state.hostTrust.list();
+    case 'remove_known_host':
+      if (!context.state.hostTrust) throw new Error('Host trust backend is not active');
+      return context.state.hostTrust.remove(
+        (args as { host: string }).host,
+        (args as { port: number }).port,
+      );
+    case 'preflight_connection':
+      if (!context.state.preflight) throw new Error('Connection preflight backend is not active');
+      return context.state.preflight.run((args as { request: never }).request);
+    case 'cancel_connection_preflight':
+      if (!context.state.preflight) throw new Error('Connection preflight backend is not active');
+      return context.state.preflight.cancel((args as { operationId: string }).operationId);
+    case 'warm_remote_connection':
+      if (!context.state.remoteFs) throw new Error('Remote filesystem backend is not active');
+      return context.state.remoteFs.warm((args as { request: never }).request, context.signal);
+    case 'disconnect_sftp':
+      if (!context.state.remoteFs) throw new Error('Remote filesystem backend is not active');
+      return context.state.remoteFs.disconnect((args as { request: never }).request);
+    case 'list_remote_directory':
+      if (!context.state.remoteFs) throw new Error('Remote filesystem backend is not active');
+      return context.state.remoteFs.list((args as { request: never }).request);
+    case 'supersede_remote_directory_request':
+      if (!context.state.remoteFs) throw new Error('Remote filesystem backend is not active');
+      return context.state.remoteFs.supersede(
+        (args as { requestKey: string }).requestKey,
+        (args as { requestId: number }).requestId,
+      );
+    case 'create_remote_entry':
+      if (!context.state.remoteFs) throw new Error('Remote filesystem backend is not active');
+      return context.state.remoteFs.create((args as { request: never }).request);
+    case 'rename_remote_path':
+      if (!context.state.remoteFs) throw new Error('Remote filesystem backend is not active');
+      return context.state.remoteFs.rename((args as { request: never }).request);
+    case 'update_remote_permissions':
+      if (!context.state.remoteFs) throw new Error('Remote filesystem backend is not active');
+      return context.state.remoteFs.chmod((args as { request: never }).request);
+    case 'delete_remote_path':
+      if (!context.state.remoteFs) throw new Error('Remote filesystem backend is not active');
+      return context.state.remoteFs.delete((args as { request: never }).request);
+    case 'upload_local_paths':
+      if (!context.state.remoteFs) throw new Error('Remote filesystem backend is not active');
+      return context.state.remoteFs.upload((args as { request: never }).request);
+    case 'download_remote_paths':
+      if (!context.state.remoteFs) throw new Error('Remote filesystem backend is not active');
+      return context.state.remoteFs.download((args as { request: never }).request);
+    case 'preview_remote_file':
+      if (!context.state.remoteFs) throw new Error('Remote filesystem backend is not active');
+      return context.state.remoteFs.preview((args as { request: never }).request);
+    case 'open_remote_file':
+      if (!context.state.remoteFs) throw new Error('Remote filesystem backend is not active');
+      return context.state.remoteFs.open((args as { request: never }).request);
+    case 'copy_remote_path':
+      if (!context.state.remoteFs) throw new Error('Remote filesystem backend is not active');
+      return context.state.remoteFs.copyRemote((args as { request: never }).request);
+    case 'copy_remote_to_remote':
+      if (!context.state.remoteFs) throw new Error('Remote filesystem backend is not active');
+      return context.state.remoteFs.copyRemoteToRemote((args as { request: never }).request);
+    case 'resolve_remote_entry_owners':
+      if (!context.state.remoteFs) throw new Error('Remote filesystem backend is not active');
+      return context.state.remoteFs.owners((args as { request: never }).request);
+    case 'cancel_upload':
+    case 'cancel_download':
+    case 'cancel_delete':
+    case 'cancel_remote_copy':
+    case 'cancel_remote_file_read':
+      if (!context.state.remoteFs) throw new Error('Remote filesystem backend is not active');
+      return context.state.remoteFs.cancel(
+        (args as { operationId: string }).operationId,
+        command === 'cancel_upload'
+          ? 'upload'
+          : command === 'cancel_download'
+            ? 'download'
+            : command === 'cancel_delete'
+              ? 'delete'
+              : command === 'cancel_remote_copy'
+                ? 'copy'
+                : 'read',
+      );
+    case 'collect_remote_health_snapshot':
+      if (!context.state.remoteHealth) throw new Error('Remote health backend is not active');
+      return context.state.remoteHealth.collect((args as { request: never }).request);
+    case 'cancel_remote_health_snapshot':
+      if (!context.state.remoteHealth) throw new Error('Remote health backend is not active');
+      return context.state.remoteHealth.cancel((args as { operationId: string }).operationId);
+    case 'list_port_forwards':
+      if (!context.state.portForwards) throw new Error('Port forward backend is not active');
+      return context.state.portForwards.list();
+    case 'start_port_forward':
+      if (!context.state.portForwards) throw new Error('Port forward backend is not active');
+      return context.state.portForwards.start((args as { request: never }).request);
+    case 'stop_port_forward':
+      if (!context.state.portForwards) throw new Error('Port forward backend is not active');
+      return context.state.portForwards.stopOne((args as { operationId: string }).operationId);
+    case 'stop_all_port_forwards':
+      if (!context.state.portForwards) throw new Error('Port forward backend is not active');
+      return context.state.portForwards.stopAll();
+    case 'create_local_session':
+      if (!context.state.terminal) throw new Error('Terminal backend is not active');
+      return context.state.terminal.createLocal(
+        (args as { cols: number }).cols,
+        (args as { rows: number }).rows,
+      );
+    case 'create_session':
+      if (!context.state.terminal) throw new Error('Terminal backend is not active');
+      return context.state.terminal.createRemote(
+        (args as { request: Parameters<typeof context.state.terminal.createRemote>[0] }).request,
+        context.signal,
+      );
+    case 'get_session_status':
+      if (!context.state.terminal) throw new Error('Terminal backend is not active');
+      return context.state.terminal.getStatus((args as { sessionId: string }).sessionId);
+    case 'mark_session_ready':
+      if (!context.state.terminal) throw new Error('Terminal backend is not active');
+      return context.state.terminal.markReady((args as { sessionId: string }).sessionId);
+    case 'set_session_output_paused':
+      if (!context.state.terminal) throw new Error('Terminal backend is not active');
+      return context.state.terminal.setPaused(
+        (args as { sessionId: string }).sessionId,
+        (args as { paused: boolean }).paused,
+      );
+    case 'write_session':
+      if (!context.state.terminal) throw new Error('Terminal backend is not active');
+      return context.state.terminal.write(
+        (args as { sessionId: string }).sessionId,
+        (args as { data: string }).data,
+      );
+    case 'resize_session':
+      if (!context.state.terminal) throw new Error('Terminal backend is not active');
+      return context.state.terminal.resize(
+        (args as { sessionId: string }).sessionId,
+        (args as { cols: number }).cols,
+        (args as { rows: number }).rows,
+      );
+    case 'close_session':
+      if (!context.state.terminal) throw new Error('Terminal backend is not active');
+      return context.state.terminal.close((args as { sessionId: string }).sessionId);
     case 'read_text_file':
       return readTextFile(args, context.state.paths.home);
     case 'preview_local_file':

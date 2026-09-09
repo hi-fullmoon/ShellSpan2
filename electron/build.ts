@@ -8,6 +8,16 @@ const root = path.resolve(import.meta.dirname, '..');
 const output = path.join(root, 'dist-electron');
 const require = createRequire(import.meta.url);
 const tsc = require.resolve('typescript/bin/tsc');
+if (process.platform !== 'win32') {
+  const nodePtyRoot = path.dirname(require.resolve('node-pty/package.json'));
+  for (const helper of [
+    path.join(nodePtyRoot, `prebuilds/${process.platform}-${process.arch}/spawn-helper`),
+    path.join(nodePtyRoot, 'build/Release/spawn-helper'),
+  ])
+    await chmod(helper, 0o755).catch((error) => {
+      if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error;
+    });
+}
 execFileSync(process.execPath, ['electron/build-command-types.ts'], {
   cwd: root,
   stdio: 'inherit',

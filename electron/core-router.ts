@@ -12,6 +12,13 @@ import type { CoreReady, CoreResponse } from './types.ts';
 export type CanaryMode = BackendKind | 'compare';
 export const stageTwoNodeDomains = ['health', 'local-fs', 'logs', 'petdex'] as const;
 export const stageThreeNodeDomains = ['storage', 'credentials'] as const;
+export const stageFourNodeDomains = [
+  'host-trust',
+  'terminal',
+  'remote-fs',
+  'remote-health',
+  'port-forward',
+] as const;
 
 const domainNames = new Set(Object.keys(manifest.domains));
 const commandMetadata = new Map(manifest.commands.map((command) => [command.name, command]));
@@ -23,7 +30,9 @@ if (canary.stateful || canary.mutates)
 
 export function parseBackendConfig(value = '') {
   const routes = new Map<string, BackendKind>(
-    [...stageTwoNodeDomains, ...stageThreeNodeDomains].map((domain) => [domain, 'node'] as const),
+    [...stageTwoNodeDomains, ...stageThreeNodeDomains, ...stageFourNodeDomains].map(
+      (domain) => [domain, 'node'] as const,
+    ),
   );
   if (!value.trim()) return routes;
   const configured = new Set<string>();
@@ -66,6 +75,13 @@ export class CoreBackendRouter extends EventEmitter<CoreBackendEvents> implement
       if (!domainNames.has(domain)) throw new Error(`Unknown Core backend domain: ${domain}`);
     if ((this.routes.get('storage') ?? 'rust') !== (this.routes.get('credentials') ?? 'rust'))
       throw new Error('storage and credentials backends must be selected together');
+    const stageFourOwners = new Set(
+      stageFourNodeDomains.map((domain) => this.routes.get(domain) ?? 'rust'),
+    );
+    if (stageFourOwners.size !== 1)
+      throw new Error('Stage 4 connection backends must be selected together');
+    if (stageFourOwners.has('node') && (this.routes.get('credentials') ?? 'rust') !== 'node')
+      throw new Error('Node connection backends require Node credentials');
     this.ready = Promise.all([rust.ready, node.ready]).then(() => ({
       type: 'ready',
       protocol: 1,
