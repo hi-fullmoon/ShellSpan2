@@ -281,6 +281,18 @@ export class CredentialManager {
     return this.store.get(this.passwordService, profileId);
   }
 
+  aiCredentialSet(reference: string, value: string) {
+    return this.store.set(this.aiService, reference, value);
+  }
+
+  aiCredentialGet(reference: string) {
+    return this.store.get(this.aiService, reference);
+  }
+
+  aiCredentialDelete(reference: string) {
+    return this.store.delete(this.aiService, reference);
+  }
+
   profileSecret(profileId: string, kind: string) {
     return this.store.get(this.profileSecretService, this.secretAccount(profileId, kind));
   }

@@ -1,0 +1,115 @@
+[
+  {
+    "name": "openai-responses",
+    "recording": {
+      "adapterId": "responses",
+      "framing": "sse",
+      "frames": [
+        "{\"type\":\"response.output_text.delta\",\"output_index\":0,\"delta\":\"hello\"}",
+        "{\"type\":\"response.completed\",\"response\":{\"id\":\"resp_fixture\",\"model\":\"gpt-5\",\"usage\":{\"input_tokens\":12,\"output_tokens\":7,\"total_tokens\":19}}}"
+      ]
+    },
+    "expectedDeltas": [
+      { "type": "text", "index": 0, "text": "hello" },
+      {
+        "type": "usage",
+        "usage": { "uncachedInputTokens": 12, "outputTokens": 7, "totalTokens": 19 }
+      }
+    ],
+    "expected": {
+      "content": [{ "type": "text", "text": "hello" }],
+      "finishReason": "stop",
+      "usage": { "uncachedInputTokens": 12, "outputTokens": 7, "totalTokens": 19 }
+    }
+  },
+  {
+    "name": "openai-chat-completions",
+    "recording": {
+      "adapterId": "chat-completions",
+      "framing": "sse",
+      "frames": [
+        "{\"id\":\"chat_fixture\",\"model\":\"fixture\",\"choices\":[{\"delta\":{\"content\":\"hello\"},\"finish_reason\":null}]}",
+        "{\"choices\":[{\"delta\":{},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":10,\"completion_tokens\":2,\"total_tokens\":12}}",
+        "[DONE]"
+      ]
+    },
+    "expectedDeltas": [
+      { "type": "text", "index": 0, "text": "hello" },
+      {
+        "type": "usage",
+        "usage": { "uncachedInputTokens": 10, "outputTokens": 2, "totalTokens": 12 }
+      }
+    ],
+    "expected": {
+      "content": [{ "type": "text", "text": "hello" }],
+      "finishReason": "stop",
+      "usage": { "uncachedInputTokens": 10, "outputTokens": 2, "totalTokens": 12 }
+    }
+  },
+  {
+    "name": "ollama-ndjson",
+    "recording": {
+      "adapterId": "ollama",
+      "framing": "ndjson",
+      "frames": [
+        "{\"model\":\"qwen3\",\"message\":{\"role\":\"assistant\",\"thinking\":\"plan\",\"content\":\"hello\"},\"done\":false}",
+        "{\"model\":\"qwen3\",\"message\":{\"role\":\"assistant\",\"content\":\"\"},\"done\":true,\"done_reason\":\"stop\",\"prompt_eval_count\":8,\"eval_count\":3}"
+      ]
+    },
+    "expectedDeltas": [
+      { "type": "reasoning", "index": 0, "text": "plan" },
+      { "type": "text", "index": 1, "text": "hello" },
+      {
+        "type": "usage",
+        "usage": { "uncachedInputTokens": 8, "outputTokens": 3, "totalTokens": 11 }
+      }
+    ],
+    "expected": {
+      "content": [
+        { "type": "reasoning", "text": "plan" },
+        { "type": "text", "text": "hello" }
+      ],
+      "finishReason": "stop",
+      "usage": { "uncachedInputTokens": 8, "outputTokens": 3, "totalTokens": 11 }
+    }
+  },
+  {
+    "name": "anthropic-messages",
+    "recording": {
+      "adapterId": "anthropic-messages",
+      "framing": "sse",
+      "frames": [
+        "{\"type\":\"message_start\",\"message\":{\"id\":\"msg_fixture\",\"model\":\"claude-sonnet-5\",\"usage\":{\"input_tokens\":11,\"cache_creation_input_tokens\":3,\"cache_read_input_tokens\":5,\"output_tokens\":1}}}",
+        "{\"type\":\"content_block_start\",\"index\":0,\"content_block\":{\"type\":\"text\",\"text\":\"\"}}",
+        "{\"type\":\"content_block_delta\",\"index\":0,\"delta\":{\"type\":\"text_delta\",\"text\":\"hello\"}}",
+        "{\"type\":\"content_block_stop\",\"index\":0}",
+        "{\"type\":\"message_delta\",\"delta\":{\"stop_reason\":\"end_turn\"},\"usage\":{\"output_tokens\":4}}"
+      ]
+    },
+    "expectedDeltas": [
+      {
+        "type": "usage",
+        "usage": {
+          "uncachedInputTokens": 11,
+          "cacheReadTokens": 5,
+          "cacheWriteTokens": 3,
+          "outputTokens": 1,
+          "totalTokens": 20
+        }
+      },
+      { "type": "text", "index": 0, "text": "hello" },
+      { "type": "usage", "usage": { "outputTokens": 4 } }
+    ],
+    "expected": {
+      "content": [{ "type": "text", "text": "hello" }],
+      "finishReason": "stop",
+      "usage": {
+        "uncachedInputTokens": 11,
+        "cacheReadTokens": 5,
+        "cacheWriteTokens": 3,
+        "outputTokens": 4,
+        "totalTokens": 20
+      }
+    }
+  }
+]

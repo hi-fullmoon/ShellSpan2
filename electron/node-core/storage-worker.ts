@@ -413,6 +413,17 @@ function command(name: string, args: Record<string, unknown>) {
       }
       return null;
     }
+    case '__db_delete_preferences': {
+      database.exec('BEGIN IMMEDIATE');
+      try {
+        for (const key of args.keys as string[]) run('DELETE FROM preferences WHERE key=?', key);
+        database.exec('COMMIT');
+      } catch (error) {
+        database.exec('ROLLBACK');
+        throw error;
+      }
+      return null;
+    }
     case '__db_schema_version':
       return schemaVersion(database);
     case '__db_test_drop_key_credentials':

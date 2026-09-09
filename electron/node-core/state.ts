@@ -11,6 +11,7 @@ import { RemoteFsManager } from './remote-fs.ts';
 import { RemoteHealthManager } from './remote-health.ts';
 import { PortForwardManager } from './port-forward.ts';
 import { PreflightManager } from './preflight.ts';
+import { LlmDomain } from './llm-domain.ts';
 import type { NodeCoreEventSender } from './events.ts';
 
 export type NodeCoreLifecycle = 'starting' | 'ready' | 'stopping' | 'stopped';
@@ -32,11 +33,12 @@ export class NodeCoreState {
   remoteHealth?: RemoteHealthManager;
   portForwards?: PortForwardManager;
   preflight?: PreflightManager;
+  llm?: LlmDomain;
 
   constructor(readonly env: NodeJS.ProcessEnv) {
     this.paths = new NodeCorePaths(env);
     const domains = new Set((env.SHELLSPAN_NODE_DOMAINS || '').split(',').filter(Boolean));
-    if (domains.has('storage') || domains.has('credentials'))
+    if (domains.has('storage') || domains.has('credentials') || domains.has('llm'))
       this.storage = new StorageClient(this.paths.database);
   }
 
@@ -44,10 +46,14 @@ export class NodeCoreState {
     const domains = new Set((this.env.SHELLSPAN_NODE_DOMAINS || '').split(',').filter(Boolean));
     if (this.storage) {
       await this.storage.ready;
-      if (domains.has('credentials')) {
+      if (domains.has('credentials') || domains.has('llm')) {
         this.credentials = new CredentialManager(this.env, this.storage);
         await this.credentials.migrateInlineApiKeys();
       }
+    }
+    if (domains.has('llm') && this.storage && this.credentials) {
+      this.llm = new LlmDomain(this.storage, this.credentials, this.paths.appData);
+      await this.llm.ready;
     }
     const testEndpoint =
       this.env.SHELLSPAN_NODE_CORE_TEST_MODE === '1'

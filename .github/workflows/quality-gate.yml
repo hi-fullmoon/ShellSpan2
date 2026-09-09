@@ -95,6 +95,10 @@ jobs:
         run: cargo clippy --manifest-path native/Cargo.toml --all-targets --all-features --locked -- -D warnings
       - name: Run Rust tests
         run: cargo test --manifest-path native/Cargo.toml --all-features --no-fail-fast --locked
+      - name: Run Stage 5 LLM differential gate
+        run: pnpm test:core-stage5
+      - name: Report configured Node LLM live smoke result or explicit SKIP
+        run: node --env-file-if-exists=.env.local scripts/node-llm-live-smoke.mjs
 
   ssh-e2e:
     name: Isolated SSH/SFTP E2E

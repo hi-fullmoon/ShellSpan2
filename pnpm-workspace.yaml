@@ -5,6 +5,7 @@ allowBuilds:
   keytar: true
   node-pty: true
   ssh2: true
+  sharp: true
 ignoredOptionalDependencies:
   - cpu-features
 patchedDependencies:

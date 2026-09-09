@@ -240,6 +240,15 @@ import * as assert from 'node:assert/strict';
       (window as SmokeWindow).shellspan.commands.list_profiles(),
     );
     assert.deepEqual(result, { ok: true, value: [] });
+    const llm = await page.evaluate(() =>
+      (window as SmokeWindow).shellspan.commands.ai_list_routes(),
+    );
+    assert.equal(llm.ok, true);
+    if (llm.ok) {
+      assert.equal(llm.value.schemaVersion, 1);
+      assert.equal(llm.value.revision, 1);
+      assert.deepEqual(llm.value.routes, []);
+    }
     const unknown = await page.evaluate(() =>
       Object.keys((window as SmokeWindow).shellspan.commands).includes('exec'),
     );
@@ -260,6 +269,7 @@ import * as assert from 'node:assert/strict';
             'Renderer-to-Rust/Node exact canary',
             'four default Node Stage 2 domains via Renderer',
             'Node storage and credential domains via Renderer',
+            'Node LLM domain via the unchanged Renderer bridge',
             'unchanged window constraints',
             'no page exceptions',
             'legacy width and IndexedDB draft import',

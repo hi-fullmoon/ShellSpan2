@@ -9,6 +9,7 @@ import {
   parseCanaryMode,
   stageThreeNodeDomains,
   stageFourNodeDomains,
+  stageFiveNodeDomains,
   stageTwoNodeDomains,
 } from '../core-router.ts';
 import type { BackendKind, CoreBackendEvents, CoreRequestType } from '../core-backend.ts';
@@ -124,7 +125,9 @@ test('all Stage 3 commands default to Node with whole-domain rollback', async ()
   await defaults.stop();
 
   const routes = parseBackendConfig(
-    [...stageThreeNodeDomains, ...stageFourNodeDomains].map((domain) => `${domain}:rust`).join(','),
+    [...stageThreeNodeDomains, ...stageFourNodeDomains, ...stageFiveNodeDomains]
+      .map((domain) => `${domain}:rust`)
+      .join(','),
   );
   const rollback = new CoreBackendRouter(new FakeBackend('rust'), new FakeBackend('node'), routes);
   for (const command of commands) assert.equal(rollback.backendFor(command.name).kind, 'rust');
@@ -149,6 +152,39 @@ test('all 40 Stage 4 commands share Node connection and credential ownership', a
         parseBackendConfig('terminal:rust'),
       ),
     /selected together/,
+  );
+});
+
+test('all 9 Stage 5 LLM commands default to Node with whole-domain rollback', async () => {
+  const rust = new FakeBackend('rust');
+  const node = new FakeBackend('node');
+  const defaults = new CoreBackendRouter(rust, node, parseBackendConfig());
+  const commands = [...commandMetadata.values()].filter((command) =>
+    (stageFiveNodeDomains as readonly string[]).includes(command.domain),
+  );
+  assert.equal(commands.length, 9);
+  for (const command of commands) assert.equal(defaults.backendFor(command.name), node);
+  await defaults.stop();
+
+  const rollback = new CoreBackendRouter(
+    new FakeBackend('rust'),
+    new FakeBackend('node'),
+    parseBackendConfig('llm:rust'),
+  );
+  for (const command of commands) assert.equal(rollback.backendFor(command.name).kind, 'rust');
+  await rollback.stop();
+  assert.throws(
+    () =>
+      new CoreBackendRouter(
+        new FakeBackend('rust'),
+        new FakeBackend('node'),
+        parseBackendConfig(
+          `storage:rust,credentials:rust,llm:node,${stageFourNodeDomains
+            .map((domain) => `${domain}:rust`)
+            .join(',')}`,
+        ),
+      ),
+    /requires Node storage and credentials/,
   );
 });
 

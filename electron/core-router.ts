@@ -19,6 +19,7 @@ export const stageFourNodeDomains = [
   'remote-health',
   'port-forward',
 ] as const;
+export const stageFiveNodeDomains = ['llm'] as const;
 
 const domainNames = new Set(Object.keys(manifest.domains));
 const commandMetadata = new Map(manifest.commands.map((command) => [command.name, command]));
@@ -30,9 +31,12 @@ if (canary.stateful || canary.mutates)
 
 export function parseBackendConfig(value = '') {
   const routes = new Map<string, BackendKind>(
-    [...stageTwoNodeDomains, ...stageThreeNodeDomains, ...stageFourNodeDomains].map(
-      (domain) => [domain, 'node'] as const,
-    ),
+    [
+      ...stageTwoNodeDomains,
+      ...stageThreeNodeDomains,
+      ...stageFourNodeDomains,
+      ...stageFiveNodeDomains,
+    ].map((domain) => [domain, 'node'] as const),
   );
   if (!value.trim()) return routes;
   const configured = new Set<string>();
@@ -82,6 +86,12 @@ export class CoreBackendRouter extends EventEmitter<CoreBackendEvents> implement
       throw new Error('Stage 4 connection backends must be selected together');
     if (stageFourOwners.has('node') && (this.routes.get('credentials') ?? 'rust') !== 'node')
       throw new Error('Node connection backends require Node credentials');
+    if (
+      (this.routes.get('llm') ?? 'rust') === 'node' &&
+      ((this.routes.get('storage') ?? 'rust') !== 'node' ||
+        (this.routes.get('credentials') ?? 'rust') !== 'node')
+    )
+      throw new Error('Node LLM backend requires Node storage and credentials');
     this.ready = Promise.all([rust.ready, node.ready]).then(() => ({
       type: 'ready',
       protocol: 1,

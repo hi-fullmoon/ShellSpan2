@@ -254,10 +254,23 @@ impl RouteStore {
         Ok(store)
     }
     pub fn snapshot(&self) -> Result<Arc<RouteSnapshot>, String> {
-        self.current
-            .lock()
-            .map(|v| v.clone())
-            .map_err(|_| "ROUTE_STORE_UNAVAILABLE".into())
+        // During Stage 5 the Node LLM domain owns route writes while the still-Rust
+        // Agent domain remains a read-only consumer until Stage 6. Read the durable
+        // snapshot at each preparation boundary so an Agent never uses Node's stale
+        // startup-era route. SQLite transaction publication keeps this single-read
+        // bridge atomic without adding a second writer.
+        let preferences = self.database.load_preferences()?;
+        let Some((_, raw)) = preferences.iter().find(|(key, _)| key == ROUTES_KEY) else {
+            return self
+                .current
+                .lock()
+                .map(|value| value.clone())
+                .map_err(|_| "ROUTE_STORE_UNAVAILABLE".into());
+        };
+        let snapshot: RouteSnapshot = serde_json::from_str(raw)
+            .map_err(|error| format!("INVALID_ROUTE_DOCUMENT: {error}"))?;
+        snapshot.validate()?;
+        Ok(Arc::new(snapshot))
     }
     pub fn save(
         &self,
@@ -648,6 +661,29 @@ mod tests {
             db.commit_llm_routes(Some(1), &next, None).unwrap_err(),
             "REVISION_CONFLICT"
         );
+    }
+
+    #[test]
+    fn rust_agent_reader_observes_a_node_owned_durable_route_revision() {
+        let dir = tempfile::tempdir().unwrap();
+        let db = Database::open(&dir.path().join("db.sqlite")).unwrap();
+        let store = RouteStore::open(db.clone(), CredentialManager::in_memory_for_tests()).unwrap();
+        assert_eq!(store.snapshot().unwrap().revision, 1);
+        let externally_committed = RouteSnapshot {
+            schema_version: 1,
+            revision: 2,
+            routes: vec![],
+            default_selection: None,
+            migration_complete: true,
+            migration_issues: vec![],
+        };
+        db.commit_llm_routes(
+            Some(1),
+            &serde_json::to_string(&externally_committed).unwrap(),
+            None,
+        )
+        .unwrap();
+        assert_eq!(store.snapshot().unwrap().revision, 2);
     }
 
     fn keyed_route(id: &str) -> ProviderRoute {

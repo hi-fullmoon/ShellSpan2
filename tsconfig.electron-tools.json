@@ -22,6 +22,7 @@
     "scripts/core-canary-smoke.ts",
     "scripts/stage2-differential-smoke.ts",
     "scripts/stage3-differential-smoke.ts",
+    "scripts/stage5-differential-smoke.ts",
     "scripts/restore-node-storage-backup.ts",
     "scripts/platform-credential-smoke.ts",
     "scripts/stage4-ssh-smoke.ts",
