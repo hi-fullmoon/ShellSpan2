@@ -16,12 +16,16 @@ import { pathToFileURL } from 'node:url';
 import { isRendererEvent } from './events.ts';
 import { trustedURL, verifySender } from './security.ts';
 import { fontResponse } from './fonts.ts';
-import { NativeHost } from './native.ts';
+import { RustCoreBackend } from './rust-core-backend.ts';
+import { NodeCoreBackend } from './node-core-backend.ts';
+import { CoreBackendRouter, parseBackendConfig, parseCanaryMode } from './core-router.ts';
 import { TerminalFlow } from './terminal-flow.ts';
 import { validateCommand } from './validation.ts';
 import { createLogs } from './logs.ts';
 import { autoUpdater } from 'electron-updater';
 import { downloadUpdate, installDownloadedUpdate } from './update-download.ts';
+import { NodeCorePaths } from './node-core/paths.ts';
+import { recoverInterruptedDatabase } from './node-core/storage-recovery.ts';
 import type {
   IpcMainEvent,
   IpcMainInvokeEvent,
@@ -33,7 +37,7 @@ import type { UpdateInfo } from 'electron-updater';
 
 let win: BrowserWindow;
 let tray: Tray;
-let core: NativeHost;
+let core: CoreBackendRouter;
 let terminalFlow: TerminalFlow;
 let logs: ReturnType<typeof createLogs>;
 let quitting = false;
@@ -406,19 +410,44 @@ else {
             '../native/target/debug',
             process.platform === 'win32' ? 'shellspan-core.exe' : 'shellspan-core',
           );
-      core = new NativeHost(binary, {
+      const backendRoutes = parseBackendConfig(process.env.SHELLSPAN_CORE_BACKENDS);
+      const coreEnv = {
         ...process.env,
         SHELLSPAN_APP_DATA: appData,
         SHELLSPAN_LOG_DIR: logDir,
-      });
+        SHELLSPAN_APP_VERSION: app.getVersion(),
+        SHELLSPAN_BUILD_MODE: app.isPackaged ? 'production' : 'development',
+        SHELLSPAN_NODE_DOMAINS: [...backendRoutes]
+          .filter(([, backend]) => backend === 'node')
+          .map(([domain]) => domain)
+          .join(','),
+      };
+      await recoverInterruptedDatabase(new NodeCorePaths(coreEnv).database);
+      const rustBackend = new RustCoreBackend(binary, coreEnv);
+      // Rust performs the existing migration guard before ready. Opening Node's
+      // storage worker afterwards prevents startup races on legacy data.
+      const startupLog = (record: { level: string; message: string; target?: string }) =>
+        logs.write('backend', record.level, record.message, record.target);
+      rustBackend.on('log', startupLog);
+      try {
+        await rustBackend.ready;
+      } finally {
+        rustBackend.off('log', startupLog);
+      }
+      core = new CoreBackendRouter(
+        rustBackend,
+        new NodeCoreBackend(coreEnv),
+        backendRoutes,
+        parseCanaryMode(process.env.SHELLSPAN_CORE_CANARY),
+      );
       terminalFlow = new TerminalFlow(
         (event, payload, id) => {
           if (win && !win.isDestroyed() && !core.stopping)
             win.webContents.send('desktop:event', event, payload, id);
           else terminalFlow.ack(id);
         },
-        () => core.terminalSocket?.pause(),
-        () => core.terminalSocket?.resume(),
+        () => core.pauseTerminalEvents(),
+        () => core.resumeTerminalEvents(),
       );
       core.on('log', (record) =>
         logs.write('backend', record.level, record.message, record.target),
@@ -435,7 +464,7 @@ else {
       });
       core.on('failure', (error) => logs.write('backend', 'error', error.message));
       core.on('exit', ({ expected }) => {
-        if (!expected && win) void fatal(new Error('Native core stopped'));
+        if (!expected && win) void fatal(new Error('Core backend stopped'));
       });
       installIPC();
       win = new BrowserWindow({

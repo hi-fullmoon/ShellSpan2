@@ -31,6 +31,7 @@ use self::{
 
 const PETDEX_STATE_ENDPOINT: &str = "http://127.0.0.1:7777/state";
 const PETDEX_STATUS_EVENT: &str = "petdex-status";
+const PETDEX_BRIDGE_EVENT: &str = "__core-petdex-activity";
 const CONNECT_TIMEOUT: Duration = Duration::from_millis(250);
 const REQUEST_TIMEOUT: Duration = Duration::from_millis(750);
 const COORDINATOR_QUEUE_CAPACITY: usize = 16;
@@ -413,6 +414,11 @@ impl PetdexAdapter {
 }
 
 pub(crate) fn notify(app: &AppHandle, event: PetdexEvent) {
+    let (kind, operation_id) = event.bridge_payload();
+    let _ = app.emit(
+        PETDEX_BRIDGE_EVENT,
+        serde_json::json!({ "kind": kind, "operationId": operation_id }),
+    );
     if let Some(adapter) = app.try_state::<PetdexAdapter>() {
         adapter.queue_event(event);
     }

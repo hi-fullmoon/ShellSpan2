@@ -18,6 +18,11 @@ import * as assert from 'node:assert/strict';
 
 (async () => {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'shellspan-electron-ui-'));
+  const canaryFile = path.join(root, 'renderer-core-canary.txt');
+  const canaryText = 'Renderer → Rust/Node Core 世界\n';
+  await fs.writeFile(canaryFile, canaryText);
+  const docWorkerFixture = path.join(root, 'legacy-invalid.doc');
+  await fs.writeFile(docWorkerFixture, Buffer.from([0, 1, 2]));
   const env: Record<string, string> = {
     ...Object.fromEntries(
       Object.entries(process.env).filter(
@@ -28,6 +33,8 @@ import * as assert from 'node:assert/strict';
     SHELLSPAN_APP_DATA: path.join(root, 'app'),
     SHELLSPAN_LOG_DIR: path.join(root, 'logs'),
     SHELLSPAN_CHROMIUM_DATA: path.join(root, 'chromium'),
+    SHELLSPAN_CORE_CANARY: 'compare',
+    SHELLSPAN_CREDENTIAL_TEST_MODE: '1',
   };
   delete env.ELECTRON_RUN_AS_NODE;
   const packaged = process.argv.includes('--packaged');
@@ -87,6 +94,60 @@ import * as assert from 'node:assert/strict';
     assert.equal(state.node, 'undefined');
     assert.equal(state.tauri, 'undefined');
     assert.ok(state.root);
+    const canary = await page.evaluate(
+      (file) => (window as SmokeWindow).shellspan.commands.read_text_file({ path: file }),
+      canaryFile,
+    );
+    assert.deepEqual(canary, { ok: true, value: canaryText });
+    const stageTwo = await page.evaluate(
+      async ({ root, docWorkerFixture }) => {
+        const bridge = (window as SmokeWindow).shellspan.commands;
+        return {
+          directory: await bridge.list_local_directory({ path: root }),
+          document: await bridge.preview_local_file({ path: docWorkerFixture }),
+          health: await bridge.get_system_health(),
+          logs: await bridge.list_log_files(),
+          petdex: await bridge.petdex_set_enabled({ enabled: false }),
+        };
+      },
+      { root, docWorkerFixture },
+    );
+    assert.equal(stageTwo.directory.ok, true);
+    assert.equal(stageTwo.health.ok, true);
+    assert.equal(stageTwo.logs.ok, true);
+    assert.equal(stageTwo.document.ok, true);
+    assert.deepEqual(stageTwo.petdex, { ok: true, value: 'notDetected' });
+    const stageThree = await page.evaluate(async () => {
+      const bridge = (window as SmokeWindow).shellspan.commands;
+      const profile = {
+        id: 'stage3-smoke-profile',
+        name: 'Stage 3 smoke',
+        host: 'localhost',
+        port: 22,
+        username: 'smoke',
+        authMethod: 'password' as const,
+        createdAt: 1,
+        updatedAt: 1,
+      };
+      const added = await bridge.add_profile({ profile });
+      const passwordStored = await bridge.store_profile_password({
+        profileId: profile.id,
+        password: 'STAGE3_SMOKE_SECRET',
+      });
+      const password = await bridge.retrieve_profile_password({ profileId: profile.id });
+      const profiles = await bridge.list_profiles();
+      const credentials = await bridge.list_key_credentials();
+      const deleted = await bridge.delete_profile_secrets({ profileId: profile.id });
+      const removed = await bridge.remove_profile({ id: profile.id });
+      return { added, passwordStored, password, profiles, credentials, deleted, removed };
+    });
+    assert.deepEqual(stageThree.added, { ok: true, value: null });
+    assert.deepEqual(stageThree.passwordStored, { ok: true, value: null });
+    assert.deepEqual(stageThree.password, { ok: true, value: 'STAGE3_SMOKE_SECRET' });
+    assert.equal(stageThree.profiles.ok, true);
+    assert.equal(stageThree.credentials.ok, true);
+    assert.deepEqual(stageThree.deleted, { ok: true, value: null });
+    assert.deepEqual(stageThree.removed, { ok: true, value: null });
     await page.screenshot({
       path: `artifacts/migration/${packaged ? 'packaged' : 'electron'}-main.png`,
     });
@@ -196,6 +257,9 @@ import * as assert from 'node:assert/strict';
             'isolated preload',
             '141-command bridge',
             'real native IPC',
+            'Renderer-to-Rust/Node exact canary',
+            'four default Node Stage 2 domains via Renderer',
+            'Node storage and credential domains via Renderer',
             'unchanged window constraints',
             'no page exceptions',
             'legacy width and IndexedDB draft import',

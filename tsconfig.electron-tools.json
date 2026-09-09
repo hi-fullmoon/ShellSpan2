@@ -19,6 +19,11 @@
     "scripts/electron-dev.ts",
     "scripts/electron-smoke.ts",
     "scripts/native-smoke.ts",
+    "scripts/core-canary-smoke.ts",
+    "scripts/stage2-differential-smoke.ts",
+    "scripts/stage3-differential-smoke.ts",
+    "scripts/restore-node-storage-backup.ts",
+    "scripts/platform-credential-smoke.ts",
     "scripts/capture-native-core-baseline.ts",
     "electron/tests/types/bridge-types.ts"
   ],

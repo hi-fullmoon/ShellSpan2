@@ -37,6 +37,21 @@ pub(crate) enum PetdexEvent {
     SftpCancelled(String),
 }
 
+impl PetdexEvent {
+    pub(crate) fn bridge_payload(&self) -> (&'static str, &str) {
+        match self {
+            Self::SshConnecting(id) => ("ssh-connecting", id),
+            Self::SshConnected(id) => ("ssh-connected", id),
+            Self::SshFailed(id) => ("ssh-failed", id),
+            Self::SshClosed(id) => ("ssh-closed", id),
+            Self::SftpStarted(id) => ("sftp-started", id),
+            Self::SftpSucceeded(id) => ("sftp-succeeded", id),
+            Self::SftpFailed(id) => ("sftp-failed", id),
+            Self::SftpCancelled(id) => ("sftp-cancelled", id),
+        }
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) enum PetdexConnectionStatus {

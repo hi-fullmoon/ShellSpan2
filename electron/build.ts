@@ -24,6 +24,7 @@ execFileSync(process.execPath, [tsc, '-p', 'tsconfig.electron.json'], {
 });
 await mkdir(output, { recursive: true });
 await chmod(path.join(output, 'tests/fixtures/native-child.js'), 0o755);
+await chmod(path.join(output, 'node-core/entry.js'), 0o755);
 await writeFile(path.join(output, 'package.json'), '{"type":"commonjs"}\n');
 // Sandboxed preloads cannot load local modules. Inline the JSON and event allowlist
 // into a single CommonJS file, leaving only Electron itself external.

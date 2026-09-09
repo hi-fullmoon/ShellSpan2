@@ -2,6 +2,7 @@ allowBuilds:
   electron-winstaller: false
   electron: true
   react-intl-universal: true
+  keytar: true
 patchedDependencies:
   sonner@2.0.8: patches/sonner@2.0.8.patch
 overrides:

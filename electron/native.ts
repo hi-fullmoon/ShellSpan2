@@ -10,14 +10,14 @@ import { encode, Decoder } from './protocol.ts';
 import type { ChildProcessWithoutNullStreams } from 'node:child_process';
 import type { Server, Socket } from 'node:net';
 import type { NativeMessage, NativeReady, NativeResponse } from './types.ts';
+import type { CoreExitInfo } from './core-backend.ts';
 
-type ExitInfo = { code: number | null; signal: NodeJS.Signals | null; expected: boolean };
 class NativeHost extends EventEmitter<{
   log: [record: { level: string; message: string; target?: string }];
   event: [event: string, payload: unknown];
   initializing: [progress: { phase: string; sequence: number }];
   stopped: [];
-  exit: [info: ExitInfo];
+  exit: [info: CoreExitInfo];
   failure: [error: Error];
 }> {
   nextId: number;
@@ -46,9 +46,9 @@ class NativeHost extends EventEmitter<{
   killTimer?: NodeJS.Timeout;
   decoder!: Decoder<NativeMessage>;
   stderrText = '';
-  exitInfo: ExitInfo | null = null;
+  exitInfo: CoreExitInfo | null = null;
   exitError: Error | null = null;
-  constructor(binary: string, env: NodeJS.ProcessEnv) {
+  constructor(binary: string, env: NodeJS.ProcessEnv, childArgs: readonly string[] = []) {
     super();
     this.nextId = 0;
     this.pending = new Map();
@@ -114,7 +114,7 @@ class NativeHost extends EventEmitter<{
     this.spawned = new Promise<void>((resolve, reject) => {
       this.terminalServer.once('error', reject);
       this.terminalServer.listen(this.pipePath, () => {
-        this.child = spawn(binary, [], {
+        this.child = spawn(binary, childArgs, {
           env: { ...env, SHELLSPAN_TERMINAL_PIPE: this.pipePath },
           stdio: ['pipe', 'pipe', 'pipe'],
           windowsHide: true,
