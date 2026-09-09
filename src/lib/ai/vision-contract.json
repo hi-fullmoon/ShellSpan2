@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "verifiedOn": "2026-09-04",
+  "sourceMimeTypes": ["image/png", "image/jpeg", "image/webp", "image/gif"],
+  "maxSourceBytes": 8388608,
+  "maxBatchBytes": 16777216,
+  "maxImages": 20,
+  "maxSourcePixels": 16777216,
+  "maxSourceDimension": 8192,
+  "maxDecodeBytes": 134217728,
+  "maxFrames": 1,
+  "normalizedMimeType": "image/png",
+  "maxNormalizedPixels": 1048576,
+  "maxNormalizedDimension": 2048,
+  "maxNormalizedBytes": 5242880
+}

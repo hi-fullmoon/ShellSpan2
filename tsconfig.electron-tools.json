@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": ["ES2022", "DOM"],
+    "types": ["node"],
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "allowImportingTsExtensions": true
+  },
+  "include": [
+    "electron/after-pack.ts",
+    "electron/build.ts",
+    "electron/build-command-types.ts",
+    "scripts/electron-dev.ts",
+    "scripts/electron-smoke.ts",
+    "scripts/native-smoke.ts",
+    "electron/tests/types/bridge-types.ts"
+  ],
+  "extends": "./tsconfig.json"
+}

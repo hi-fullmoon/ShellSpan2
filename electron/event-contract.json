@@ -1,0 +1,188 @@
+{
+  "baseline": "b2149fd97b18eb084f4dcd9fff4e7b2affa371d3",
+  "businessEvents": [
+    {
+      "name": "ssh-data:${sessionId}",
+      "rustPayload": "String",
+      "baselineSource": "src-tauri/src/lib.rs",
+      "sourceSHA256": "53b893cade3536600c850d40a981dfd9729d86c8b2b37d8229e91e91cfb28dac",
+      "definition": null,
+      "behavior": "Per-session UTF-8 chunks; subscribe before mark_session_ready; unlisten detaches only this subscriber."
+    },
+    {
+      "name": "ssh-status",
+      "rustPayload": "StatusEvent",
+      "baselineSource": "src-tauri/src/models.rs",
+      "sourceSHA256": "5b1d2f6e9ca0c3fcd50edce39ec3baef8846212da8b84c9219a0de5f1352847b",
+      "definition": "#[derive(Debug, Clone, Serialize)]\n#[serde(rename_all = \"camelCase\")]\npub(crate) struct StatusEvent {\n    pub(crate) session_id: String,\n    pub(crate) status: SessionStatus,\n    pub(crate) message: Option<String>,\n}",
+      "behavior": "Connecting/connected/closed states emitted by original session worker; no new ordering guarantee across sessions."
+    },
+    {
+      "name": "ssh-closed",
+      "rustPayload": "ClosedEvent",
+      "baselineSource": "src-tauri/src/models.rs",
+      "sourceSHA256": "5b1d2f6e9ca0c3fcd50edce39ec3baef8846212da8b84c9219a0de5f1352847b",
+      "definition": "#[derive(Debug, Clone, Serialize)]\n#[serde(rename_all = \"camelCase\")]\npub(crate) struct ClosedEvent {\n    pub(crate) session_id: String,\n    pub(crate) identity: Option<SessionIdentity>,\n    pub(crate) reason: Option<String>,\n    pub(crate) reason_kind: ClosedReasonKind,\n    pub(crate) retryable: bool,\n}",
+      "behavior": "Session identity and reason survive UI record removal; optional fields remain null."
+    },
+    {
+      "name": "ssh-session-error",
+      "rustPayload": "SessionErrorEvent",
+      "baselineSource": "src-tauri/src/models.rs",
+      "sourceSHA256": "5b1d2f6e9ca0c3fcd50edce39ec3baef8846212da8b84c9219a0de5f1352847b",
+      "definition": "#[derive(Debug, Clone, Serialize)]\n#[serde(rename_all = \"camelCase\", tag = \"type\", content = \"payload\")]\npub(crate) enum SessionErrorEvent {\n    HostKeyUnknown {\n        session_id: String,\n        host: String,\n        port: u16,\n        fingerprint: Option<String>,\n    },\n    HostKeyMismatch {\n        session_id: String,\n        host: String,\n        port: u16,\n        #[serde(skip_serializing_if = \"Option::is_none\")]\n        fingerprint: Option<String>,\n    },\n}",
+      "behavior": "Tagged type/payload union; field omission follows serde attributes."
+    },
+    {
+      "name": "upload-progress",
+      "rustPayload": "UploadProgressEvent",
+      "baselineSource": "src-tauri/src/models.rs",
+      "sourceSHA256": "5b1d2f6e9ca0c3fcd50edce39ec3baef8846212da8b84c9219a0de5f1352847b",
+      "definition": "#[derive(Debug, Clone, Serialize)]\n#[serde(rename_all = \"camelCase\")]\npub(crate) struct UploadProgressEvent {\n    pub(crate) operation_id: String,\n    pub(crate) current_path: Option<String>,\n    pub(crate) total_bytes: u64,\n    pub(crate) uploaded_bytes: u64,\n    pub(crate) total_steps: u64,\n    pub(crate) completed_steps: u64,\n}",
+      "behavior": "Operation ID; original tracker throttling and final flush; cancellation does not invent a success event."
+    },
+    {
+      "name": "download-progress",
+      "rustPayload": "DownloadProgressEvent",
+      "baselineSource": "src-tauri/src/models.rs",
+      "sourceSHA256": "5b1d2f6e9ca0c3fcd50edce39ec3baef8846212da8b84c9219a0de5f1352847b",
+      "definition": "#[derive(Debug, Clone, Serialize)]\n#[serde(rename_all = \"camelCase\")]\npub(crate) struct DownloadProgressEvent {\n    pub(crate) operation_id: String,\n    pub(crate) current_path: Option<String>,\n    pub(crate) total_bytes: u64,\n    pub(crate) downloaded_bytes: u64,\n    pub(crate) total_steps: u64,\n    pub(crate) completed_steps: u64,\n}",
+      "behavior": "Operation ID; original tracker throttling and final flush."
+    },
+    {
+      "name": "delete-progress",
+      "rustPayload": "DeleteProgressEvent",
+      "baselineSource": "src-tauri/src/models.rs",
+      "sourceSHA256": "5b1d2f6e9ca0c3fcd50edce39ec3baef8846212da8b84c9219a0de5f1352847b",
+      "definition": "#[derive(Debug, Clone, Serialize)]\n#[serde(rename_all = \"camelCase\")]\npub(crate) struct DeleteProgressEvent {\n    pub(crate) operation_id: String,\n    pub(crate) current_path: Option<String>,\n    pub(crate) total_steps: u64,\n    pub(crate) completed_steps: u64,\n}",
+      "behavior": "Operation ID; original precheck/approval/cancel and final flush semantics."
+    },
+    {
+      "name": "remote-copy-progress",
+      "rustPayload": "RemoteCopyProgressEvent",
+      "baselineSource": "src-tauri/src/models.rs",
+      "sourceSHA256": "5b1d2f6e9ca0c3fcd50edce39ec3baef8846212da8b84c9219a0de5f1352847b",
+      "definition": "#[derive(Debug, Clone, Serialize)]\n#[serde(rename_all = \"camelCase\")]\npub(crate) struct RemoteCopyProgressEvent {\n    pub(crate) operation_id: String,\n    pub(crate) current_path: Option<String>,\n    pub(crate) total_bytes: u64,\n    pub(crate) copied_bytes: u64,\n    pub(crate) total_steps: u64,\n    pub(crate) completed_steps: u64,\n}",
+      "behavior": "Operation ID; original tracker throttling and final flush."
+    },
+    {
+      "name": "agent-runtime-session-event",
+      "rustPayload": "AgentSessionEvent",
+      "baselineSource": "src-tauri/src/agent_runtime/event.rs",
+      "sourceSHA256": "cfe9f97153a7ee2ab031368cd4c75f4a2ce35795c003d8c9fd59fbf73711e560",
+      "definition": "#[derive(Debug, Clone, Deserialize, Serialize, PartialEq)]\n#[serde(rename_all = \"camelCase\", deny_unknown_fields)]\npub(crate) struct AgentSessionEvent {\n    #[serde(deserialize_with = \"deserialize_event_version\")]\n    pub(crate) version: u8,\n    pub(crate) session_id: String,\n    pub(crate) seq: u64,\n    pub(crate) time_unix_ms: u64,\n    #[serde(default, skip_serializing_if = \"Option::is_none\")]\n    pub(crate) turn_id: Option<String>,\n    #[serde(default, skip_serializing_if = \"Option::is_none\")]\n    pub(crate) step_id: Option<String>,\n    #[serde(flatten)]\n    pub(crate) payload: AgentSessionEventPayload,\n}",
+      "behavior": "Version 5; sessionId/seq/timeUnixMs and flattened tagged payload; optional IDs omitted; replay remains get_events/get_committed_events."
+    },
+    {
+      "name": "port-forward-event",
+      "rustPayload": "PortForwardRuntime",
+      "baselineSource": "src-tauri/src/port_forward.rs",
+      "sourceSHA256": "4095759f7f4edd2c68443169e25fecabff7fcfed4b03f3b7d720afcf97b54bed",
+      "definition": "#[derive(Debug, Clone, Serialize)]\n#[serde(rename_all = \"camelCase\")]\npub(crate) struct PortForwardRuntime {\n    pub(crate) operation_id: String,\n    pub(crate) profile_id: String,\n    pub(crate) config_id: String,\n    pub(crate) name: String,\n    pub(crate) kind: PortForwardKind,\n    pub(crate) mode: PortForwardStartMode,\n    pub(crate) status: PortForwardStatus,\n    pub(crate) started_at: Option<u64>,\n    pub(crate) stopped_at: Option<u64>,\n    pub(crate) bytes_sent: u64,\n    pub(crate) bytes_received: u64,\n    pub(crate) last_error: Option<String>,\n    pub(crate) error_category: Option<PortForwardErrorCategory>,\n}",
+      "behavior": "Operation/profile/config IDs and runtime status/counters; no synthetic retry."
+    },
+    {
+      "name": "petdex-status",
+      "rustPayload": "PetdexConnectionStatus",
+      "baselineSource": "src-tauri/src/petdex/types.rs",
+      "sourceSHA256": "48f3d7b2f63be7618ec22446d467fb3621654c80b9da3bd54f46333cdd1410c3",
+      "definition": "#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]\n#[serde(rename_all = \"camelCase\")]\npub(crate) enum PetdexConnectionStatus {\n    NotDetected = 0,\n    Connected = 1,\n    NotRunning = 2,\n    ConnectionError = 3,\n}",
+      "behavior": "CamelCase enum: notDetected/connected/notRunning/connectionError."
+    },
+    {
+      "name": "system-open-settings",
+      "rustPayload": "()",
+      "baselineSource": "src-tauri/src/menu.rs",
+      "sourceSHA256": "3bcd4cd961f7fe47d124e6bfebd20d2936d75fb6ec6e8a7c05dc6136b6cff98b",
+      "definition": null,
+      "behavior": "Unit -> null; native menu/close callback; subscribe at App mount and detach on cleanup."
+    },
+    {
+      "name": "system-about",
+      "rustPayload": "()",
+      "baselineSource": "src-tauri/src/menu.rs",
+      "sourceSHA256": "3bcd4cd961f7fe47d124e6bfebd20d2936d75fb6ec6e8a7c05dc6136b6cff98b",
+      "definition": null,
+      "behavior": "Unit -> null; native menu/close callback; subscribe at App mount and detach on cleanup."
+    },
+    {
+      "name": "system-check-update",
+      "rustPayload": "()",
+      "baselineSource": "src-tauri/src/menu.rs",
+      "sourceSHA256": "3bcd4cd961f7fe47d124e6bfebd20d2936d75fb6ec6e8a7c05dc6136b6cff98b",
+      "definition": null,
+      "behavior": "Unit -> null; native menu/close callback; subscribe at App mount and detach on cleanup."
+    },
+    {
+      "name": "system-request-app-exit",
+      "rustPayload": "()",
+      "baselineSource": "src-tauri/src/menu.rs",
+      "sourceSHA256": "3bcd4cd961f7fe47d124e6bfebd20d2936d75fb6ec6e8a7c05dc6136b6cff98b",
+      "definition": null,
+      "behavior": "Unit -> null; native menu/close callback; subscribe at App mount and detach on cleanup."
+    }
+  ],
+  "callbacks": [
+    {
+      "name": "desktop-resized",
+      "visibility": "renderer",
+      "payload": "null",
+      "baseline": "Window.onResized PhysicalSize",
+      "adaptation": "Current UI callbacks requery isMaximized; physical size is not consumed; coalescing/real window behavior stage2."
+    },
+    {
+      "name": "desktop-drag-drop",
+      "visibility": "renderer-local",
+      "payload": "DragDropEvent in src/lib/desktop/window.ts",
+      "baseline": "WebviewWindow.onDragDropEvent",
+      "adaptation": "DOM clientX/Y and macOS Wry coordinates are logical pixels; drop resolves webUtils paths. Phase3 verified native right-directory and left-multiple drops; Windows remains unverified."
+    },
+    {
+      "name": "desktop-update-progress",
+      "visibility": "renderer",
+      "payload": "Started {contentLength?} | Progress {chunkLength} | Finished",
+      "baseline": "updater DownloadEvent",
+      "adaptation": "Subscribe before download; finally unsubscribe; original API exposes no cancel action. Phase2 verified Started/Finished for cached and zero-progress local downloads; real installation is a stage4 condition."
+    },
+    {
+      "name": "desktop-exit",
+      "visibility": "main-only",
+      "payload": "i32 exit code",
+      "baseline": "AppHandle.exit(code)",
+      "adaptation": "Main stops core then quits; currently ignores code (existing request_app_exit uses 0)."
+    },
+    {
+      "name": "desktop-restart",
+      "visibility": "main-only",
+      "payload": "null",
+      "baseline": "AppHandle.request_restart",
+      "adaptation": "Main stops core then relaunches, or installs already downloaded update."
+    }
+  ],
+  "privateTransport": {
+    "control": "length-prefixed JSON on stdin/stdout; existing request/response/validate envelopes",
+    "terminal": "separate private Unix socket or Windows named pipe; length-prefixed JSON event plus strictly increasing terminalSeq",
+    "ready": "protocol 1 plus required terminalChannel:true; resolve only after terminal connection exists",
+    "diagnostics": "stderr only; bounded nonblocking log queue with explicit omission summary",
+    "rendererCredits": [
+      "desktop:terminal-ack",
+      "desktop:terminal-ready"
+    ],
+    "rendererCreditSecurity": "verified current main frame; no raw IPC exported; old credit IDs ignored after trusted main-frame reload"
+  },
+  "privateRequests": [
+    {
+      "type": "validate",
+      "commands": [
+        "pick_local_files",
+        "pick_local_folder",
+        "pick_private_key_file",
+        "export_log_file"
+      ],
+      "result": "null on valid arguments; baseline Serde error otherwise",
+      "purpose": "Main validates dialog arguments in native without executing dialogs or business commands; not exposed in preload"
+    }
+  ],
+  "dynamicId": "Core creates UUID v4; whitelist preserves baseline allowed event characters rather than requiring UUID on subscription. No cross-session authorization boundary inside the single trusted renderer.",
+  "unlisten": "Idempotent, removes exact callback; snapshots dispatch in subscription order; no raw Electron event object exposed."
+}

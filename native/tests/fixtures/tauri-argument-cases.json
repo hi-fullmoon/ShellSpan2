@@ -1,0 +1,307 @@
+[
+  {
+    "args": {},
+    "baseline": {
+      "Err": "invalid args `value` for command `string_arg`: command string_arg missing required key value"
+    },
+    "command": "string_arg",
+    "native": {
+      "Err": "invalid args `value` for command `string_arg`: command string_arg missing required key value"
+    }
+  },
+  {
+    "args": {
+      "value": null
+    },
+    "baseline": {
+      "Err": "invalid args `value` for command `string_arg`: invalid type: null, expected a string"
+    },
+    "command": "string_arg",
+    "native": {
+      "Err": "invalid args `value` for command `string_arg`: invalid type: null, expected a string"
+    }
+  },
+  {
+    "args": {
+      "value": 2
+    },
+    "baseline": {
+      "Err": "invalid args `value` for command `string_arg`: invalid type: integer `2`, expected a string"
+    },
+    "command": "string_arg",
+    "native": {
+      "Err": "invalid args `value` for command `string_arg`: invalid type: integer `2`, expected a string"
+    }
+  },
+  {
+    "args": {
+      "value": true
+    },
+    "baseline": {
+      "Err": "invalid args `value` for command `string_arg`: invalid type: boolean `true`, expected a string"
+    },
+    "command": "string_arg",
+    "native": {
+      "Err": "invalid args `value` for command `string_arg`: invalid type: boolean `true`, expected a string"
+    }
+  },
+  {
+    "args": {
+      "value": []
+    },
+    "baseline": {
+      "Err": "invalid args `value` for command `string_arg`: invalid type: sequence, expected a string"
+    },
+    "command": "string_arg",
+    "native": {
+      "Err": "invalid args `value` for command `string_arg`: invalid type: sequence, expected a string"
+    }
+  },
+  {
+    "args": {
+      "extra": 1,
+      "value": "汉字"
+    },
+    "baseline": {
+      "Ok": "汉字"
+    },
+    "command": "string_arg",
+    "native": {
+      "Ok": "汉字"
+    }
+  },
+  {
+    "args": {},
+    "baseline": {
+      "Ok": null
+    },
+    "command": "optional_arg",
+    "native": {
+      "Ok": null
+    }
+  },
+  {
+    "args": {
+      "value": null
+    },
+    "baseline": {
+      "Ok": null
+    },
+    "command": "optional_arg",
+    "native": {
+      "Ok": null
+    }
+  },
+  {
+    "args": {
+      "value": ""
+    },
+    "baseline": {
+      "Ok": ""
+    },
+    "command": "optional_arg",
+    "native": {
+      "Ok": ""
+    }
+  },
+  {
+    "args": {
+      "value": false
+    },
+    "baseline": {
+      "Err": "invalid args `value` for command `optional_arg`: invalid type: boolean `false`, expected a string"
+    },
+    "command": "optional_arg",
+    "native": {
+      "Err": "invalid args `value` for command `optional_arg`: invalid type: boolean `false`, expected a string"
+    }
+  },
+  {
+    "args": {},
+    "baseline": {
+      "Err": "invalid args `value` for command `integer_arg`: command integer_arg missing required key value"
+    },
+    "command": "integer_arg",
+    "native": {
+      "Err": "invalid args `value` for command `integer_arg`: command integer_arg missing required key value"
+    }
+  },
+  {
+    "args": {
+      "value": -1
+    },
+    "baseline": {
+      "Err": "invalid args `value` for command `integer_arg`: invalid value: integer `-1`, expected u16"
+    },
+    "command": "integer_arg",
+    "native": {
+      "Err": "invalid args `value` for command `integer_arg`: invalid value: integer `-1`, expected u16"
+    }
+  },
+  {
+    "args": {
+      "value": 65536
+    },
+    "baseline": {
+      "Err": "invalid args `value` for command `integer_arg`: invalid value: integer `65536`, expected u16"
+    },
+    "command": "integer_arg",
+    "native": {
+      "Err": "invalid args `value` for command `integer_arg`: invalid value: integer `65536`, expected u16"
+    }
+  },
+  {
+    "args": {
+      "value": 1.5
+    },
+    "baseline": {
+      "Err": "invalid args `value` for command `integer_arg`: invalid type: floating point `1.5`, expected u16"
+    },
+    "command": "integer_arg",
+    "native": {
+      "Err": "invalid args `value` for command `integer_arg`: invalid type: floating point `1.5`, expected u16"
+    }
+  },
+  {
+    "args": {
+      "value": "22"
+    },
+    "baseline": {
+      "Err": "invalid args `value` for command `integer_arg`: invalid type: string \"22\", expected u16"
+    },
+    "command": "integer_arg",
+    "native": {
+      "Err": "invalid args `value` for command `integer_arg`: invalid type: string \"22\", expected u16"
+    }
+  },
+  {
+    "args": {
+      "value": 65535
+    },
+    "baseline": {
+      "Ok": 65535
+    },
+    "command": "integer_arg",
+    "native": {
+      "Ok": 65535
+    }
+  },
+  {
+    "args": {
+      "value": [["k", "v"]]
+    },
+    "baseline": {
+      "Ok": [["k", "v"]]
+    },
+    "command": "tuple_arg",
+    "native": {
+      "Ok": [["k", "v"]]
+    }
+  },
+  {
+    "args": {
+      "value": [["k", 1]]
+    },
+    "baseline": {
+      "Err": "invalid args `value` for command `tuple_arg`: invalid type: integer `1`, expected a string"
+    },
+    "command": "tuple_arg",
+    "native": {
+      "Err": "invalid args `value` for command `tuple_arg`: invalid type: integer `1`, expected a string"
+    }
+  },
+  {
+    "args": {
+      "value": [["k"]]
+    },
+    "baseline": {
+      "Err": "invalid args `value` for command `tuple_arg`: invalid length 1, expected a tuple of size 2"
+    },
+    "command": "tuple_arg",
+    "native": {
+      "Err": "invalid args `value` for command `tuple_arg`: invalid length 1, expected a tuple of size 2"
+    }
+  },
+  {
+    "args": {
+      "value": {
+        "port": 22
+      }
+    },
+    "baseline": {
+      "Ok": {
+        "port": 22,
+        "title": null
+      }
+    },
+    "command": "nested_arg",
+    "native": {
+      "Ok": {
+        "port": 22,
+        "title": null
+      }
+    }
+  },
+  {
+    "args": {
+      "value": {
+        "port": 22,
+        "title": null
+      }
+    },
+    "baseline": {
+      "Ok": {
+        "port": 22,
+        "title": null
+      }
+    },
+    "command": "nested_arg",
+    "native": {
+      "Ok": {
+        "port": 22,
+        "title": null
+      }
+    }
+  },
+  {
+    "args": {
+      "value": {
+        "port": 65536
+      }
+    },
+    "baseline": {
+      "Err": "invalid args `value` for command `nested_arg`: invalid value: integer `65536`, expected u16"
+    },
+    "command": "nested_arg",
+    "native": {
+      "Err": "invalid args `value` for command `nested_arg`: invalid value: integer `65536`, expected u16"
+    }
+  },
+  {
+    "args": {
+      "value": {
+        "extra": 1,
+        "port": 22
+      }
+    },
+    "baseline": {
+      "Err": "invalid args `value` for command `nested_arg`: unknown field `extra`, expected `port` or `title`"
+    },
+    "command": "nested_arg",
+    "native": {
+      "Err": "invalid args `value` for command `nested_arg`: unknown field `extra`, expected `port` or `title`"
+    }
+  },
+  {
+    "args": {
+      "value": {}
+    },
+    "baseline": {
+      "Err": "invalid args `value` for command `nested_arg`: missing field `port`"
+    },
+    "command": "nested_arg",
+    "native": {
+      "Err": "invalid args `value` for command `nested_arg`: missing field `port`"
+    }
+  }
+]

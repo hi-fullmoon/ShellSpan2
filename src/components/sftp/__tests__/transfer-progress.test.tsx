@@ -1,0 +1,367 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { TransferProgress } from '@/components/sftp/transfer-progress';
+import { TooltipProvider } from '@/components/ui/tooltip';
+import { useTransferStore, type TransferOperation } from '@/stores/transferStore';
+
+vi.mock('@/hooks/useI18n', () => ({
+  useI18n: () => ({ t: (key: string) => key }),
+}));
+
+const failedUpload: TransferOperation = {
+  operationId: 'upload-1',
+  kind: 'upload',
+  currentPath: '/tmp/apple-touch-icon.png',
+  totalBytes: 100,
+  processedBytes: 20,
+  totalSteps: 1,
+  completedSteps: 0,
+  status: 'failed',
+  error: 'connection lost',
+  retry: vi.fn().mockResolvedValue(undefined),
+};
+
+describe('TransferProgress', () => {
+  beforeEach(() => {
+    useTransferStore.setState({ operations: [] });
+  });
+
+  it('renders nothing without transfers', () => {
+    const { container } = render(<TransferProgress />);
+    expect(container).toBeEmptyDOMElement();
+  });
+
+  it('shows failed uploads as file rows and retries them', async () => {
+    const user = userEvent.setup();
+    useTransferStore.setState({ operations: [failedUpload] });
+    render(
+      <TooltipProvider>
+        <TransferProgress />
+      </TooltipProvider>,
+    );
+
+    expect(screen.getByText('apple-touch-icon.png')).toBeInTheDocument();
+
+    await user.hover(screen.getByText('sftp.transfer.uploadFailed'));
+    expect(await screen.findByText('connection lost')).toHaveAttribute(
+      'data-slot',
+      'tooltip-content',
+    );
+
+    expect(screen.getByRole('button', { name: 'common.retry' })).toHaveClass('h-6');
+    expect(screen.getByRole('button', { name: 'sftp.transfer.discard' })).toHaveClass('h-6');
+
+    fireEvent.click(screen.getByRole('button', { name: 'common.retry' }));
+    await waitFor(() => expect(failedUpload.retry).toHaveBeenCalledOnce());
+  });
+
+  it('shows the delete error in a tooltip on the failure indicator', async () => {
+    const user = userEvent.setup();
+    useTransferStore.setState({
+      operations: [
+        {
+          ...failedUpload,
+          kind: 'delete',
+          error: 'permission denied',
+          retry: undefined,
+        },
+      ],
+    });
+    render(
+      <TooltipProvider>
+        <TransferProgress />
+      </TooltipProvider>,
+    );
+
+    await user.hover(screen.getByText('sftp.transfer.failed'));
+    expect(await screen.findByText('permission denied')).toHaveAttribute(
+      'data-slot',
+      'tooltip-content',
+    );
+  });
+
+  it('discards failed uploads', () => {
+    useTransferStore.setState({ operations: [failedUpload] });
+    render(<TransferProgress />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'sftp.transfer.discard' }));
+    expect(useTransferStore.getState().operations).toHaveLength(0);
+  });
+
+  it('uses a compact height for each transfer row', () => {
+    useTransferStore.setState({ operations: [failedUpload] });
+    render(<TransferProgress />);
+
+    expect(screen.getByText('apple-touch-icon.png').parentElement).toHaveClass(
+      'h-8',
+      'bg-app-surface-muted/60',
+    );
+  });
+
+  it('uses a 3px progress track aligned to the bottom edge for active transfers', () => {
+    useTransferStore.setState({
+      operations: [{ ...failedUpload, status: 'running' }],
+    });
+    render(<TransferProgress />);
+
+    expect(document.body.querySelector('[data-slot="transfer-progress-track"]')).toHaveClass(
+      'bottom-0',
+      'h-[3px]',
+    );
+  });
+
+  it('cancels an active download from its task row', async () => {
+    const cancel = vi.fn().mockResolvedValue(undefined);
+    useTransferStore.setState({
+      operations: [
+        {
+          ...failedUpload,
+          kind: 'download',
+          status: 'running',
+          retry: undefined,
+          cancel,
+        },
+      ],
+    });
+    render(<TransferProgress />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'common.cancel' }));
+
+    await waitFor(() => expect(cancel).toHaveBeenCalledOnce());
+    expect(useTransferStore.getState().operations[0]?.status).toBe('cancelling');
+  });
+
+  it('uses the download-specific failure message', () => {
+    useTransferStore.setState({
+      operations: [{ ...failedUpload, kind: 'download' }],
+    });
+    render(<TransferProgress />);
+
+    expect(screen.getByText('sftp.transfer.downloadFailed')).toBeInTheDocument();
+  });
+
+  it('shows remote-to-remote completion before dismissing the task', () => {
+    useTransferStore.setState({
+      operations: [
+        {
+          ...failedUpload,
+          operationId: 'remote-copy-1',
+          kind: 'remote-copy',
+          status: 'running',
+          completedSteps: 1,
+          totalSteps: 1,
+          error: undefined,
+          retry: undefined,
+        },
+      ],
+    });
+    render(<TransferProgress />);
+
+    expect(screen.getByText('1/1')).toHaveClass('text-app-success');
+  });
+
+  it('uses the remote-copy-specific failure message', () => {
+    useTransferStore.setState({
+      operations: [{ ...failedUpload, kind: 'remote-copy' }],
+    });
+    render(<TransferProgress />);
+
+    expect(screen.getByText('sftp.transfer.remoteCopyFailed')).toBeInTheDocument();
+  });
+
+  it('shows a muted transfer speed while bytes are flowing', () => {
+    vi.useFakeTimers();
+    try {
+      vi.setSystemTime(1_000);
+      useTransferStore.setState({
+        operations: [
+          {
+            ...failedUpload,
+            status: 'running',
+            error: undefined,
+            retry: undefined,
+            processedBytes: 0,
+            totalBytes: 4096,
+          },
+        ],
+      });
+      render(<TransferProgress />);
+      expect(screen.queryByText('/s', { exact: false })).not.toBeInTheDocument();
+
+      vi.setSystemTime(3_000);
+      act(() => {
+        useTransferStore.setState((state) => ({
+          operations: state.operations.map((op) => ({
+            ...op,
+            processedBytes: 2048,
+          })),
+        }));
+      });
+
+      const speed = screen.getByText('1.0 KB/s');
+      expect(speed).toHaveClass('text-muted-foreground/60');
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('hides the transfer speed once the transfer completes', () => {
+    vi.useFakeTimers();
+    try {
+      vi.setSystemTime(1_000);
+      useTransferStore.setState({
+        operations: [
+          {
+            ...failedUpload,
+            status: 'running',
+            error: undefined,
+            retry: undefined,
+            processedBytes: 0,
+            totalBytes: 2048,
+          },
+        ],
+      });
+      render(<TransferProgress />);
+
+      vi.setSystemTime(3_000);
+      act(() => {
+        useTransferStore.setState((state) => ({
+          operations: state.operations.map((op) => ({
+            ...op,
+            processedBytes: 2048,
+          })),
+        }));
+      });
+      expect(screen.getByText('1.0 KB/s')).toBeInTheDocument();
+
+      act(() => {
+        useTransferStore.getState().markOperationCompleted('upload-1');
+      });
+      expect(screen.queryByText('1.0 KB/s')).not.toBeInTheDocument();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('keeps successful deletes until they are closed manually', () => {
+    useTransferStore.setState({
+      operations: [
+        {
+          ...failedUpload,
+          kind: 'delete',
+          status: 'running',
+          processedBytes: 100,
+          completedSteps: 1,
+        },
+      ],
+    });
+    render(<TransferProgress />);
+
+    expect(useTransferStore.getState().operations).toHaveLength(1);
+    fireEvent.click(screen.getByRole('button', { name: 'common.close' }));
+    expect(useTransferStore.getState().operations).toHaveLength(0);
+  });
+
+  it('dims active delete rows without a strikethrough filename', () => {
+    useTransferStore.setState({
+      operations: [
+        {
+          ...failedUpload,
+          kind: 'delete',
+          status: 'running',
+          error: undefined,
+          retry: undefined,
+        },
+      ],
+    });
+    render(<TransferProgress />);
+
+    expect(screen.getByText('/tmp/apple-touch-icon.png')).toHaveClass('text-app-text/70');
+    expect(screen.getByText('/tmp/apple-touch-icon.png')).not.toHaveClass(
+      'text-destructive',
+      'line-through',
+    );
+  });
+
+  it('dims a completed delete row to the muted foreground color', () => {
+    useTransferStore.setState({
+      operations: [
+        {
+          ...failedUpload,
+          kind: 'delete',
+          status: 'completed',
+          error: undefined,
+          retry: undefined,
+        },
+      ],
+    });
+    render(<TransferProgress />);
+
+    expect(screen.getByText('/tmp/apple-touch-icon.png')).toHaveClass('text-muted-foreground/70');
+    expect(screen.getByText('/tmp/apple-touch-icon.png')).not.toHaveClass(
+      'text-destructive',
+      'line-through',
+    );
+  });
+
+  it('shows the top-level name plus sub-path for scoped folder deletes', () => {
+    useTransferStore.setState({
+      operations: [
+        {
+          ...failedUpload,
+          kind: 'delete',
+          status: 'running',
+          error: undefined,
+          retry: undefined,
+          paths: ['/home/user/proj'],
+          currentPath: '/home/user/proj/src/index.ts',
+        },
+      ],
+    });
+    render(<TransferProgress />);
+
+    expect(screen.getByText('proj/src/index.ts')).toBeInTheDocument();
+  });
+
+  it('uses a trash icon for delete rows', () => {
+    useTransferStore.setState({
+      operations: [
+        {
+          ...failedUpload,
+          kind: 'delete',
+          status: 'running',
+          error: undefined,
+          retry: undefined,
+        },
+      ],
+    });
+    render(<TransferProgress />);
+
+    expect(
+      screen
+        .getByText('/tmp/apple-touch-icon.png')
+        .parentElement!.querySelector('svg.lucide-trash-2'),
+    ).not.toBeNull();
+  });
+
+  it('keeps a normal filename color for non-delete rows', () => {
+    useTransferStore.setState({ operations: [failedUpload] });
+    render(<TransferProgress />);
+
+    expect(screen.getByText('apple-touch-icon.png')).toHaveClass('text-app-text');
+    expect(screen.getByText('apple-touch-icon.png')).not.toHaveClass(
+      'text-destructive',
+      'line-through',
+    );
+  });
+
+  it('uses a compact 16px leading icon for transfer rows', () => {
+    useTransferStore.setState({ operations: [failedUpload] });
+    render(<TransferProgress />);
+
+    expect(
+      screen.getByText('apple-touch-icon.png').parentElement!.querySelector('svg'),
+    ).toHaveClass('size-4');
+  });
+});

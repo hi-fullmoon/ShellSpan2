@@ -1,0 +1,19 @@
+services:
+  ssh:
+    image: ${SHELLSPAN_E2E_IMAGE:-shellspan-ssh-e2e:local}
+    ports:
+      - '127.0.0.1:${SHELLSPAN_E2E_SSH_PORT:-22222}:22'
+    healthcheck:
+      test: ['CMD', 'ssh-keyscan', '-p', '22', '127.0.0.1']
+      interval: 1s
+      timeout: 3s
+      retries: 30
+  jump:
+    image: ${SHELLSPAN_E2E_IMAGE:-shellspan-ssh-e2e:local}
+    ports:
+      - '127.0.0.1:${SHELLSPAN_E2E_SSH_JUMP_PORT:-22223}:22'
+    healthcheck:
+      test: ['CMD', 'ssh-keyscan', '-p', '22', '127.0.0.1']
+      interval: 1s
+      timeout: 3s
+      retries: 30

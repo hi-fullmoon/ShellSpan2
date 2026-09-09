@@ -1,0 +1,12 @@
+allowBuilds:
+  electron-winstaller: false
+  electron: true
+  react-intl-universal: true
+patchedDependencies:
+  sonner@2.0.8: patches/sonner@2.0.8.patch
+overrides:
+  # MCP SDK imports zod/v3 and zod/v4, which zod 3.24.x does not export.
+  # https://github.com/shadcn-ui/ui/issues/10860
+  'shadcn@4>zod': ^3.25.76
+  # Builder 26.15.3 uses ElectronDownloadCacheMode, absent from its declared get@3.
+  'app-builder-lib@26.15.3>@electron/get': 5.1.0

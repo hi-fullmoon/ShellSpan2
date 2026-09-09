@@ -1,0 +1,592 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+@import '@fontsource-variable/geist';
+
+@custom-variant dark (&:is([data-theme="dark"] *));
+
+/* File completion uses the popover surface directly, without a nested card. */
+.ai-completion-popup:has(> [data-file-completion]) {
+  width: min(440px, var(--anchor-width));
+  overflow-x: hidden;
+  overflow-y: auto;
+  border-radius: 14px;
+}
+
+.ai-file-completion {
+  max-height: inherit;
+}
+
+.image-preview-overlay {
+  background: var(--image-preview-backdrop);
+  backdrop-filter: none;
+}
+
+.image-preview {
+  /* Preview controls retain their light appearance against the dark canvas. */
+  --secondary: var(--image-preview-controls);
+  --secondary-foreground: var(--image-preview-foreground);
+  --accent: var(--image-preview-control-hover);
+  --accent-foreground: var(--image-preview-foreground);
+  --ring: var(--image-preview-controls);
+  overflow: hidden;
+  color: var(--image-preview-controls);
+  -webkit-app-region: no-drag;
+}
+
+.image-preview-stage {
+  position: absolute;
+  inset: 80px 24px 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.image-preview-picture {
+  flex: none;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: 10px;
+  object-fit: contain;
+  user-select: none;
+  touch-action: none;
+  cursor: zoom-in;
+}
+
+.image-preview-picture[data-status='loading'] {
+  visibility: hidden;
+}
+
+.image-preview-picture[data-status='error'] {
+  display: none;
+}
+
+.image-preview-picture[data-zoomed='true'] {
+  cursor: grab;
+}
+
+.image-preview-picture[data-dragging='true'] {
+  cursor: grabbing;
+}
+
+.image-preview-actions {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: flex;
+  gap: 8px;
+}
+
+.image-preview-zoom {
+  --secondary: var(--image-preview-control-hover);
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px;
+  border-radius: 999px;
+  background: var(--image-preview-controls);
+  color: var(--image-preview-foreground);
+  transform: translateX(-50%);
+}
+
+@theme {
+  /* Move the gap around a fixed circle to avoid rotating and resampling its outline. */
+  --animate-spinner: spinner 1s linear infinite;
+
+  @keyframes spinner {
+    from {
+      stroke-dashoffset: 0;
+    }
+    to {
+      stroke-dashoffset: -100;
+    }
+  }
+
+  --color-app-bg: var(--app-bg);
+  --color-app-surface: var(--app-surface);
+  --color-app-surface-muted: var(--app-surface-muted);
+  --color-app-text: var(--app-text);
+  --color-app-text-soft: var(--app-text-soft);
+  --color-app-border: var(--app-border);
+  --color-app-primary: var(--app-primary);
+  --color-app-primary-text: var(--app-primary-text);
+  --color-app-button: var(--app-button);
+  --color-app-button-text: var(--app-button-text);
+  --color-app-error: var(--app-error);
+  --color-app-warning: var(--app-warning);
+  --color-app-success: var(--app-success);
+  --color-app-tab-active: var(--app-tab-active);
+  --color-app-tab-accent: var(--app-tab-accent);
+}
+
+:root {
+  --image-preview-backdrop: rgb(0 0 0 / 88%);
+  --image-preview-controls: #f4f4f4;
+  --image-preview-control-hover: #dedede;
+  --image-preview-foreground: #202124;
+  --app-bg: #f6f8fb;
+  --app-surface: #ffffff;
+  --app-surface-muted: #e9eff5;
+  --app-text: #0f172a;
+  --app-text-soft: #475569;
+  --app-border: rgba(100, 116, 139, 0.28);
+  --app-primary: #0e7490;
+  --app-primary-text: #ffffff;
+  --app-button: #0e7490;
+  --app-button-text: #ffffff;
+  --app-terminal-selection: rgba(14, 116, 144, 0.28);
+  --app-terminal-selection-inactive: rgba(14, 116, 144, 0.16);
+  --app-error: #dc2626;
+  --app-warning: #d97706;
+  --app-success: #16a34a;
+  --app-tab-active: color-mix(in srgb, var(--app-primary) 10%, transparent);
+  --app-tab-accent: var(--app-primary);
+  --app-scrollbar-thumb: color-mix(in srgb, var(--app-text-soft) 32%, transparent);
+  --app-scrollbar-thumb-hover: color-mix(in srgb, var(--app-text-soft) 52%, transparent);
+  --radius: 0.375rem;
+  --shadow-card: 0 1px 2px 0 rgba(0, 0, 0, 0.04), 0 1px 3px 0 rgba(0, 0, 0, 0.03);
+  --shadow-dialog: 0 24px 48px -12px rgba(0, 0, 0, 0.18);
+  --shadow-toast:
+    0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 3px 6px -4px rgba(0, 0, 0, 0.12),
+    0 9px 28px 8px rgba(0, 0, 0, 0.05);
+  --background: var(--app-bg);
+  --foreground: var(--app-text);
+  --card: var(--app-surface);
+  --card-foreground: var(--app-text);
+  --popover: var(--app-surface);
+  --popover-foreground: var(--app-text);
+  --primary: var(--app-primary);
+  --primary-foreground: var(--app-primary-text);
+  --secondary: var(--app-surface-muted);
+  --secondary-foreground: var(--app-text);
+  --muted: var(--app-surface-muted);
+  --muted-foreground: var(--app-text-soft);
+  --accent: var(--app-surface-muted);
+  --accent-foreground: var(--app-text);
+  --destructive: var(--app-error);
+  --border: var(--app-border);
+  --input: var(--app-border);
+  --ring: var(--app-primary);
+  --chart-1: var(--app-primary);
+  --chart-2: var(--app-text-soft);
+  --chart-3: var(--app-surface-muted);
+  --chart-4: var(--app-warning);
+  --chart-5: var(--app-success);
+  --sidebar: var(--app-surface-muted);
+  --sidebar-foreground: var(--app-text);
+  --sidebar-primary: var(--app-primary);
+  --sidebar-primary-foreground: var(--app-primary-text);
+  --sidebar-accent: var(--app-surface-muted);
+  --sidebar-accent-foreground: var(--app-text);
+  --sidebar-border: var(--app-border);
+  --sidebar-ring: var(--app-primary);
+}
+
+[data-theme='dark'] {
+  /* Obsidian palette: a near-black canvas with restrained graphite elevation. */
+  --app-bg: #191a1b;
+  --app-surface: #202122;
+  --app-surface-muted: #28292a;
+  --app-text: #d4d4d8;
+  --app-text-soft: #a1a1aa;
+  --app-border: rgba(255, 255, 255, 0.09);
+  --app-primary: #b3b3b8;
+  --app-primary-text: #191a1b;
+  --app-button: #353638;
+  --app-button-text: #f4f4f5;
+  --app-terminal-selection: rgba(244, 244, 245, 0.22);
+  --app-terminal-selection-inactive: rgba(244, 244, 245, 0.12);
+  --app-error: #fb7185;
+  --app-warning: #fbbf24;
+  --app-success: #4ade80;
+  --app-tab-active: color-mix(in srgb, var(--app-primary) 14%, transparent);
+  --app-tab-accent: var(--app-primary);
+  --shadow-card: 0 1px 0 0 rgba(255, 255, 255, 0.035), 0 16px 32px -20px rgba(0, 0, 0, 0.86);
+  --shadow-dialog: 0 28px 64px -20px rgba(0, 0, 0, 0.88), 0 0 0 1px rgba(255, 255, 255, 0.045);
+  --shadow-toast: 0 14px 32px -12px rgba(0, 0, 0, 0.78), 0 0 0 1px rgba(255, 255, 255, 0.06);
+  --background: var(--app-bg);
+  --foreground: var(--app-text);
+  --card: var(--app-surface);
+  --card-foreground: var(--app-text);
+  --popover: var(--app-surface);
+  --popover-foreground: var(--app-text);
+  --primary: var(--app-primary);
+  --primary-foreground: var(--app-primary-text);
+  --secondary: var(--app-surface-muted);
+  --secondary-foreground: var(--app-text);
+  --muted: var(--app-surface-muted);
+  --muted-foreground: var(--app-text-soft);
+  --accent: var(--app-surface-muted);
+  --accent-foreground: var(--app-text);
+  --destructive: var(--app-error);
+  --border: var(--app-border);
+  --input: var(--app-border);
+  --ring: var(--app-primary);
+  --chart-1: var(--app-primary);
+  --chart-2: var(--app-text-soft);
+  --chart-3: var(--app-surface-muted);
+  --chart-4: var(--app-warning);
+  --chart-5: var(--app-success);
+  --sidebar: var(--app-surface-muted);
+  --sidebar-foreground: var(--app-text);
+  --sidebar-primary: var(--app-primary);
+  --sidebar-primary-foreground: var(--app-primary-text);
+  --sidebar-accent: var(--app-surface-muted);
+  --sidebar-accent-foreground: var(--app-text);
+  --sidebar-border: var(--app-border);
+  --sidebar-ring: var(--app-primary);
+}
+
+/* History is portalled outside the AI panel, so map its row tokens here. */
+.ai-session-history-popover {
+  --ai-shell-clearance: 12px;
+  --ds-ease-in-out: ease-in-out;
+  --dsw-alias-label-primary: var(--popover-foreground);
+  --dsw-alias-label-tertiary: var(--muted-foreground);
+  --dsw-alias-interactive-bg-hover: var(--accent);
+  --dsw-alias-interactive-bg-active: var(--muted);
+  --dsw-alias-state-business-primary: var(--primary);
+  --dsw-alias-state-error-primary: var(--destructive);
+  --dsw-alias-state-success-primary: var(--app-success);
+  --dsw-alias-state-warn-primary: var(--app-warning);
+  width: min(420px, calc(100vw - 16px));
+  height: min(380px, var(--available-height));
+  max-height: calc(100dvh - 56px);
+  gap: 0;
+  overflow: hidden;
+  border-radius: 16px;
+  padding: 0;
+}
+
+.ai-session-browser-filters {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.ai-session-browser[data-compact] .ai-session-browser-toolbar {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  padding: 8px 8px 4px;
+}
+
+.ai-session-browser[data-compact] .ai-session-search {
+  height: 30px;
+  flex: none;
+  border: 0;
+  border-radius: 0;
+  border-bottom: 1px solid var(--border);
+  background: transparent;
+  box-shadow: none;
+}
+
+.ai-session-browser[data-compact] .ai-session-browser-filters {
+  justify-content: space-between;
+}
+
+.ai-session-browser[data-compact] .ai-session-browser-list {
+  min-height: 0;
+  padding: 0 4px 6px;
+}
+
+.ai-session-browser[data-compact] .ai-session-browser-list > [role='tree'] {
+  gap: 0;
+}
+
+.ai-session-browser[data-compact] :is(.ai-session-row, .ai-session-row-main) {
+  height: 28px;
+}
+
+.ai-session-browser[data-compact]
+  .ai-session-row-status:not([data-state='running'], [data-state='waiting']) {
+  display: none;
+}
+
+/* The account menu uses one soft surface, with inset rounded action rows. */
+.workbench-user-menu {
+  background-color: color-mix(in srgb, var(--popover) 92%, transparent);
+}
+
+.workbench-user-menu [data-slot='dropdown-menu-item'] {
+  min-height: 30px;
+  gap: 8px;
+  border-radius: 10px;
+  padding: 5px 10px;
+  color: var(--popover-foreground);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 20px;
+  transition: background-color 120ms ease;
+}
+
+.workbench-user-menu [data-slot='dropdown-menu-item']:is(:focus, [data-highlighted]) {
+  background-color: color-mix(in srgb, var(--popover-foreground) 5%, var(--popover));
+  color: var(--popover-foreground);
+}
+
+.workbench-user-menu [data-slot='dropdown-menu-item'] > svg {
+  width: 16px;
+  height: 16px;
+  color: var(--muted-foreground);
+  stroke-width: 1.75;
+}
+
+.workbench-user-menu [data-slot='dropdown-menu-shortcut'] {
+  color: var(--muted-foreground);
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: normal;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+  color: var(--foreground);
+  background-color: var(--background);
+  overflow: hidden;
+}
+
+/* Disable native text selection app-wide. user-select is not inherited and
+   WebKit does not reliably propagate it from body to descendants, so it must
+   be applied to every element directly. Editable form controls opt back in
+   below so users can still select and correct text inside fields. */
+* {
+  box-sizing: border-box;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+input,
+textarea,
+[contenteditable='true'] {
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+/* Chat replies, code samples, and diagnostic output need to remain copyable
+   even though the surrounding desktop chrome disables native selection. */
+[data-slot='message-scroller-content'],
+[data-slot='message-scroller-content'] * {
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+[data-slot='message-scroller-content'] :is(button, button *) {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Chromium gives the standards-based scrollbar properties precedence over
+   the WebKit pseudo-elements. Keep them as a Firefox fallback so WebView2 can
+   render the rounded, inset thumb and suppress native arrow buttons below. */
+@supports not selector(::-webkit-scrollbar) {
+  * {
+    scrollbar-color: var(--app-scrollbar-thumb) transparent;
+    scrollbar-width: thin;
+  }
+
+  *:hover {
+    scrollbar-color: var(--app-scrollbar-thumb-hover) transparent;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-button,
+::-webkit-scrollbar-button:single-button {
+  width: 0;
+  height: 0;
+  appearance: none;
+  background: transparent;
+  display: none;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  min-width: 32px;
+  min-height: 32px;
+  background: var(--app-scrollbar-thumb);
+  background-clip: padding-box;
+  border: 2px solid transparent;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--app-scrollbar-thumb-hover);
+  background-clip: padding-box;
+}
+
+@theme inline {
+  --font-heading: var(--font-sans);
+  --font-sans: 'Geist Variable', sans-serif;
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+@keyframes dialog-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes dialog-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+}
+
+/* Global toast: antd-message style filled status icons (solid colored disc, glyph cut out in surface color) */
+.toast-icon-filled circle {
+  fill: currentColor;
+}
+
+.toast-icon-filled :is(path, line, polyline) {
+  stroke: var(--popover);
+}
+
+/* Toast enter animation: slide in horizontally from the edge matching data-x-position.
+   Sonner only animates vertically by default; we append a --x custom property to its
+   transform so the existing --y behavior (stacking, swipe, dismiss) is preserved. */
+[data-sonner-toaster] [data-sonner-toast] {
+  transform: var(--y) var(--x, translateX(0));
+}
+
+/* Content-sized toasts still need to remain centered inside Sonner's fixed-width track. */
+[data-sonner-toaster] [data-sonner-toast][data-x-position='center'] {
+  inset-inline: 0;
+  margin-inline: auto;
+}
+
+[data-sonner-toaster] [data-sonner-toast][data-x-position='right']:not([data-mounted='true']) {
+  --x: translateX(100%);
+}
+
+[data-sonner-toaster] [data-sonner-toast][data-x-position='right'][data-mounted='true'] {
+  --x: translateX(0);
+}
+
+[data-sonner-toaster] [data-sonner-toast][data-x-position='left']:not([data-mounted='true']) {
+  --x: translateX(-100%);
+}
+
+[data-sonner-toaster] [data-sonner-toast][data-x-position='left'][data-mounted='true'] {
+  --x: translateX(0);
+}
+
+/* Keep the entrance purely horizontal by suppressing the default vertical offset. */
+[data-sonner-toaster]
+  [data-sonner-toast][data-x-position='right'][data-y-position='top']:not([data-mounted='true']),
+[data-sonner-toaster]
+  [data-sonner-toast][data-x-position='right'][data-y-position='bottom']:not([data-mounted='true']),
+[data-sonner-toaster]
+  [data-sonner-toast][data-x-position='left'][data-y-position='top']:not([data-mounted='true']),
+[data-sonner-toaster]
+  [data-sonner-toast][data-x-position='left'][data-y-position='bottom']:not([data-mounted='true']) {
+  --y: translateY(0);
+}
+
+/* While a tab drag is active, force the default cursor everywhere — whatever
+   sits under the pointer (tabs, text inputs, the terminal) would otherwise
+   take over the cursor style mid-drag. */
+body.tab-dragging,
+body.tab-dragging * {
+  cursor: default !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-slot='ai-workspace-root'] * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Desktop shell only: preserve the existing titlebar geometry. */
+[data-desktop-drag-region] {
+  -webkit-app-region: drag;
+}
+[data-desktop-drag-region] button,
+[data-desktop-drag-region] a,
+[data-desktop-drag-region] input,
+[data-desktop-drag-region] [role='tab'] {
+  -webkit-app-region: no-drag;
+}

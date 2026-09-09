@@ -1,0 +1,30 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="background" x1="154" y1="104" x2="870" y2="928" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#17243D"/>
+      <stop offset="0.52" stop-color="#0D1628"/>
+      <stop offset="1" stop-color="#070B13"/>
+    </linearGradient>
+    <linearGradient id="mark" x1="232" y1="284" x2="772" y2="748" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#7BE7FF"/>
+      <stop offset="0.48" stop-color="#55A7FF"/>
+      <stop offset="1" stop-color="#7A6CFF"/>
+    </linearGradient>
+    <linearGradient id="border" x1="132" y1="86" x2="875" y2="942" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#3E5778"/>
+      <stop offset="0.55" stop-color="#233754"/>
+      <stop offset="1" stop-color="#101C2F"/>
+    </linearGradient>
+    <filter id="shadow" x="27" y="30" width="970" height="976" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="20" stdDeviation="22" flood-color="#050509" flood-opacity="0.52"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#shadow)">
+    <rect x="72" y="64" width="880" height="880" rx="220" fill="url(#background)"/>
+    <rect x="86" y="78" width="852" height="852" rx="206" stroke="url(#border)" stroke-width="28"/>
+  </g>
+
+  <!-- The word "Term". -->
+  <text x="512" y="520" text-anchor="middle" dominant-baseline="central" font-family="'Arial Rounded MT Bold', 'Helvetica Neue', Arial, sans-serif" font-size="270" font-weight="700" fill="url(#mark)">Term</text>
+</svg>

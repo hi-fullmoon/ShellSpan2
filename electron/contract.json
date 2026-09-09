@@ -1,0 +1,1804 @@
+[
+  {
+    "command": "petdex_set_enabled",
+    "args": [
+      {
+        "name": "enabled",
+        "rustType": "bool",
+        "optional": false
+      }
+    ],
+    "returns": "PetdexConnectionStatus",
+    "source": "native/src/petdex.rs",
+    "owner": "native"
+  },
+  {
+    "command": "petdex_get_status",
+    "args": [],
+    "returns": "PetdexConnectionStatus",
+    "source": "native/src/petdex.rs",
+    "owner": "native"
+  },
+  {
+    "command": "petdex_test_connection",
+    "args": [],
+    "returns": "PetdexConnectionStatus",
+    "source": "native/src/petdex.rs",
+    "owner": "native"
+  },
+  {
+    "command": "get_system_health",
+    "args": [],
+    "returns": "Result<SystemHealth, String>",
+    "source": "native/src/health.rs",
+    "owner": "native"
+  },
+  {
+    "command": "ai_list_routes",
+    "args": [],
+    "returns": "Result<crate::llm::routes::RouteSnapshot, String>",
+    "source": "native/src/ai.rs",
+    "owner": "native"
+  },
+  {
+    "command": "ai_save_routes",
+    "args": [
+      {
+        "name": "input",
+        "rustType": "SaveRouteDocumentInput",
+        "optional": false
+      }
+    ],
+    "returns": "Result<crate::llm::routes::RouteSnapshot, String>",
+    "source": "native/src/ai.rs",
+    "owner": "native"
+  },
+  {
+    "command": "ai_list_route_models",
+    "args": [
+      {
+        "name": "routeId",
+        "rustType": "String",
+        "optional": false
+      }
+    ],
+    "returns": "Result<RouteModelsResult, String>",
+    "source": "native/src/ai.rs",
+    "owner": "native"
+  },
+  {
+    "command": "ai_resolve_selection",
+    "args": [
+      {
+        "name": "input",
+        "rustType": "ResolveSelectionInput",
+        "optional": false
+      }
+    ],
+    "returns": "Result<crate::llm::catalog::ResolvedModel, String>",
+    "source": "native/src/ai.rs",
+    "owner": "native"
+  },
+  {
+    "command": "ai_list_session_migrations",
+    "args": [],
+    "returns": "Result<Vec<SessionMigrationStatus>, String>",
+    "source": "native/src/ai.rs",
+    "owner": "native"
+  },
+  {
+    "command": "ai_convert_session_v4_to_v5",
+    "args": [
+      {
+        "name": "input",
+        "rustType": "ConvertSessionInput",
+        "optional": false
+      }
+    ],
+    "returns": "Result<crate::llm::migration::ConversionResult, String>",
+    "source": "native/src/ai.rs",
+    "owner": "native"
+  },
+  {
+    "command": "ai_list_models",
+    "args": [
+      {
+        "name": "provider",
+        "rustType": "AiProviderConfig",
+        "optional": false
+      }
+    ],
+    "returns": "Result<Vec<String>, String>",
+    "source": "native/src/ai.rs",
+    "owner": "native"
+  },
+  {
+    "command": "ai_resolve_model",
+    "args": [
+      {
+        "name": "provider",
+        "rustType": "AiProviderConfig",
+        "optional": false
+      }
+    ],
+    "returns": "Result<crate::llm::catalog::ResolvedModel, String>",
+    "source": "native/src/ai.rs",
+    "owner": "native"
+  },
+  {
+    "command": "ai_model_declaration_template",
+    "args": [
+      {
+        "name": "provider",
+        "rustType": "AiProviderConfig",
+        "optional": false
+      }
+    ],
+    "returns": "Result<crate::llm::catalog::ModelDefinition, String>",
+    "source": "native/src/ai.rs",
+    "owner": "native"
+  },
+  {
+    "command": "create_session",
+    "args": [
+      {
+        "name": "request",
+        "rustType": "SessionCreateRequest",
+        "optional": false
+      }
+    ],
+    "returns": "Result<SessionSummary, CreateSessionError>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "create_local_session",
+    "args": [
+      {
+        "name": "cols",
+        "rustType": "u16",
+        "optional": false
+      },
+      {
+        "name": "rows",
+        "rustType": "u16",
+        "optional": false
+      }
+    ],
+    "returns": "Result<SessionSummary, String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "write_session",
+    "args": [
+      {
+        "name": "sessionId",
+        "rustType": "String",
+        "optional": false
+      },
+      {
+        "name": "data",
+        "rustType": "String",
+        "optional": false
+      }
+    ],
+    "returns": "Result<(), String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "get_session_status",
+    "args": [
+      {
+        "name": "sessionId",
+        "rustType": "String",
+        "optional": false
+      }
+    ],
+    "returns": "Result<StatusEvent, String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "mark_session_ready",
+    "args": [
+      {
+        "name": "sessionId",
+        "rustType": "String",
+        "optional": false
+      }
+    ],
+    "returns": "Result<(), String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "set_session_output_paused",
+    "args": [
+      {
+        "name": "sessionId",
+        "rustType": "String",
+        "optional": false
+      },
+      {
+        "name": "paused",
+        "rustType": "bool",
+        "optional": false
+      }
+    ],
+    "returns": "Result<(), String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "resize_session",
+    "args": [
+      {
+        "name": "sessionId",
+        "rustType": "String",
+        "optional": false
+      },
+      {
+        "name": "cols",
+        "rustType": "u32",
+        "optional": false
+      },
+      {
+        "name": "rows",
+        "rustType": "u32",
+        "optional": false
+      }
+    ],
+    "returns": "Result<(), String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "close_session",
+    "args": [
+      {
+        "name": "sessionId",
+        "rustType": "String",
+        "optional": false
+      }
+    ],
+    "returns": "Result<(), String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "request_app_restart",
+    "args": [],
+    "returns": "()",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "request_app_exit",
+    "args": [],
+    "returns": "()",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "list_remote_directory",
+    "args": [
+      {
+        "name": "request",
+        "rustType": "RemoteDirectoryRequest",
+        "optional": false
+      }
+    ],
+    "returns": "Result<RemoteDirectoryListing, RemoteFsError>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "supersede_remote_directory_request",
+    "args": [
+      {
+        "name": "requestKey",
+        "rustType": "String",
+        "optional": false
+      },
+      {
+        "name": "requestId",
+        "rustType": "u64",
+        "optional": false
+      }
+    ],
+    "returns": "Result<(), String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "resolve_remote_entry_owners",
+    "args": [
+      {
+        "name": "request",
+        "rustType": "RemoteEntryOwnersRequest",
+        "optional": false
+      }
+    ],
+    "returns": "Result<RemoteEntryOwners, RemoteFsError>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "warm_remote_connection",
+    "args": [
+      {
+        "name": "request",
+        "rustType": "RemoteConnectionRequest",
+        "optional": false
+      }
+    ],
+    "returns": "Result<(), RemoteFsError>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "create_remote_entry",
+    "args": [
+      {
+        "name": "request",
+        "rustType": "CreateRemoteEntryRequest",
+        "optional": false
+      }
+    ],
+    "returns": "Result<(), RemoteFsError>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "rename_remote_path",
+    "args": [
+      {
+        "name": "request",
+        "rustType": "RenameRemotePathRequest",
+        "optional": false
+      }
+    ],
+    "returns": "Result<(), RemoteFsError>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "delete_remote_path",
+    "args": [
+      {
+        "name": "request",
+        "rustType": "DeleteRemotePathRequest",
+        "optional": false
+      }
+    ],
+    "returns": "Result<(), RemoteFsError>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "copy_remote_path",
+    "args": [
+      {
+        "name": "request",
+        "rustType": "CopyRemotePathRequest",
+        "optional": false
+      }
+    ],
+    "returns": "Result<(), RemoteFsError>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "copy_remote_to_remote",
+    "args": [
+      {
+        "name": "request",
+        "rustType": "CopyRemoteToRemoteRequest",
+        "optional": false
+      }
+    ],
+    "returns": "Result<(), RemoteFsError>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "cancel_remote_copy",
+    "args": [
+      {
+        "name": "operationId",
+        "rustType": "String",
+        "optional": false
+      }
+    ],
+    "returns": "Result<(), String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "upload_local_paths",
+    "args": [
+      {
+        "name": "request",
+        "rustType": "UploadLocalPathsRequest",
+        "optional": false
+      }
+    ],
+    "returns": "Result<TransferBatchResult, RemoteFsError>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "copy_local_paths",
+    "args": [
+      {
+        "name": "request",
+        "rustType": "CopyLocalPathsRequest",
+        "optional": false
+      }
+    ],
+    "returns": "Result<(), String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "rename_local_path",
+    "args": [
+      {
+        "name": "path",
+        "rustType": "String",
+        "optional": false
+      },
+      {
+        "name": "newName",
+        "rustType": "String",
+        "optional": false
+      }
+    ],
+    "returns": "Result<(), String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "paste_local_paths",
+    "args": [
+      {
+        "name": "sourcePaths",
+        "rustType": "Vec<String>",
+        "optional": false
+      },
+      {
+        "name": "destinationDirectory",
+        "rustType": "String",
+        "optional": false
+      },
+      {
+        "name": "copySuffix",
+        "rustType": "String",
+        "optional": false
+      }
+    ],
+    "returns": "Result<Vec<String>, String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "trash_local_paths",
+    "args": [
+      {
+        "name": "paths",
+        "rustType": "Vec<String>",
+        "optional": false
+      }
+    ],
+    "returns": "Result<(), String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "cancel_upload",
+    "args": [
+      {
+        "name": "operationId",
+        "rustType": "String",
+        "optional": false
+      }
+    ],
+    "returns": "Result<(), String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "cancel_delete",
+    "args": [
+      {
+        "name": "operationId",
+        "rustType": "String",
+        "optional": false
+      }
+    ],
+    "returns": "Result<(), String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "download_remote_paths",
+    "args": [
+      {
+        "name": "request",
+        "rustType": "DownloadRemotePathsRequest",
+        "optional": false
+      }
+    ],
+    "returns": "Result<TransferBatchResult, RemoteFsError>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "cancel_download",
+    "args": [
+      {
+        "name": "operationId",
+        "rustType": "String",
+        "optional": false
+      }
+    ],
+    "returns": "Result<(), String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "disconnect_sftp",
+    "args": [
+      {
+        "name": "request",
+        "rustType": "RemoteConnectionRequest",
+        "optional": false
+      }
+    ],
+    "returns": "Result<(), RemoteFsError>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "open_path",
+    "args": [
+      {
+        "name": "path",
+        "rustType": "String",
+        "optional": false
+      }
+    ],
+    "returns": "Result<(), String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "pick_local_files",
+    "args": [],
+    "returns": "Result<Vec<String>, String>",
+    "source": "native/src/commands.rs",
+    "owner": "electron"
+  },
+  {
+    "command": "pick_local_folder",
+    "args": [
+      {
+        "name": "title",
+        "rustType": "Option<String>",
+        "optional": true
+      }
+    ],
+    "returns": "Result<Vec<String>, String>",
+    "source": "native/src/commands.rs",
+    "owner": "electron"
+  },
+  {
+    "command": "pick_private_key_file",
+    "args": [],
+    "returns": "Result<Option<String>, String>",
+    "source": "native/src/commands.rs",
+    "owner": "electron"
+  },
+  {
+    "command": "open_remote_file",
+    "args": [
+      {
+        "name": "request",
+        "rustType": "OpenRemoteFileRequest",
+        "optional": false
+      }
+    ],
+    "returns": "Result<(), RemoteFsError>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "preview_local_file",
+    "args": [
+      {
+        "name": "path",
+        "rustType": "String",
+        "optional": false
+      }
+    ],
+    "returns": "Result<ReadRemoteFileResponse, String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "preview_remote_file",
+    "args": [
+      {
+        "name": "request",
+        "rustType": "ReadRemoteFileRequest",
+        "optional": false
+      }
+    ],
+    "returns": "Result<ReadRemoteFileResponse, RemoteFsError>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "cancel_remote_file_read",
+    "args": [
+      {
+        "name": "operationId",
+        "rustType": "String",
+        "optional": false
+      }
+    ],
+    "returns": "Result<(), String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "update_remote_permissions",
+    "args": [
+      {
+        "name": "request",
+        "rustType": "UpdateRemotePermissionsRequest",
+        "optional": false
+      }
+    ],
+    "returns": "Result<(), RemoteFsError>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "store_key_credential",
+    "args": [
+      {
+        "name": "request",
+        "rustType": "KeyCredentialRequest",
+        "optional": false
+      }
+    ],
+    "returns": "Result<(), String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "list_key_credentials",
+    "args": [],
+    "returns": "Result<Vec<KeyCredentialSummary>, String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "retrieve_key_credential",
+    "args": [
+      {
+        "name": "id",
+        "rustType": "String",
+        "optional": false
+      }
+    ],
+    "returns": "Result<Option<KeyCredentialResponse>, String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "delete_key_credential",
+    "args": [
+      {
+        "name": "id",
+        "rustType": "String",
+        "optional": false
+      }
+    ],
+    "returns": "Result<Vec<String>, String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "read_text_file",
+    "args": [
+      {
+        "name": "path",
+        "rustType": "String",
+        "optional": false
+      }
+    ],
+    "returns": "Result<String, String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "store_profile_password",
+    "args": [
+      {
+        "name": "profileId",
+        "rustType": "String",
+        "optional": false
+      },
+      {
+        "name": "password",
+        "rustType": "String",
+        "optional": false
+      }
+    ],
+    "returns": "Result<(), String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "retrieve_profile_password",
+    "args": [
+      {
+        "name": "profileId",
+        "rustType": "String",
+        "optional": false
+      }
+    ],
+    "returns": "Result<Option<String>, String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "delete_profile_password",
+    "args": [
+      {
+        "name": "profileId",
+        "rustType": "String",
+        "optional": false
+      }
+    ],
+    "returns": "Result<(), String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "store_profile_secret",
+    "args": [
+      {
+        "name": "profileId",
+        "rustType": "String",
+        "optional": false
+      },
+      {
+        "name": "kind",
+        "rustType": "crate::keychain::ProfileSecretKind",
+        "optional": false
+      },
+      {
+        "name": "value",
+        "rustType": "String",
+        "optional": false
+      }
+    ],
+    "returns": "Result<(), String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "retrieve_profile_secret",
+    "args": [
+      {
+        "name": "profileId",
+        "rustType": "String",
+        "optional": false
+      },
+      {
+        "name": "kind",
+        "rustType": "crate::keychain::ProfileSecretKind",
+        "optional": false
+      }
+    ],
+    "returns": "Result<Option<String>, String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "delete_profile_secrets",
+    "args": [
+      {
+        "name": "profileId",
+        "rustType": "String",
+        "optional": false
+      }
+    ],
+    "returns": "Result<(), String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "delete_profile_secret",
+    "args": [
+      {
+        "name": "profileId",
+        "rustType": "String",
+        "optional": false
+      },
+      {
+        "name": "kind",
+        "rustType": "crate::keychain::ProfileSecretKind",
+        "optional": false
+      }
+    ],
+    "returns": "Result<(), String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "start_port_forward",
+    "args": [
+      {
+        "name": "request",
+        "rustType": "PortForwardStartRequest",
+        "optional": false
+      }
+    ],
+    "returns": "Result<crate::port_forward::PortForwardRuntime, String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "stop_port_forward",
+    "args": [
+      {
+        "name": "operationId",
+        "rustType": "String",
+        "optional": false
+      }
+    ],
+    "returns": "Result<crate::port_forward::PortForwardRuntime, String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "stop_all_port_forwards",
+    "args": [],
+    "returns": "Result<Vec<crate::port_forward::PortForwardRuntime>, String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "list_port_forwards",
+    "args": [],
+    "returns": "Result<Vec<crate::port_forward::PortForwardRuntime>, String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "check_host_key",
+    "args": [
+      {
+        "name": "request",
+        "rustType": "HostKeyCheckRequest",
+        "optional": false
+      }
+    ],
+    "returns": "Result<HostKeyCheckResult, String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "preflight_connection",
+    "args": [
+      {
+        "name": "request",
+        "rustType": "ConnectionPreflightRequest",
+        "optional": false
+      }
+    ],
+    "returns": "Result<ConnectionPreflightResult, String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "cancel_connection_preflight",
+    "args": [
+      {
+        "name": "operationId",
+        "rustType": "String",
+        "optional": false
+      }
+    ],
+    "returns": "Result<(), String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "trust_host",
+    "args": [
+      {
+        "name": "request",
+        "rustType": "TrustHostRequest",
+        "optional": false
+      }
+    ],
+    "returns": "Result<(), String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "open_url",
+    "args": [
+      {
+        "name": "url",
+        "rustType": "String",
+        "optional": false
+      }
+    ],
+    "returns": "Result<(), String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "list_known_hosts",
+    "args": [],
+    "returns": "Result<Vec<KnownHostEntry>, String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "remove_known_host",
+    "args": [
+      {
+        "name": "host",
+        "rustType": "String",
+        "optional": false
+      },
+      {
+        "name": "port",
+        "rustType": "u16",
+        "optional": false
+      }
+    ],
+    "returns": "Result<(), String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "list_log_files",
+    "args": [],
+    "returns": "Result<Vec<LogFileInfo>, String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "read_log_file",
+    "args": [
+      {
+        "name": "name",
+        "rustType": "String",
+        "optional": false
+      }
+    ],
+    "returns": "Result<String, String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "export_log_file",
+    "args": [
+      {
+        "name": "name",
+        "rustType": "String",
+        "optional": false
+      },
+      {
+        "name": "content",
+        "rustType": "String",
+        "optional": false
+      }
+    ],
+    "returns": "Result<Option<String>, String>",
+    "source": "native/src/commands.rs",
+    "owner": "electron"
+  },
+  {
+    "command": "list_local_directory",
+    "args": [
+      {
+        "name": "path",
+        "rustType": "String",
+        "optional": false
+      }
+    ],
+    "returns": "Result<LocalDirectoryListing, String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "list_profiles",
+    "args": [],
+    "returns": "Result<Vec<ProfileRow>, String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "add_profile",
+    "args": [
+      {
+        "name": "profile",
+        "rustType": "ProfileRow",
+        "optional": false
+      }
+    ],
+    "returns": "Result<(), String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "update_profile",
+    "args": [
+      {
+        "name": "id",
+        "rustType": "String",
+        "optional": false
+      },
+      {
+        "name": "profile",
+        "rustType": "ProfileRow",
+        "optional": false
+      }
+    ],
+    "returns": "Result<(), String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "remove_profile",
+    "args": [
+      {
+        "name": "id",
+        "rustType": "String",
+        "optional": false
+      }
+    ],
+    "returns": "Result<(), String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "load_preferences",
+    "args": [],
+    "returns": "Result<Vec<(String, String)>, String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "save_preferences",
+    "args": [
+      {
+        "name": "entries",
+        "rustType": "Vec<(String, String)>",
+        "optional": false
+      }
+    ],
+    "returns": "Result<(), String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "list_recent_profiles",
+    "args": [],
+    "returns": "Result<Vec<String>, String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "touch_recent_profile",
+    "args": [
+      {
+        "name": "profileId",
+        "rustType": "String",
+        "optional": false
+      }
+    ],
+    "returns": "Result<(), String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "remove_recent_profile",
+    "args": [
+      {
+        "name": "profileId",
+        "rustType": "String",
+        "optional": false
+      }
+    ],
+    "returns": "Result<(), String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "list_sftp_bookmarks",
+    "args": [
+      {
+        "name": "host",
+        "rustType": "String",
+        "optional": false
+      },
+      {
+        "name": "port",
+        "rustType": "u16",
+        "optional": false
+      },
+      {
+        "name": "username",
+        "rustType": "String",
+        "optional": false
+      }
+    ],
+    "returns": "Result<Vec<SftpBookmarkRow>, String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "add_sftp_bookmark",
+    "args": [
+      {
+        "name": "bookmark",
+        "rustType": "SftpBookmarkRow",
+        "optional": false
+      }
+    ],
+    "returns": "Result<(), String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "remove_sftp_bookmark",
+    "args": [
+      {
+        "name": "id",
+        "rustType": "String",
+        "optional": false
+      }
+    ],
+    "returns": "Result<(), String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "load_terminal_workspace",
+    "args": [],
+    "returns": "Result<Option<String>, String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "save_terminal_workspace",
+    "args": [
+      {
+        "name": "sessionsJson",
+        "rustType": "String",
+        "optional": false
+      }
+    ],
+    "returns": "Result<(), String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "clear_terminal_workspace",
+    "args": [],
+    "returns": "Result<(), String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "load_sftp_workspace",
+    "args": [],
+    "returns": "Result<Option<String>, String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "save_sftp_workspace",
+    "args": [
+      {
+        "name": "workspaceJson",
+        "rustType": "String",
+        "optional": false
+      }
+    ],
+    "returns": "Result<(), String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "clear_sftp_workspace",
+    "args": [],
+    "returns": "Result<(), String>",
+    "source": "native/src/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "collect_remote_health_snapshot",
+    "args": [
+      {
+        "name": "request",
+        "rustType": "RemoteHealthSnapshotRequest",
+        "optional": false
+      }
+    ],
+    "returns": "Result<RemoteHealthSnapshotResult, String>",
+    "source": "native/src/remote_health.rs",
+    "owner": "native"
+  },
+  {
+    "command": "cancel_remote_health_snapshot",
+    "args": [
+      {
+        "name": "operationId",
+        "rustType": "String",
+        "optional": false
+      }
+    ],
+    "returns": "Result<(), String>",
+    "source": "native/src/remote_health.rs",
+    "owner": "native"
+  },
+  {
+    "command": "agent_runtime_prepare_images",
+    "args": [
+      {
+        "name": "images",
+        "rustType": "Vec<super::images::ImageUpload>",
+        "optional": false
+      }
+    ],
+    "returns": "Result<Vec<super::images::ImageUpload>, String>",
+    "source": "native/src/agent_runtime/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "agent_runtime_submit_images",
+    "args": [
+      {
+        "name": "input",
+        "rustType": "super::images::ImageSubmission",
+        "optional": false
+      }
+    ],
+    "returns": "Result<AgentSessionSnapshot, String>",
+    "source": "native/src/agent_runtime/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "agent_runtime_cancel_image_submission",
+    "args": [
+      {
+        "name": "input",
+        "rustType": "super::images::ImageOperation",
+        "optional": false
+      }
+    ],
+    "returns": "Result<bool, String>",
+    "source": "native/src/agent_runtime/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "agent_runtime_image_preview",
+    "args": [
+      {
+        "name": "input",
+        "rustType": "super::images::ImagePreviewRequest",
+        "optional": false
+      }
+    ],
+    "returns": "Result<String, String>",
+    "source": "native/src/agent_runtime/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "agent_runtime_create_session",
+    "args": [
+      {
+        "name": "request",
+        "rustType": "CreateAgentSessionRequest",
+        "optional": false
+      }
+    ],
+    "returns": "Result<AgentSessionSnapshot, String>",
+    "source": "native/src/agent_runtime/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "agent_runtime_spawn_subagent",
+    "args": [
+      {
+        "name": "request",
+        "rustType": "AgentSubagentSpawnRequest",
+        "optional": false
+      }
+    ],
+    "returns": "Result<AgentSessionSnapshot, String>",
+    "source": "native/src/agent_runtime/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "agent_runtime_send_child_input",
+    "args": [
+      {
+        "name": "request",
+        "rustType": "AgentChildInputRequest",
+        "optional": false
+      }
+    ],
+    "returns": "Result<AgentSessionSnapshot, String>",
+    "source": "native/src/agent_runtime/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "agent_runtime_inspect_child_agent",
+    "args": [
+      {
+        "name": "request",
+        "rustType": "AgentChildRequest",
+        "optional": false
+      }
+    ],
+    "returns": "Result<AgentChildInspection, String>",
+    "source": "native/src/agent_runtime/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "agent_runtime_cancel_child_agent",
+    "args": [
+      {
+        "name": "request",
+        "rustType": "AgentChildRequest",
+        "optional": false
+      }
+    ],
+    "returns": "Result<AgentSessionSnapshot, String>",
+    "source": "native/src/agent_runtime/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "agent_runtime_fleet_plan",
+    "args": [
+      {
+        "name": "request",
+        "rustType": "AgentFleetPlanRequest",
+        "optional": false
+      }
+    ],
+    "returns": "Result<AgentFleetInspection, String>",
+    "source": "native/src/agent_runtime/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "agent_runtime_fleet_start",
+    "args": [
+      {
+        "name": "request",
+        "rustType": "AgentFleetControlRequest",
+        "optional": false
+      }
+    ],
+    "returns": "Result<AgentFleetInspection, String>",
+    "source": "native/src/agent_runtime/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "agent_runtime_fleet_resume",
+    "args": [
+      {
+        "name": "request",
+        "rustType": "AgentFleetControlRequest",
+        "optional": false
+      }
+    ],
+    "returns": "Result<AgentFleetInspection, String>",
+    "source": "native/src/agent_runtime/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "agent_runtime_fleet_pause",
+    "args": [
+      {
+        "name": "request",
+        "rustType": "AgentFleetControlRequest",
+        "optional": false
+      }
+    ],
+    "returns": "Result<AgentFleetInspection, String>",
+    "source": "native/src/agent_runtime/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "agent_runtime_fleet_abort",
+    "args": [
+      {
+        "name": "request",
+        "rustType": "AgentFleetControlRequest",
+        "optional": false
+      }
+    ],
+    "returns": "Result<AgentFleetInspection, String>",
+    "source": "native/src/agent_runtime/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "agent_runtime_fleet_reconcile",
+    "args": [
+      {
+        "name": "request",
+        "rustType": "AgentFleetReconcileRequest",
+        "optional": false
+      }
+    ],
+    "returns": "Result<AgentFleetInspection, String>",
+    "source": "native/src/agent_runtime/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "agent_runtime_start",
+    "args": [
+      {
+        "name": "input",
+        "rustType": "AgentRuntimeStartInput",
+        "optional": false
+      }
+    ],
+    "returns": "Result<AgentSessionSnapshot, String>",
+    "source": "native/src/agent_runtime/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "agent_runtime_select_model",
+    "args": [
+      {
+        "name": "input",
+        "rustType": "AgentRuntimeModelSelectionInput",
+        "optional": false
+      }
+    ],
+    "returns": "Result<AgentSessionSnapshot, String>",
+    "source": "native/src/agent_runtime/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "agent_runtime_set_permission",
+    "args": [
+      {
+        "name": "input",
+        "rustType": "AgentPermissionInput",
+        "optional": false
+      }
+    ],
+    "returns": "Result<AgentSessionSnapshot, String>",
+    "source": "native/src/agent_runtime/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "agent_runtime_answer_question",
+    "args": [
+      {
+        "name": "input",
+        "rustType": "super::user_questions::AnswerQuestionInput",
+        "optional": false
+      }
+    ],
+    "returns": "Result<AgentSessionSnapshot, String>",
+    "source": "native/src/agent_runtime/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "agent_runtime_followup",
+    "args": [
+      {
+        "name": "input",
+        "rustType": "AgentSessionInput",
+        "optional": false
+      }
+    ],
+    "returns": "Result<AgentSessionSnapshot, String>",
+    "source": "native/src/agent_runtime/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "agent_runtime_steer",
+    "args": [
+      {
+        "name": "input",
+        "rustType": "AgentSessionInput",
+        "optional": false
+      }
+    ],
+    "returns": "Result<AgentSessionSnapshot, String>",
+    "source": "native/src/agent_runtime/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "agent_runtime_mutate_inbox",
+    "args": [
+      {
+        "name": "input",
+        "rustType": "AgentInboxMutationInput",
+        "optional": false
+      }
+    ],
+    "returns": "Result<AgentSessionSnapshot, String>",
+    "source": "native/src/agent_runtime/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "agent_runtime_rename_session",
+    "args": [
+      {
+        "name": "input",
+        "rustType": "AgentSessionRenameInput",
+        "optional": false
+      }
+    ],
+    "returns": "Result<AgentSessionSnapshot, String>",
+    "source": "native/src/agent_runtime/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "agent_runtime_inject",
+    "args": [
+      {
+        "name": "input",
+        "rustType": "AgentRuntimeInjectionInput",
+        "optional": false
+      }
+    ],
+    "returns": "Result<AgentSessionSnapshot, String>",
+    "source": "native/src/agent_runtime/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "agent_runtime_interrupt",
+    "args": [
+      {
+        "name": "input",
+        "rustType": "AgentSessionIdInput",
+        "optional": false
+      }
+    ],
+    "returns": "Result<AgentSessionSnapshot, String>",
+    "source": "native/src/agent_runtime/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "agent_runtime_resume",
+    "args": [
+      {
+        "name": "input",
+        "rustType": "AgentSessionIdInput",
+        "optional": false
+      }
+    ],
+    "returns": "Result<AgentSessionSnapshot, String>",
+    "source": "native/src/agent_runtime/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "agent_runtime_cancel",
+    "args": [
+      {
+        "name": "input",
+        "rustType": "AgentSessionIdInput",
+        "optional": false
+      }
+    ],
+    "returns": "Result<AgentSessionSnapshot, String>",
+    "source": "native/src/agent_runtime/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "agent_runtime_approve_tool",
+    "args": [
+      {
+        "name": "input",
+        "rustType": "AgentToolDecisionInput",
+        "optional": false
+      }
+    ],
+    "returns": "Result<AgentSessionSnapshot, String>",
+    "source": "native/src/agent_runtime/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "agent_runtime_reject_tool",
+    "args": [
+      {
+        "name": "input",
+        "rustType": "AgentToolDecisionInput",
+        "optional": false
+      }
+    ],
+    "returns": "Result<AgentSessionSnapshot, String>",
+    "source": "native/src/agent_runtime/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "agent_runtime_get_session",
+    "args": [
+      {
+        "name": "input",
+        "rustType": "AgentSessionIdInput",
+        "optional": false
+      }
+    ],
+    "returns": "Result<AgentSessionSnapshot, String>",
+    "source": "native/src/agent_runtime/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "agent_runtime_list_sessions",
+    "args": [
+      {
+        "name": "request",
+        "rustType": "AgentSessionListRequest",
+        "optional": false
+      }
+    ],
+    "returns": "Result<AgentSessionListPage, String>",
+    "source": "native/src/agent_runtime/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "agent_runtime_archive_session",
+    "args": [
+      {
+        "name": "input",
+        "rustType": "AgentSessionIdInput",
+        "optional": false
+      }
+    ],
+    "returns": "Result<AgentSessionSnapshot, String>",
+    "source": "native/src/agent_runtime/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "agent_runtime_get_events",
+    "args": [
+      {
+        "name": "request",
+        "rustType": "AgentSessionEventsRequest",
+        "optional": false
+      }
+    ],
+    "returns": "Result<AgentSessionEventPage, String>",
+    "source": "native/src/agent_runtime/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "agent_runtime_get_committed_events",
+    "args": [
+      {
+        "name": "request",
+        "rustType": "AgentCommittedEventsRequest",
+        "optional": false
+      }
+    ],
+    "returns": "Result<AgentSessionEventPage, String>",
+    "source": "native/src/agent_runtime/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "agent_runtime_get_artifact",
+    "args": [
+      {
+        "name": "request",
+        "rustType": "AgentArtifactRequest",
+        "optional": false
+      }
+    ],
+    "returns": "Result<AgentArtifactResponse, String>",
+    "source": "native/src/agent_runtime/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "agent_runtime_inspect_recovery",
+    "args": [
+      {
+        "name": "input",
+        "rustType": "AgentRecoverySessionInput",
+        "optional": false
+      }
+    ],
+    "returns": "Result<AgentRecoveryCheckpoint, String>",
+    "source": "native/src/agent_runtime/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "agent_runtime_resume_recovery",
+    "args": [
+      {
+        "name": "input",
+        "rustType": "AgentRecoverySessionInput",
+        "optional": false
+      }
+    ],
+    "returns": "Result<AgentSessionSnapshot, String>",
+    "source": "native/src/agent_runtime/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "agent_runtime_reconcile_recovery",
+    "args": [
+      {
+        "name": "input",
+        "rustType": "AgentRecoveryReconcileInput",
+        "optional": false
+      }
+    ],
+    "returns": "Result<AgentSessionSnapshot, String>",
+    "source": "native/src/agent_runtime/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "agent_runtime_abort_recovery",
+    "args": [
+      {
+        "name": "input",
+        "rustType": "AgentRecoverySessionInput",
+        "optional": false
+      }
+    ],
+    "returns": "Result<AgentSessionSnapshot, String>",
+    "source": "native/src/agent_runtime/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "agent_runtime_list_skills",
+    "args": [
+      {
+        "name": "input",
+        "rustType": "AgentSessionIdInput",
+        "optional": false
+      }
+    ],
+    "returns": "Result<super::skill_runtime::SkillUserList, String>",
+    "source": "native/src/agent_runtime/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "agent_runtime_list_file_references",
+    "args": [
+      {
+        "name": "input",
+        "rustType": "super::file_references::FileReferenceInput",
+        "optional": false
+      }
+    ],
+    "returns": "Result<super::file_references::FileReferenceList, String>",
+    "source": "native/src/agent_runtime/commands.rs",
+    "owner": "native"
+  },
+  {
+    "command": "agent_runtime_cancel_file_references",
+    "args": [
+      {
+        "name": "input",
+        "rustType": "super::file_references::FileReferenceCancel",
+        "optional": false
+      }
+    ],
+    "returns": "Result<(), String>",
+    "source": "native/src/agent_runtime/commands.rs",
+    "owner": "native"
+  }
+]

@@ -1,0 +1,734 @@
+{
+  "baseline": "b2149fd97b18eb084f4dcd9fff4e7b2affa371d3",
+  "rootTypes": {
+    "AgentArtifactRequest": [
+      {
+        "source": "src-tauri/src/agent_runtime/artifact.rs",
+        "line": 41,
+        "sourceSHA256": "4edfb37670573e2dc133017cfa09f6eb98feabc267aec15bf3e2c23dbabae7e6",
+        "definition": "#[derive(Debug, Clone, Deserialize)]\n#[serde(rename_all = \"camelCase\", deny_unknown_fields)]\npub(crate) struct AgentArtifactRequest {\n    pub(crate) session_id: String,\n    pub(crate) artifact_id: String,\n    pub(crate) max_bytes: usize,\n}"
+      }
+    ],
+    "AgentArtifactResponse": [
+      {
+        "source": "src-tauri/src/agent_runtime/artifact.rs",
+        "line": 49,
+        "sourceSHA256": "4edfb37670573e2dc133017cfa09f6eb98feabc267aec15bf3e2c23dbabae7e6",
+        "definition": "#[derive(Debug, Clone, Serialize, PartialEq, Eq)]\n#[serde(rename_all = \"camelCase\", deny_unknown_fields)]\npub(crate) struct AgentArtifactResponse {\n    pub(crate) metadata: AgentArtifactMetadata,\n    pub(crate) body_base64: String,\n    pub(crate) truncated: bool,\n}"
+      }
+    ],
+    "AgentChildInputRequest": [
+      {
+        "source": "src-tauri/src/agent_runtime/subagent.rs",
+        "line": 43,
+        "sourceSHA256": "53c45f829c5b1a936b2265bd2a1e6628a79d59f358f1bea1d7e84622a30a397f",
+        "definition": "#[derive(Debug, Clone, Deserialize)]\n#[serde(rename_all = \"camelCase\", deny_unknown_fields)]\npub(crate) struct AgentChildInputRequest {\n    pub(crate) parent_session_id: String,\n    pub(crate) child_session_id: String,\n    pub(crate) content: String,\n}"
+      }
+    ],
+    "AgentChildInspection": [
+      {
+        "source": "src-tauri/src/agent_runtime/subagent.rs",
+        "line": 58,
+        "sourceSHA256": "53c45f829c5b1a936b2265bd2a1e6628a79d59f358f1bea1d7e84622a30a397f",
+        "definition": "#[derive(Debug, Clone, Serialize)]\n#[serde(rename_all = \"camelCase\", deny_unknown_fields)]\npub(crate) struct AgentChildInspection {\n    pub(crate) snapshot: AgentSessionSnapshot,\n    pub(crate) resident: bool,\n    pub(crate) descendant_session_ids: Vec<String>,\n    pub(crate) tool_calls: u32,\n    pub(crate) total_tokens: u64,\n    pub(crate) last_summary: Option<String>,\n}"
+      }
+    ],
+    "AgentChildRequest": [
+      {
+        "source": "src-tauri/src/agent_runtime/subagent.rs",
+        "line": 51,
+        "sourceSHA256": "53c45f829c5b1a936b2265bd2a1e6628a79d59f358f1bea1d7e84622a30a397f",
+        "definition": "#[derive(Debug, Clone, Deserialize)]\n#[serde(rename_all = \"camelCase\", deny_unknown_fields)]\npub(crate) struct AgentChildRequest {\n    pub(crate) parent_session_id: String,\n    pub(crate) child_session_id: String,\n}"
+      }
+    ],
+    "AgentCommittedEventsRequest": [
+      {
+        "source": "src-tauri/src/agent_runtime/session.rs",
+        "line": 191,
+        "sourceSHA256": "8e84a9244414749f5a396e963b63be4f3ae93607ad4515764fd6a3340b888056",
+        "definition": "#[derive(Debug, Clone, Deserialize)]\n#[serde(rename_all = \"camelCase\", deny_unknown_fields)]\npub(crate) struct AgentCommittedEventsRequest {\n    pub(crate) session_id: String,\n    #[serde(default)]\n    pub(crate) after_seq: Option<u64>,\n    pub(crate) limit: usize,\n}"
+      }
+    ],
+    "AgentFleetControlRequest": [
+      {
+        "source": "src-tauri/src/agent_runtime/subagent.rs",
+        "line": 86,
+        "sourceSHA256": "53c45f829c5b1a936b2265bd2a1e6628a79d59f358f1bea1d7e84622a30a397f",
+        "definition": "#[derive(Debug, Clone, Deserialize)]\n#[serde(rename_all = \"camelCase\", deny_unknown_fields)]\npub(crate) struct AgentFleetControlRequest {\n    pub(crate) parent_session_id: String,\n    pub(crate) fleet_id: String,\n}"
+      }
+    ],
+    "AgentFleetInspection": [
+      {
+        "source": "src-tauri/src/agent_runtime/subagent.rs",
+        "line": 102,
+        "sourceSHA256": "53c45f829c5b1a936b2265bd2a1e6628a79d59f358f1bea1d7e84622a30a397f",
+        "definition": "#[derive(Debug, Clone, Serialize)]\n#[serde(rename_all = \"camelCase\", deny_unknown_fields)]\npub(crate) struct AgentFleetInspection {\n    pub(crate) fleet: AgentFleetState,\n    pub(crate) failure_threshold: u32,\n    pub(crate) failures: u32,\n}"
+      }
+    ],
+    "AgentFleetPlanRequest": [
+      {
+        "source": "src-tauri/src/agent_runtime/subagent.rs",
+        "line": 76,
+        "sourceSHA256": "53c45f829c5b1a936b2265bd2a1e6628a79d59f358f1bea1d7e84622a30a397f",
+        "definition": "#[derive(Debug, Clone, Deserialize)]\n#[serde(rename_all = \"camelCase\", deny_unknown_fields)]\npub(crate) struct AgentFleetPlanRequest {\n    pub(crate) parent_session_id: String,\n    pub(crate) targets: Vec<AgentFleetTargetRequest>,\n    pub(crate) canary_size: u32,\n    pub(crate) wave_size: u32,\n    pub(crate) failure_threshold: u32,\n}"
+      }
+    ],
+    "AgentFleetReconcileRequest": [
+      {
+        "source": "src-tauri/src/agent_runtime/subagent.rs",
+        "line": 93,
+        "sourceSHA256": "53c45f829c5b1a936b2265bd2a1e6628a79d59f358f1bea1d7e84622a30a397f",
+        "definition": "#[derive(Debug, Clone, Deserialize)]\n#[serde(rename_all = \"camelCase\", deny_unknown_fields)]\npub(crate) struct AgentFleetReconcileRequest {\n    pub(crate) parent_session_id: String,\n    pub(crate) fleet_id: String,\n    pub(crate) target_id: String,\n    pub(crate) evidence: String,\n}"
+      }
+    ],
+    "AgentInboxMutationInput": [
+      {
+        "source": "src-tauri/src/agent_runtime/session.rs",
+        "line": 113,
+        "sourceSHA256": "8e84a9244414749f5a396e963b63be4f3ae93607ad4515764fd6a3340b888056",
+        "definition": "#[derive(Debug, Clone, Deserialize, PartialEq, Eq)]\n#[serde(rename_all = \"camelCase\", deny_unknown_fields)]\npub(crate) struct AgentInboxMutationInput {\n    pub(crate) session_id: String,\n    pub(crate) expected_revision: u64,\n    pub(crate) client_operation_id: String,\n    pub(crate) mutation: AgentInboxMutation,\n}"
+      }
+    ],
+    "AgentPermissionInput": [
+      {
+        "source": "src-tauri/src/agent_runtime/commands.rs",
+        "line": 277,
+        "sourceSHA256": "afb1bb1d5bfeb75303e16eea0cb6a39537e438227e21e47e661b7b7bd2a2fbc1",
+        "definition": "#[derive(Debug, Deserialize)]\n#[serde(rename_all = \"camelCase\", deny_unknown_fields)]\npub(crate) struct AgentPermissionInput {\n    session_id: String,\n    mode: super::AgentSessionPermissionMode,\n}"
+      }
+    ],
+    "AgentRecoveryCheckpoint": [
+      {
+        "source": "src-tauri/src/agent_runtime/recovery.rs",
+        "line": 29,
+        "sourceSHA256": "3870d245547b048558dc99850938c3c3630076298e2d795137d3f9dbfc841323",
+        "definition": "#[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq)]\n#[serde(rename_all = \"camelCase\", deny_unknown_fields)]\npub(crate) struct AgentRecoveryCheckpoint {\n    pub(crate) kind: AgentRecoveryCheckpointKind,\n    pub(crate) status: AgentRecoveryStatus,\n    pub(crate) summary: String,\n    pub(crate) last_committed_seq: u64,\n    #[serde(default, skip_serializing_if = \"Option::is_none\")]\n    pub(crate) turn_id: Option<String>,\n    #[serde(default, skip_serializing_if = \"Option::is_none\")]\n    pub(crate) step_id: Option<String>,\n    #[serde(default, skip_serializing_if = \"Option::is_none\")]\n    pub(crate) request_id: Option<String>,\n    #[serde(default, skip_serializing_if = \"Option::is_none\")]\n    pub(crate) call_id: Option<String>,\n    #[serde(default, skip_serializing_if = \"Option::is_none\")]\n    pub(crate) effect: Option<AgentSessionEffect>,\n    #[serde(default, skip_serializing_if = \"Option::is_none\")]\n    pub(crate) idempotency: Option<String>,\n}"
+      }
+    ],
+    "AgentRecoveryReconcileInput": [
+      {
+        "source": "src-tauri/src/agent_runtime/recovery.rs",
+        "line": 65,
+        "sourceSHA256": "3870d245547b048558dc99850938c3c3630076298e2d795137d3f9dbfc841323",
+        "definition": "#[derive(Debug, Clone, Deserialize)]\n#[serde(rename_all = \"camelCase\", deny_unknown_fields)]\npub(crate) struct AgentRecoveryReconcileInput {\n    pub(crate) session_id: String,\n    pub(crate) outcome: AgentRecoveryReconcileOutcome,\n    pub(crate) evidence: String,\n}"
+      }
+    ],
+    "AgentRecoverySessionInput": [
+      {
+        "source": "src-tauri/src/agent_runtime/recovery.rs",
+        "line": 50,
+        "sourceSHA256": "3870d245547b048558dc99850938c3c3630076298e2d795137d3f9dbfc841323",
+        "definition": "#[derive(Debug, Clone, Deserialize)]\n#[serde(rename_all = \"camelCase\", deny_unknown_fields)]\npub(crate) struct AgentRecoverySessionInput {\n    pub(crate) session_id: String,\n}"
+      }
+    ],
+    "AgentRuntimeInjectionInput": [
+      {
+        "source": "src-tauri/src/agent_runtime/commands.rs",
+        "line": 107,
+        "sourceSHA256": "afb1bb1d5bfeb75303e16eea0cb6a39537e438227e21e47e661b7b7bd2a2fbc1",
+        "definition": "#[derive(Debug, Deserialize)]\n#[serde(rename_all = \"camelCase\", deny_unknown_fields)]\npub(crate) struct AgentRuntimeInjectionInput {\n    session_id: String,\n    message_id: String,\n    label: String,\n    content: String,\n}"
+      }
+    ],
+    "AgentRuntimeModelSelectionInput": [
+      {
+        "source": "src-tauri/src/agent_runtime/commands.rs",
+        "line": 100,
+        "sourceSHA256": "afb1bb1d5bfeb75303e16eea0cb6a39537e438227e21e47e661b7b7bd2a2fbc1",
+        "definition": "#[derive(Debug, Deserialize)]\n#[serde(rename_all = \"camelCase\", deny_unknown_fields)]\npub(crate) struct AgentRuntimeModelSelectionInput {\n    session_id: String,\n    selection: crate::llm::routes::ModelSelection,\n}"
+      }
+    ],
+    "AgentRuntimeStartInput": [
+      {
+        "source": "src-tauri/src/agent_runtime/commands.rs",
+        "line": 93,
+        "sourceSHA256": "afb1bb1d5bfeb75303e16eea0cb6a39537e438227e21e47e661b7b7bd2a2fbc1",
+        "definition": "#[derive(Debug, Deserialize)]\n#[serde(rename_all = \"camelCase\", deny_unknown_fields)]\npub(crate) struct AgentRuntimeStartInput {\n    session_id: String,\n    selection: crate::llm::routes::ModelSelection,\n}"
+      }
+    ],
+    "AgentSessionEventPage": [
+      {
+        "source": "src-tauri/src/agent_runtime/session.rs",
+        "line": 200,
+        "sourceSHA256": "8e84a9244414749f5a396e963b63be4f3ae93607ad4515764fd6a3340b888056",
+        "definition": "#[derive(Debug, Clone, Serialize, PartialEq)]\n#[serde(rename_all = \"camelCase\", deny_unknown_fields)]\npub(crate) struct AgentSessionEventPage {\n    pub(crate) events: Vec<AgentSessionEvent>,\n    #[serde(default, skip_serializing_if = \"Option::is_none\")]\n    pub(crate) next_cursor: Option<u64>,\n}"
+      }
+    ],
+    "AgentSessionEventsRequest": [
+      {
+        "source": "src-tauri/src/agent_runtime/session.rs",
+        "line": 182,
+        "sourceSHA256": "8e84a9244414749f5a396e963b63be4f3ae93607ad4515764fd6a3340b888056",
+        "definition": "#[derive(Debug, Clone, Deserialize)]\n#[serde(rename_all = \"camelCase\", deny_unknown_fields)]\npub(crate) struct AgentSessionEventsRequest {\n    pub(crate) session_id: String,\n    #[serde(default)]\n    pub(crate) cursor: Option<u64>,\n    pub(crate) limit: usize,\n}"
+      }
+    ],
+    "AgentSessionIdInput": [
+      {
+        "source": "src-tauri/src/agent_runtime/commands.rs",
+        "line": 116,
+        "sourceSHA256": "afb1bb1d5bfeb75303e16eea0cb6a39537e438227e21e47e661b7b7bd2a2fbc1",
+        "definition": "#[derive(Debug, Deserialize)]\n#[serde(rename_all = \"camelCase\", deny_unknown_fields)]\npub(crate) struct AgentSessionIdInput {\n    session_id: String,\n}"
+      }
+    ],
+    "AgentSessionInput": [
+      {
+        "source": "src-tauri/src/agent_runtime/commands.rs",
+        "line": 83,
+        "sourceSHA256": "afb1bb1d5bfeb75303e16eea0cb6a39537e438227e21e47e661b7b7bd2a2fbc1",
+        "definition": "#[derive(Debug, Deserialize)]\n#[serde(rename_all = \"camelCase\", deny_unknown_fields)]\npub(crate) struct AgentSessionInput {\n    session_id: String,\n    message_id: String,\n    #[serde(default)]\n    client_submission_id: Option<String>,\n    content: String,\n}"
+      }
+    ],
+    "AgentSessionListPage": [
+      {
+        "source": "src-tauri/src/agent_runtime/session.rs",
+        "line": 173,
+        "sourceSHA256": "8e84a9244414749f5a396e963b63be4f3ae93607ad4515764fd6a3340b888056",
+        "definition": "#[derive(Debug, Clone, Serialize, PartialEq, Eq)]\n#[serde(rename_all = \"camelCase\", deny_unknown_fields)]\npub(crate) struct AgentSessionListPage {\n    pub(crate) sessions: Vec<AgentSessionListItem>,\n    #[serde(default, skip_serializing_if = \"Option::is_none\")]\n    pub(crate) next_cursor: Option<String>,\n    pub(crate) recovery_notices: Vec<AgentSessionRecoveryNotice>,\n}"
+      }
+    ],
+    "AgentSessionListRequest": [
+      {
+        "source": "src-tauri/src/agent_runtime/session.rs",
+        "line": 165,
+        "sourceSHA256": "8e84a9244414749f5a396e963b63be4f3ae93607ad4515764fd6a3340b888056",
+        "definition": "#[derive(Debug, Clone, Deserialize)]\n#[serde(rename_all = \"camelCase\", deny_unknown_fields)]\npub(crate) struct AgentSessionListRequest {\n    #[serde(default)]\n    pub(crate) cursor: Option<String>,\n    pub(crate) limit: usize,\n}"
+      }
+    ],
+    "AgentSessionRenameInput": [
+      {
+        "source": "src-tauri/src/agent_runtime/session.rs",
+        "line": 122,
+        "sourceSHA256": "8e84a9244414749f5a396e963b63be4f3ae93607ad4515764fd6a3340b888056",
+        "definition": "#[derive(Debug, Clone, Deserialize, PartialEq, Eq)]\n#[serde(rename_all = \"camelCase\", deny_unknown_fields)]\npub(crate) struct AgentSessionRenameInput {\n    pub(crate) session_id: String,\n    pub(crate) expected_revision: u64,\n    pub(crate) client_operation_id: String,\n    pub(crate) title: String,\n}"
+      }
+    ],
+    "AgentSessionSnapshot": [
+      {
+        "source": "src-tauri/src/agent_runtime/session.rs",
+        "line": 131,
+        "sourceSHA256": "8e84a9244414749f5a396e963b63be4f3ae93607ad4515764fd6a3340b888056",
+        "definition": "#[derive(Debug, Clone, Serialize, PartialEq)]\n#[serde(rename_all = \"camelCase\", deny_unknown_fields)]\npub(crate) struct AgentSessionSnapshot {\n    pub(crate) header: AgentSessionHeader,\n    pub(crate) status: AgentSessionStatus,\n    pub(crate) ended: bool,\n    pub(crate) archived: bool,\n    pub(crate) event_count: u64,\n    pub(crate) surface: AgentSurfaceSnapshot,\n    pub(crate) inbox: AgentInboxProjection,\n    pub(crate) task: AgentTaskProjection,\n    pub(crate) recovery: AgentRecoveryCheckpoint,\n}"
+      }
+    ],
+    "AgentSubagentSpawnRequest": [
+      {
+        "source": "src-tauri/src/agent_runtime/subagent.rs",
+        "line": 29,
+        "sourceSHA256": "53c45f829c5b1a936b2265bd2a1e6628a79d59f358f1bea1d7e84622a30a397f",
+        "definition": "#[derive(Debug, Clone, Deserialize, Serialize)]\n#[serde(rename_all = \"camelCase\", deny_unknown_fields)]\npub(crate) struct AgentSubagentSpawnRequest {\n    pub(crate) parent_session_id: String,\n    pub(crate) goal: String,\n    pub(crate) role: AgentSubagentRole,\n    pub(crate) inheritance_mode: String,\n    pub(crate) target_ids: Vec<String>,\n    #[serde(default)]\n    pub(crate) budget: Option<AgentSubagentBudget>,\n    #[serde(default)]\n    pub(crate) continuable: bool,\n}"
+      }
+    ],
+    "AgentToolDecisionInput": [
+      {
+        "source": "src-tauri/src/agent_runtime/tool_pipeline.rs",
+        "line": 331,
+        "sourceSHA256": "34f2d61e18e6c53d9e682538e2ca7c11268885b2f74a28b37ce21b443f6e8554",
+        "definition": "#[derive(Debug, Clone, Deserialize)]\n#[serde(rename_all = \"camelCase\", deny_unknown_fields)]\npub(crate) struct AgentToolDecisionInput {\n    pub(crate) session_id: String,\n    pub(crate) turn_id: String,\n    pub(crate) step_id: String,\n    pub(crate) request_id: String,\n    pub(crate) call_id: String,\n    pub(crate) approval_id: String,\n}"
+      }
+    ],
+    "AiProviderConfig": [
+      {
+        "source": "src-tauri/src/llm/config.rs",
+        "line": 19,
+        "sourceSHA256": "c1100fb0d3f5f26e3b4e1838cb146f98152340f29bb65d562b59b3c88ca843a5",
+        "definition": "#[derive(Debug, Clone, Deserialize)]\n#[serde(rename_all = \"camelCase\", deny_unknown_fields)]\npub(crate) struct AiProviderConfig {\n    #[serde(default)]\n    pub(crate) model_definition: Option<super::catalog::ModelDefinition>,\n    #[serde(\n        default,\n        deserialize_with = \"crate::agent_runtime::RetryPolicy::deserialize_optional\"\n    )]\n    pub(crate) retry_policy: Option<crate::agent_runtime::RetryPolicy>,\n    #[serde(default)]\n    pub(crate) profile: Option<String>,\n    pub(crate) id: String,\n    pub(crate) kind: AiProviderKind,\n    pub(crate) base_url: String,\n    pub(crate) model: String,\n    #[serde(default)]\n    pub(crate) reasoning_effort: Option<AiReasoningEffort>,\n    pub(crate) requires_api_key: bool,\n    #[serde(default)]\n    pub(crate) api_key: Option<String>,\n}"
+      }
+    ],
+    "AnswerQuestionInput": [
+      {
+        "source": "src-tauri/src/agent_runtime/user_questions.rs",
+        "line": 62,
+        "sourceSHA256": "aba76d8b19280f85e952be0e136a61a0d0faefd281e27fc4f1051462c6697b99",
+        "definition": "#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]\n#[serde(rename_all = \"camelCase\", deny_unknown_fields)]\npub(crate) struct AnswerQuestionInput {\n    pub(crate) identity: QuestionIdentity,\n    pub(crate) client_operation_id: String,\n    pub(crate) answers: Vec<QuestionAnswer>,\n}"
+      }
+    ],
+    "ConnectionPreflightRequest": [
+      {
+        "source": "src-tauri/src/models.rs",
+        "line": 135,
+        "sourceSHA256": "5b1d2f6e9ca0c3fcd50edce39ec3baef8846212da8b84c9219a0de5f1352847b",
+        "definition": "#[derive(Deserialize)]\n#[serde(rename_all = \"camelCase\")]\npub(crate) struct ConnectionPreflightRequest {\n    pub(crate) operation_id: String,\n    #[serde(flatten)]\n    pub(crate) connection: RemoteConnectionRequest,\n}"
+      }
+    ],
+    "ConnectionPreflightResult": [
+      {
+        "source": "src-tauri/src/models.rs",
+        "line": 185,
+        "sourceSHA256": "5b1d2f6e9ca0c3fcd50edce39ec3baef8846212da8b84c9219a0de5f1352847b",
+        "definition": "#[derive(Debug, Clone, Serialize)]\n#[serde(rename_all = \"camelCase\")]\npub(crate) struct ConnectionPreflightResult {\n    pub(crate) operation_id: String,\n    pub(crate) status: ConnectionPreflightStatus,\n    pub(crate) checked_at: i64,\n    pub(crate) steps: Vec<ConnectionPreflightStep>,\n}"
+      }
+    ],
+    "ConversionResult": [
+      {
+        "source": "src-tauri/src/llm/migration.rs",
+        "line": 15,
+        "sourceSHA256": "6df0c378904bc336dcace262fbc92cd642be3b426660960693e85b3773f5b7cb",
+        "definition": "#[derive(Debug, Clone, Serialize, Deserialize)]\n#[serde(rename_all = \"camelCase\")]\npub(crate) struct ConversionResult {\n    pub source: PathBuf,\n    pub destination: PathBuf,\n    pub events: usize,\n    pub status: String,\n}"
+      }
+    ],
+    "ConvertSessionInput": [
+      {
+        "source": "src-tauri/src/ai.rs",
+        "line": 217,
+        "sourceSHA256": "98925aa1220c86f725c2426c85d26b5022a8035c504f56dc02a954ac37350f69",
+        "definition": "#[derive(serde::Deserialize)]\n#[serde(rename_all = \"camelCase\", deny_unknown_fields)]\npub(crate) struct ConvertSessionInput {\n    session_id: String,\n}"
+      }
+    ],
+    "CopyLocalPathsRequest": [
+      {
+        "source": "src-tauri/src/models.rs",
+        "line": 374,
+        "sourceSHA256": "5b1d2f6e9ca0c3fcd50edce39ec3baef8846212da8b84c9219a0de5f1352847b",
+        "definition": "#[derive(Debug, Deserialize)]\n#[serde(rename_all = \"camelCase\")]\npub(crate) struct CopyLocalPathsRequest {\n    pub(crate) source_paths: Vec<String>,\n    pub(crate) destination_directory: String,\n    #[serde(default)]\n    pub(crate) conflict_policies: Vec<UploadConflictPolicy>,\n    pub(crate) operation_id: String,\n}"
+      }
+    ],
+    "CopyRemotePathRequest": [
+      {
+        "source": "src-tauri/src/models.rs",
+        "line": 278,
+        "sourceSHA256": "5b1d2f6e9ca0c3fcd50edce39ec3baef8846212da8b84c9219a0de5f1352847b",
+        "definition": "#[derive(Debug, Deserialize)]\n#[serde(rename_all = \"camelCase\")]\npub(crate) struct CopyRemotePathRequest {\n    #[serde(flatten)]\n    pub(crate) connection: RemoteConnectionRequest,\n    pub(crate) source_path: String,\n    pub(crate) destination_directory: String,\n    pub(crate) operation_id: String,\n}"
+      }
+    ],
+    "CopyRemoteToRemoteRequest": [
+      {
+        "source": "src-tauri/src/models.rs",
+        "line": 384,
+        "sourceSHA256": "5b1d2f6e9ca0c3fcd50edce39ec3baef8846212da8b84c9219a0de5f1352847b",
+        "definition": "#[derive(Debug, Deserialize)]\n#[serde(rename_all = \"camelCase\")]\npub(crate) struct CopyRemoteToRemoteRequest {\n    pub(crate) source_connection: RemoteConnectionRequest,\n    pub(crate) destination_connection: RemoteConnectionRequest,\n    pub(crate) source_paths: Vec<String>,\n    pub(crate) destination_directory: String,\n    #[serde(default)]\n    pub(crate) conflict_policies: Vec<UploadConflictPolicy>,\n    pub(crate) operation_id: String,\n}"
+      }
+    ],
+    "CreateAgentSessionRequest": [
+      {
+        "source": "src-tauri/src/agent_runtime/session.rs",
+        "line": 66,
+        "sourceSHA256": "8e84a9244414749f5a396e963b63be4f3ae93607ad4515764fd6a3340b888056",
+        "definition": "#[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq)]\n#[serde(rename_all = \"camelCase\", deny_unknown_fields)]\npub(crate) struct CreateAgentSessionRequest {\n    pub(crate) session_id: String,\n    pub(crate) task_id: String,\n    pub(crate) goal: String,\n    #[serde(default, skip_serializing_if = \"Option::is_none\")]\n    pub(crate) parent_session_id: Option<String>,\n    #[serde(default, skip_serializing_if = \"Option::is_none\")]\n    pub(crate) target: Option<AgentSessionTarget>,\n    #[serde(default, skip_serializing_if = \"Option::is_none\")]\n    pub(crate) permission_mode: Option<AgentSessionPermissionMode>,\n    #[serde(default, skip_serializing_if = \"Vec::is_empty\")]\n    pub(crate) success_criteria: Vec<String>,\n    #[serde(default, skip_serializing_if = \"Option::is_none\")]\n    pub(crate) capability_scope: Option<super::AgentCapabilityScope>,\n    #[serde(default, skip_serializing_if = \"Option::is_none\")]\n    pub(crate) subagent: Option<AgentSubagentSession>,\n}"
+      }
+    ],
+    "CreateRemoteEntryRequest": [
+      {
+        "source": "src-tauri/src/models.rs",
+        "line": 242,
+        "sourceSHA256": "5b1d2f6e9ca0c3fcd50edce39ec3baef8846212da8b84c9219a0de5f1352847b",
+        "definition": "#[derive(Debug, Deserialize)]\n#[serde(rename_all = \"camelCase\")]\npub(crate) struct CreateRemoteEntryRequest {\n    #[serde(flatten)]\n    pub(crate) connection: RemoteConnectionRequest,\n    pub(crate) parent_path: String,\n    pub(crate) name: String,\n    pub(crate) kind: CreateRemoteEntryKind,\n}"
+      }
+    ],
+    "CreateSessionError": [
+      {
+        "source": "src-tauri/src/models.rs",
+        "line": 433,
+        "sourceSHA256": "5b1d2f6e9ca0c3fcd50edce39ec3baef8846212da8b84c9219a0de5f1352847b",
+        "definition": "#[derive(Debug, Clone, Serialize)]\n#[serde(tag = \"type\", content = \"payload\")]\npub(crate) enum CreateSessionError {\n    HostKeyUnknown {\n        host: String,\n        port: u16,\n        fingerprint: Option<String>,\n    },\n    HostKeyMismatch {\n        host: String,\n        port: u16,\n        #[serde(skip_serializing_if = \"Option::is_none\")]\n        fingerprint: Option<String>,\n    },\n    Other {\n        message: String,\n    },\n}"
+      }
+    ],
+    "DeleteRemotePathRequest": [
+      {
+        "source": "src-tauri/src/models.rs",
+        "line": 268,
+        "sourceSHA256": "5b1d2f6e9ca0c3fcd50edce39ec3baef8846212da8b84c9219a0de5f1352847b",
+        "definition": "#[derive(Debug, Deserialize)]\n#[serde(rename_all = \"camelCase\")]\npub(crate) struct DeleteRemotePathRequest {\n    #[serde(flatten)]\n    pub(crate) connection: RemoteConnectionRequest,\n    // Batch: all paths are deleted over a single dedicated connection.\n    pub(crate) paths: Vec<String>,\n    pub(crate) operation_id: String,\n}"
+      }
+    ],
+    "DownloadRemotePathsRequest": [
+      {
+        "source": "src-tauri/src/models.rs",
+        "line": 327,
+        "sourceSHA256": "5b1d2f6e9ca0c3fcd50edce39ec3baef8846212da8b84c9219a0de5f1352847b",
+        "definition": "#[derive(Debug, Deserialize)]\n#[serde(rename_all = \"camelCase\")]\npub(crate) struct DownloadRemotePathsRequest {\n    #[serde(flatten)]\n    pub(crate) connection: RemoteConnectionRequest,\n    pub(crate) remote_paths: Vec<String>,\n    pub(crate) destination_directory: String,\n    #[serde(default)]\n    pub(crate) conflict_policies: Vec<UploadConflictPolicy>,\n    pub(crate) operation_id: String,\n}"
+      }
+    ],
+    "FileReferenceCancel": [
+      {
+        "source": "src-tauri/src/agent_runtime/file_references.rs",
+        "line": 30,
+        "sourceSHA256": "145b68e7c264251e409e6ff130093f758461433cf6065086483af744b25b2120",
+        "definition": "#[derive(Debug, Clone, Deserialize, Serialize)]\n#[serde(rename_all = \"camelCase\", deny_unknown_fields)]\npub(crate) struct FileReferenceInput {\n    pub(crate) session_id: String,\n    pub(crate) request_id: String,\n    pub(crate) query: String,\n}\n#[derive(Debug, Clone, Deserialize, Serialize)]\n#[serde(rename_all = \"camelCase\", deny_unknown_fields)]\npub(crate) struct FileReferenceCancel {\n    pub(crate) session_id: String,\n    pub(crate) request_id: String,\n}"
+      }
+    ],
+    "FileReferenceInput": [
+      {
+        "source": "src-tauri/src/agent_runtime/file_references.rs",
+        "line": 23,
+        "sourceSHA256": "145b68e7c264251e409e6ff130093f758461433cf6065086483af744b25b2120",
+        "definition": "#[derive(Debug, Clone, Deserialize, Serialize)]\n#[serde(rename_all = \"camelCase\", deny_unknown_fields)]\npub(crate) struct FileReferenceInput {\n    pub(crate) session_id: String,\n    pub(crate) request_id: String,\n    pub(crate) query: String,\n}"
+      }
+    ],
+    "FileReferenceList": [
+      {
+        "source": "src-tauri/src/agent_runtime/file_references.rs",
+        "line": 42,
+        "sourceSHA256": "145b68e7c264251e409e6ff130093f758461433cf6065086483af744b25b2120",
+        "definition": "#[derive(Debug, Clone, Deserialize, Serialize)]\n#[serde(rename_all = \"camelCase\", deny_unknown_fields)]\npub(crate) struct FileReferenceInput {\n    pub(crate) session_id: String,\n    pub(crate) request_id: String,\n    pub(crate) query: String,\n}\n#[derive(Debug, Clone, Deserialize, Serialize)]\n#[serde(rename_all = \"camelCase\", deny_unknown_fields)]\npub(crate) struct FileReferenceCancel {\n    pub(crate) session_id: String,\n    pub(crate) request_id: String,\n}\n#[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq)]\n#[serde(rename_all = \"camelCase\", deny_unknown_fields)]\npub(crate) struct FileCandidate {\n    pub(crate) path: String,\n    pub(crate) kind: String,\n}\n#[derive(Debug, Clone, Serialize)]\n#[serde(rename_all = \"camelCase\")]\npub(crate) struct FileReferenceList {\n    pub(crate) entries: Vec<FileCandidate>,\n    pub(crate) scope: Option<SkillScope>,\n    pub(crate) status: String,\n    pub(crate) code: Option<String>,\n    pub(crate) excluded: usize,\n}"
+      }
+    ],
+    "HostKeyCheckRequest": [
+      {
+        "source": "src-tauri/src/models.rs",
+        "line": 396,
+        "sourceSHA256": "5b1d2f6e9ca0c3fcd50edce39ec3baef8846212da8b84c9219a0de5f1352847b",
+        "definition": "#[derive(Debug, Deserialize)]\n#[serde(rename_all = \"camelCase\")]\npub(crate) struct HostKeyCheckRequest {\n    pub(crate) host: String,\n    pub(crate) port: u16,\n}"
+      }
+    ],
+    "HostKeyCheckResult": [
+      {
+        "source": "src-tauri/src/models.rs",
+        "line": 403,
+        "sourceSHA256": "5b1d2f6e9ca0c3fcd50edce39ec3baef8846212da8b84c9219a0de5f1352847b",
+        "definition": "#[derive(Debug, Clone, Serialize)]\n#[serde(rename_all = \"camelCase\")]\npub(crate) struct HostKeyCheckResult {\n    pub(crate) status: HostKeyCheckStatus,\n    pub(crate) fingerprint: Option<String>,\n    pub(crate) message: Option<String>,\n}"
+      }
+    ],
+    "ImageOperation": [
+      {
+        "source": "src-tauri/src/agent_runtime/images.rs",
+        "line": 124,
+        "sourceSHA256": "6b2f6f8a0f914a9d1a1a8ef5d7de40c1ac908dfbf29006e6d69448f15a0cace3",
+        "definition": "#[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq)]\n#[serde(rename_all = \"camelCase\", deny_unknown_fields)]\npub(crate) struct ImageRef {\n    pub version: u32,\n    pub sha256: String,\n    pub media_type: String,\n    pub bytes: u64,\n    pub width: u32,\n    pub height: u32,\n    pub name: String,\n}\nimpl ImageRef {\n    pub(crate) fn validate(&self) -> Result<(), String> {\n        if self.version != 1\n            || self.sha256.len() != 64\n            || !self\n                .sha256\n                .bytes()\n                .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))\n            || self.media_type != \"image/png\"\n            || self.bytes == 0\n            || self.bytes > VISION.max_normalized_bytes as u64\n            || self.width == 0\n            || self.height == 0\n            || u64::from(self.width) * u64::from(self.height) > VISION.max_normalized_pixels\n            || self.width.max(self.height) > VISION.max_normalized_dimension\n            || clean_name(&self.name)? != self.name\n        {\n            return Err(\"IMAGE_REFERENCE_INVALID\".into());\n        }\n        Ok(())\n    }\n}\n#[derive(Debug, Clone, Deserialize, Serialize)]\n#[serde(rename_all = \"camelCase\", deny_unknown_fields)]\npub(crate) struct ImageUpload {\n    pub media_type: String,\n    pub data: String,\n    pub name: String,\n}\npub(crate) fn validate_upload_envelope(uploads: &[ImageUpload]) -> Result<(), String> {\n    if uploads.is_empty() || uploads.len() > VISION.max_images {\n        return Err(\"IMAGE_COUNT_LIMIT\".into());\n    }\n    let mut total = 0usize;\n    for upload in uploads {\n        if upload.data.len() > VISION.max_source_bytes.div_ceil(3) * 4 {\n            return Err(\"IMAGE_SOURCE_LIMIT\".into());\n        }\n        clean_name(&upload.name)?;\n        total = total\n            .checked_add(upload.data.len())\n            .ok_or(\"IMAGE_BATCH_LIMIT\")?;\n    }\n    if total > VISION.max_batch_bytes.div_ceil(3) * 4 + uploads.len() * 4 {\n        return Err(\"IMAGE_BATCH_LIMIT\".into());\n    }\n    Ok(())\n}\n#[derive(Debug, Clone, Deserialize)]\n#[serde(rename_all = \"camelCase\", deny_unknown_fields)]\npub(crate) struct ImageSubmission {\n    pub session_id: String,\n    pub client_operation_id: String,\n    pub content: String,\n    pub lane: super::AgentInboxLane,\n    pub images: Vec<ImageUpload>,\n}\n#[derive(Debug, Clone, Deserialize)]\n#[serde(rename_all = \"camelCase\", deny_unknown_fields)]\npub(crate) struct ImageOperation {\n    pub session_id: String,\n    pub client_operation_id: String,\n}"
+      }
+    ],
+    "ImagePreviewRequest": [
+      {
+        "source": "src-tauri/src/agent_runtime/images.rs",
+        "line": 130,
+        "sourceSHA256": "6b2f6f8a0f914a9d1a1a8ef5d7de40c1ac908dfbf29006e6d69448f15a0cace3",
+        "definition": "#[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq)]\n#[serde(rename_all = \"camelCase\", deny_unknown_fields)]\npub(crate) struct ImageRef {\n    pub version: u32,\n    pub sha256: String,\n    pub media_type: String,\n    pub bytes: u64,\n    pub width: u32,\n    pub height: u32,\n    pub name: String,\n}\nimpl ImageRef {\n    pub(crate) fn validate(&self) -> Result<(), String> {\n        if self.version != 1\n            || self.sha256.len() != 64\n            || !self\n                .sha256\n                .bytes()\n                .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))\n            || self.media_type != \"image/png\"\n            || self.bytes == 0\n            || self.bytes > VISION.max_normalized_bytes as u64\n            || self.width == 0\n            || self.height == 0\n            || u64::from(self.width) * u64::from(self.height) > VISION.max_normalized_pixels\n            || self.width.max(self.height) > VISION.max_normalized_dimension\n            || clean_name(&self.name)? != self.name\n        {\n            return Err(\"IMAGE_REFERENCE_INVALID\".into());\n        }\n        Ok(())\n    }\n}\n#[derive(Debug, Clone, Deserialize, Serialize)]\n#[serde(rename_all = \"camelCase\", deny_unknown_fields)]\npub(crate) struct ImageUpload {\n    pub media_type: String,\n    pub data: String,\n    pub name: String,\n}\npub(crate) fn validate_upload_envelope(uploads: &[ImageUpload]) -> Result<(), String> {\n    if uploads.is_empty() || uploads.len() > VISION.max_images {\n        return Err(\"IMAGE_COUNT_LIMIT\".into());\n    }\n    let mut total = 0usize;\n    for upload in uploads {\n        if upload.data.len() > VISION.max_source_bytes.div_ceil(3) * 4 {\n            return Err(\"IMAGE_SOURCE_LIMIT\".into());\n        }\n        clean_name(&upload.name)?;\n        total = total\n            .checked_add(upload.data.len())\n            .ok_or(\"IMAGE_BATCH_LIMIT\")?;\n    }\n    if total > VISION.max_batch_bytes.div_ceil(3) * 4 + uploads.len() * 4 {\n        return Err(\"IMAGE_BATCH_LIMIT\".into());\n    }\n    Ok(())\n}\n#[derive(Debug, Clone, Deserialize)]\n#[serde(rename_all = \"camelCase\", deny_unknown_fields)]\npub(crate) struct ImageSubmission {\n    pub session_id: String,\n    pub client_operation_id: String,\n    pub content: String,\n    pub lane: super::AgentInboxLane,\n    pub images: Vec<ImageUpload>,\n}\n#[derive(Debug, Clone, Deserialize)]\n#[serde(rename_all = \"camelCase\", deny_unknown_fields)]\npub(crate) struct ImageOperation {\n    pub session_id: String,\n    pub client_operation_id: String,\n}\n#[derive(Debug, Deserialize)]\n#[serde(rename_all = \"camelCase\", deny_unknown_fields)]\npub(crate) struct ImagePreviewRequest {\n    pub session_id: String,\n    pub sha256: String,\n}"
+      }
+    ],
+    "ImageSubmission": [
+      {
+        "source": "src-tauri/src/agent_runtime/images.rs",
+        "line": 115,
+        "sourceSHA256": "6b2f6f8a0f914a9d1a1a8ef5d7de40c1ac908dfbf29006e6d69448f15a0cace3",
+        "definition": "#[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq)]\n#[serde(rename_all = \"camelCase\", deny_unknown_fields)]\npub(crate) struct ImageRef {\n    pub version: u32,\n    pub sha256: String,\n    pub media_type: String,\n    pub bytes: u64,\n    pub width: u32,\n    pub height: u32,\n    pub name: String,\n}\nimpl ImageRef {\n    pub(crate) fn validate(&self) -> Result<(), String> {\n        if self.version != 1\n            || self.sha256.len() != 64\n            || !self\n                .sha256\n                .bytes()\n                .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))\n            || self.media_type != \"image/png\"\n            || self.bytes == 0\n            || self.bytes > VISION.max_normalized_bytes as u64\n            || self.width == 0\n            || self.height == 0\n            || u64::from(self.width) * u64::from(self.height) > VISION.max_normalized_pixels\n            || self.width.max(self.height) > VISION.max_normalized_dimension\n            || clean_name(&self.name)? != self.name\n        {\n            return Err(\"IMAGE_REFERENCE_INVALID\".into());\n        }\n        Ok(())\n    }\n}\n#[derive(Debug, Clone, Deserialize, Serialize)]\n#[serde(rename_all = \"camelCase\", deny_unknown_fields)]\npub(crate) struct ImageUpload {\n    pub media_type: String,\n    pub data: String,\n    pub name: String,\n}\npub(crate) fn validate_upload_envelope(uploads: &[ImageUpload]) -> Result<(), String> {\n    if uploads.is_empty() || uploads.len() > VISION.max_images {\n        return Err(\"IMAGE_COUNT_LIMIT\".into());\n    }\n    let mut total = 0usize;\n    for upload in uploads {\n        if upload.data.len() > VISION.max_source_bytes.div_ceil(3) * 4 {\n            return Err(\"IMAGE_SOURCE_LIMIT\".into());\n        }\n        clean_name(&upload.name)?;\n        total = total\n            .checked_add(upload.data.len())\n            .ok_or(\"IMAGE_BATCH_LIMIT\")?;\n    }\n    if total > VISION.max_batch_bytes.div_ceil(3) * 4 + uploads.len() * 4 {\n        return Err(\"IMAGE_BATCH_LIMIT\".into());\n    }\n    Ok(())\n}\n#[derive(Debug, Clone, Deserialize)]\n#[serde(rename_all = \"camelCase\", deny_unknown_fields)]\npub(crate) struct ImageSubmission {\n    pub session_id: String,\n    pub client_operation_id: String,\n    pub content: String,\n    pub lane: super::AgentInboxLane,\n    pub images: Vec<ImageUpload>,\n}"
+      }
+    ],
+    "ImageUpload": [
+      {
+        "source": "src-tauri/src/agent_runtime/images.rs",
+        "line": 89,
+        "sourceSHA256": "6b2f6f8a0f914a9d1a1a8ef5d7de40c1ac908dfbf29006e6d69448f15a0cace3",
+        "definition": "#[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq)]\n#[serde(rename_all = \"camelCase\", deny_unknown_fields)]\npub(crate) struct ImageRef {\n    pub version: u32,\n    pub sha256: String,\n    pub media_type: String,\n    pub bytes: u64,\n    pub width: u32,\n    pub height: u32,\n    pub name: String,\n}\nimpl ImageRef {\n    pub(crate) fn validate(&self) -> Result<(), String> {\n        if self.version != 1\n            || self.sha256.len() != 64\n            || !self\n                .sha256\n                .bytes()\n                .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))\n            || self.media_type != \"image/png\"\n            || self.bytes == 0\n            || self.bytes > VISION.max_normalized_bytes as u64\n            || self.width == 0\n            || self.height == 0\n            || u64::from(self.width) * u64::from(self.height) > VISION.max_normalized_pixels\n            || self.width.max(self.height) > VISION.max_normalized_dimension\n            || clean_name(&self.name)? != self.name\n        {\n            return Err(\"IMAGE_REFERENCE_INVALID\".into());\n        }\n        Ok(())\n    }\n}\n#[derive(Debug, Clone, Deserialize, Serialize)]\n#[serde(rename_all = \"camelCase\", deny_unknown_fields)]\npub(crate) struct ImageUpload {\n    pub media_type: String,\n    pub data: String,\n    pub name: String,\n}"
+      }
+    ],
+    "KeyCredentialRequest": [
+      {
+        "source": "src-tauri/src/commands.rs",
+        "line": 98,
+        "sourceSHA256": "66b64ca1d7c39f3fe43fde52590d7ae18ccefe52214e0c5ef92a307c7e36a891",
+        "definition": "#[derive(Debug, Deserialize)]\n#[serde(rename_all = \"camelCase\")]\npub(crate) struct KeyCredentialRequest {\n    pub(crate) id: String,\n    pub(crate) label: String,\n    pub(crate) kind: crate::models::KeyCredentialKind,\n    pub(crate) private_key: Option<String>,\n    pub(crate) public_key: Option<String>,\n    #[serde(default)]\n    pub(crate) key_type: Option<String>,\n}"
+      }
+    ],
+    "KeyCredentialResponse": [
+      {
+        "source": "src-tauri/src/commands.rs",
+        "line": 110,
+        "sourceSHA256": "66b64ca1d7c39f3fe43fde52590d7ae18ccefe52214e0c5ef92a307c7e36a891",
+        "definition": "#[derive(Debug, Serialize)]\n#[serde(rename_all = \"camelCase\")]\npub(crate) struct KeyCredentialResponse {\n    pub(crate) id: String,\n    pub(crate) label: String,\n    pub(crate) kind: crate::models::KeyCredentialKind,\n    pub(crate) private_key: Option<String>,\n    pub(crate) public_key: Option<String>,\n    pub(crate) key_type: String,\n    pub(crate) updated_at: i64,\n}"
+      }
+    ],
+    "KeyCredentialSummary": [
+      {
+        "source": "src-tauri/src/models.rs",
+        "line": 818,
+        "sourceSHA256": "5b1d2f6e9ca0c3fcd50edce39ec3baef8846212da8b84c9219a0de5f1352847b",
+        "definition": "#[derive(Debug, Clone, Serialize)]\n#[serde(rename_all = \"camelCase\")]\npub(crate) struct KeyCredentialSummary {\n    pub(crate) id: String,\n    pub(crate) label: String,\n    pub(crate) key_type: String,\n    pub(crate) kind: KeyCredentialKind,\n    pub(crate) service: String,\n}"
+      }
+    ],
+    "KnownHostEntry": [
+      {
+        "source": "src-tauri/src/models.rs",
+        "line": 828,
+        "sourceSHA256": "5b1d2f6e9ca0c3fcd50edce39ec3baef8846212da8b84c9219a0de5f1352847b",
+        "definition": "#[derive(Debug, Clone, Serialize)]\n#[serde(rename_all = \"camelCase\")]\npub(crate) struct KnownHostEntry {\n    pub(crate) host: String,\n    pub(crate) port: u16,\n    pub(crate) fingerprint: String,\n    pub(crate) key_type: String,\n}"
+      }
+    ],
+    "LocalDirectoryListing": [
+      {
+        "source": "src-tauri/src/models.rs",
+        "line": 845,
+        "sourceSHA256": "5b1d2f6e9ca0c3fcd50edce39ec3baef8846212da8b84c9219a0de5f1352847b",
+        "definition": "#[derive(Debug, Clone, Serialize)]\n#[serde(rename_all = \"camelCase\")]\npub(crate) struct LocalDirectoryListing {\n    pub(crate) path: String,\n    pub(crate) parent_path: Option<String>,\n    pub(crate) entries: Vec<LocalFileEntry>,\n}"
+      }
+    ],
+    "LogFileInfo": [
+      {
+        "source": "src-tauri/src/models.rs",
+        "line": 837,
+        "sourceSHA256": "5b1d2f6e9ca0c3fcd50edce39ec3baef8846212da8b84c9219a0de5f1352847b",
+        "definition": "#[derive(Debug, Clone, Serialize)]\n#[serde(rename_all = \"camelCase\")]\npub(crate) struct LogFileInfo {\n    pub(crate) name: String,\n    pub(crate) size: u64,\n    pub(crate) modified_at: u64,\n}"
+      }
+    ],
+    "ModelDefinition": [
+      {
+        "source": "src-tauri/src/llm/catalog.rs",
+        "line": 70,
+        "sourceSHA256": "e1e2219a12a8ed73a458ba3d33b99237c41d80f8314261c328faee2d2e4a225b",
+        "definition": "/// Full explicit declaration, also usable to replace an exact built-in entry.\n/// All capacities and support states are required: absence never grants tools/images.\n#[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq)]\n#[serde(rename_all = \"camelCase\", deny_unknown_fields)]\npub(crate) struct ModelDefinition {\n    pub context_window: u64,\n    pub max_output_tokens: u64,\n    pub tool_calling: Support,\n    pub text_input: Support,\n    pub image_input: Support,\n    pub reasoning: Vec<ReasoningOption>,\n    pub compat: Compat,\n    #[serde(default, skip_serializing_if = \"Option::is_none\")]\n    pub vision: Option<VisionBudget>,\n}"
+      }
+    ],
+    "OpenRemoteFileRequest": [
+      {
+        "source": "src-tauri/src/models.rs",
+        "line": 288,
+        "sourceSHA256": "5b1d2f6e9ca0c3fcd50edce39ec3baef8846212da8b84c9219a0de5f1352847b",
+        "definition": "#[derive(Debug, Deserialize)]\n#[serde(rename_all = \"camelCase\")]\npub(crate) struct OpenRemoteFileRequest {\n    #[serde(flatten)]\n    pub(crate) connection: RemoteConnectionRequest,\n    pub(crate) path: String,\n    pub(crate) operation_id: String,\n}"
+      }
+    ],
+    "PetdexConnectionStatus": [
+      {
+        "source": "src-tauri/src/petdex/types.rs",
+        "line": 42,
+        "sourceSHA256": "48f3d7b2f63be7618ec22446d467fb3621654c80b9da3bd54f46333cdd1410c3",
+        "definition": "#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]\n#[serde(rename_all = \"camelCase\")]\npub(crate) enum PetdexConnectionStatus {\n    NotDetected = 0,\n    Connected = 1,\n    NotRunning = 2,\n    ConnectionError = 3,\n}"
+      }
+    ],
+    "PortForwardRuntime": [
+      {
+        "source": "src-tauri/src/port_forward.rs",
+        "line": 53,
+        "sourceSHA256": "4095759f7f4edd2c68443169e25fecabff7fcfed4b03f3b7d720afcf97b54bed",
+        "definition": "#[derive(Debug, Clone, Serialize)]\n#[serde(rename_all = \"camelCase\")]\npub(crate) struct PortForwardRuntime {\n    pub(crate) operation_id: String,\n    pub(crate) profile_id: String,\n    pub(crate) config_id: String,\n    pub(crate) name: String,\n    pub(crate) kind: PortForwardKind,\n    pub(crate) mode: PortForwardStartMode,\n    pub(crate) status: PortForwardStatus,\n    pub(crate) started_at: Option<u64>,\n    pub(crate) stopped_at: Option<u64>,\n    pub(crate) bytes_sent: u64,\n    pub(crate) bytes_received: u64,\n    pub(crate) last_error: Option<String>,\n    pub(crate) error_category: Option<PortForwardErrorCategory>,\n}"
+      }
+    ],
+    "PortForwardStartRequest": [
+      {
+        "source": "src-tauri/src/models.rs",
+        "line": 55,
+        "sourceSHA256": "5b1d2f6e9ca0c3fcd50edce39ec3baef8846212da8b84c9219a0de5f1352847b",
+        "definition": "#[derive(Clone, Deserialize)]\n#[serde(rename_all = \"camelCase\")]\npub(crate) struct PortForwardStartRequest {\n    pub(crate) operation_id: String,\n    pub(crate) profile_id: String,\n    pub(crate) mode: PortForwardStartMode,\n    pub(crate) connection: RemoteConnectionRequest,\n    pub(crate) forward: PortForwardConfig,\n}"
+      }
+    ],
+    "ProfileRow": [
+      {
+        "source": "src-tauri/src/models.rs",
+        "line": 2107,
+        "sourceSHA256": "5b1d2f6e9ca0c3fcd50edce39ec3baef8846212da8b84c9219a0de5f1352847b",
+        "definition": "#[derive(Debug, Clone, Serialize, Deserialize)]\n#[serde(rename_all = \"camelCase\")]\npub(crate) struct ProfileRow {\n    pub(crate) id: String,\n    pub(crate) name: String,\n    pub(crate) host: String,\n    pub(crate) port: u16,\n    pub(crate) username: String,\n    pub(crate) auth_method: ProfileAuthMethod,\n    pub(crate) keychain_key_id: Option<String>,\n    pub(crate) jump_host_config: Option<String>,\n    #[serde(default)]\n    pub(crate) organization_json: Option<String>,\n    pub(crate) created_at: i64,\n    pub(crate) updated_at: i64,\n}"
+      }
+    ],
+    "ProfileSecretKind": [
+      {
+        "source": "src-tauri/src/keychain.rs",
+        "line": 106,
+        "sourceSHA256": "2b5f7922db0e4c86c8b763e4bd2042d77526efd3e3d8339895cf27500fba6c0e",
+        "definition": "/// Kinds of per-profile secrets other than the main login password.\n///\n/// The main password keeps using [`PROFILE_PASSWORD_SERVICE`] keyed by the\n/// bare profile id; these secrets live in [`PROFILE_SECRET_SERVICE`] keyed by\n/// `{profile_id}:{suffix}` so one profile can hold several secrets without\n/// collisions.\n#[derive(Debug, Clone, Copy, serde::Serialize, serde::Deserialize, PartialEq, Eq)]\n#[serde(rename_all = \"kebab-case\")]\npub(crate) enum ProfileSecretKind {\n    /// Passphrase of the profile's own private key.\n    Passphrase,\n    /// Password of the jump host (password auth).\n    JumpPassword,\n    /// Passphrase of the jump host's private key.\n    JumpPassphrase,\n}"
+      }
+    ],
+    "ReadRemoteFileRequest": [
+      {
+        "source": "src-tauri/src/models.rs",
+        "line": 306,
+        "sourceSHA256": "5b1d2f6e9ca0c3fcd50edce39ec3baef8846212da8b84c9219a0de5f1352847b",
+        "definition": "#[derive(Debug, Deserialize)]\n#[serde(rename_all = \"camelCase\")]\npub(crate) struct ReadRemoteFileRequest {\n    #[serde(flatten)]\n    pub(crate) connection: RemoteConnectionRequest,\n    pub(crate) path: String,\n    pub(crate) operation_id: String,\n}"
+      }
+    ],
+    "ReadRemoteFileResponse": [
+      {
+        "source": "src-tauri/src/models.rs",
+        "line": 315,
+        "sourceSHA256": "5b1d2f6e9ca0c3fcd50edce39ec3baef8846212da8b84c9219a0de5f1352847b",
+        "definition": "#[derive(Debug, Clone, Serialize)]\n#[serde(rename_all = \"camelCase\")]\npub(crate) struct ReadRemoteFileResponse {\n    pub(crate) path: String,\n    pub(crate) name: String,\n    pub(crate) content: String,\n    pub(crate) size: u64,\n    pub(crate) is_text: bool,\n    pub(crate) content_encoding: String,\n    pub(crate) truncated: bool,\n}"
+      }
+    ],
+    "RemoteConnectionRequest": [
+      {
+        "source": "src-tauri/src/models.rs",
+        "line": 120,
+        "sourceSHA256": "5b1d2f6e9ca0c3fcd50edce39ec3baef8846212da8b84c9219a0de5f1352847b",
+        "definition": "#[derive(Clone, Deserialize)]\n#[serde(rename_all = \"camelCase\")]\npub(crate) struct RemoteConnectionRequest {\n    pub(crate) host: String,\n    pub(crate) port: u16,\n    pub(crate) username: String,\n    pub(crate) auth_method: AuthMethod,\n    pub(crate) password: Option<String>,\n    pub(crate) keychain_key_id: Option<String>,\n    #[serde(default)]\n    pub(crate) private_key_data: Option<String>,\n    pub(crate) passphrase: Option<String>,\n    pub(crate) jump_host: Option<JumpHostConfig>,\n}"
+      }
+    ],
+    "RemoteDirectoryListing": [
+      {
+        "source": "src-tauri/src/models.rs",
+        "line": 754,
+        "sourceSHA256": "5b1d2f6e9ca0c3fcd50edce39ec3baef8846212da8b84c9219a0de5f1352847b",
+        "definition": "#[derive(Debug, Clone, Serialize)]\n#[serde(rename_all = \"camelCase\")]\npub(crate) struct RemoteDirectoryListing {\n    pub(crate) path: String,\n    pub(crate) parent_path: Option<String>,\n    pub(crate) entries: Vec<RemoteFileEntry>,\n}"
+      }
+    ],
+    "RemoteDirectoryRequest": [
+      {
+        "source": "src-tauri/src/models.rs",
+        "line": 212,
+        "sourceSHA256": "5b1d2f6e9ca0c3fcd50edce39ec3baef8846212da8b84c9219a0de5f1352847b",
+        "definition": "#[derive(Debug, Deserialize)]\n#[serde(rename_all = \"camelCase\")]\npub(crate) struct RemoteDirectoryRequest {\n    #[serde(flatten)]\n    pub(crate) connection: RemoteConnectionRequest,\n    pub(crate) path: Option<String>,\n    pub(crate) request_key: String,\n    pub(crate) request_id: u64,\n}"
+      }
+    ],
+    "RemoteEntryOwners": [
+      {
+        "source": "src-tauri/src/models.rs",
+        "line": 235,
+        "sourceSHA256": "5b1d2f6e9ca0c3fcd50edce39ec3baef8846212da8b84c9219a0de5f1352847b",
+        "definition": "#[derive(Debug, Clone, Serialize)]\n#[serde(rename_all = \"camelCase\")]\npub(crate) struct RemoteEntryOwners {\n    pub(crate) owner_names: HashMap<u32, String>,\n    pub(crate) group_names: HashMap<u32, String>,\n}"
+      }
+    ],
+    "RemoteEntryOwnersRequest": [
+      {
+        "source": "src-tauri/src/models.rs",
+        "line": 222,
+        "sourceSHA256": "5b1d2f6e9ca0c3fcd50edce39ec3baef8846212da8b84c9219a0de5f1352847b",
+        "definition": "#[derive(Debug, Deserialize)]\n#[serde(rename_all = \"camelCase\")]\npub(crate) struct RemoteEntryOwnersRequest {\n    #[serde(flatten)]\n    pub(crate) connection: RemoteConnectionRequest,\n    pub(crate) request_key: String,\n    pub(crate) request_id: u64,\n    #[serde(default)]\n    pub(crate) owner_ids: Vec<u32>,\n    #[serde(default)]\n    pub(crate) group_ids: Vec<u32>,\n}"
+      }
+    ],
+    "RemoteFsError": [
+      {
+        "source": "src-tauri/src/models.rs",
+        "line": 535,
+        "sourceSHA256": "5b1d2f6e9ca0c3fcd50edce39ec3baef8846212da8b84c9219a0de5f1352847b",
+        "definition": "/// Structured remote filesystem error. Serialization matches `CreateSessionError`\n/// so the frontend can reuse the same host-key dialog handling.\n#[derive(Debug, Clone, PartialEq, Serialize)]\n#[serde(tag = \"type\", content = \"payload\")]\npub(crate) enum RemoteFsError {\n    HostKeyUnknown {\n        host: String,\n        port: u16,\n        fingerprint: Option<String>,\n    },\n    HostKeyMismatch {\n        host: String,\n        port: u16,\n        #[serde(skip_serializing_if = \"Option::is_none\")]\n        fingerprint: Option<String>,\n    },\n    Other {\n        message: String,\n    },\n}"
+      }
+    ],
+    "RemoteHealthSnapshotRequest": [
+      {
+        "source": "src-tauri/src/remote_health.rs",
+        "line": 55,
+        "sourceSHA256": "a5fe7c25cb6f708326c097b49aa0c2b6b4becf298911c99e633c47c7c43d2880",
+        "definition": "#[derive(Debug, Clone, Deserialize)]\n#[serde(rename_all = \"camelCase\")]\npub(crate) struct RemoteHealthSnapshotRequest {\n    operation_id: String,\n    profile_id: String,\n    authorized: bool,\n    timeout_ms: u64,\n    connection: RemoteConnectionRequest,\n}"
+      }
+    ],
+    "RemoteHealthSnapshotResult": [
+      {
+        "source": "src-tauri/src/remote_health.rs",
+        "line": 142,
+        "sourceSHA256": "a5fe7c25cb6f708326c097b49aa0c2b6b4becf298911c99e633c47c7c43d2880",
+        "definition": "#[derive(Debug, Clone, Serialize)]\n#[serde(rename_all = \"camelCase\")]\npub(crate) struct RemoteHealthSnapshotResult {\n    operation_id: String,\n    profile_id: String,\n    status: RemoteHealthResultStatus,\n    checked_at: i64,\n    source: RemoteHealthSource,\n    snapshot: Option<RemoteHealthSnapshot>,\n    error: Option<String>,\n}"
+      }
+    ],
+    "RenameRemotePathRequest": [
+      {
+        "source": "src-tauri/src/models.rs",
+        "line": 259,
+        "sourceSHA256": "5b1d2f6e9ca0c3fcd50edce39ec3baef8846212da8b84c9219a0de5f1352847b",
+        "definition": "#[derive(Debug, Deserialize)]\n#[serde(rename_all = \"camelCase\")]\npub(crate) struct RenameRemotePathRequest {\n    #[serde(flatten)]\n    pub(crate) connection: RemoteConnectionRequest,\n    pub(crate) path: String,\n    pub(crate) new_name: String,\n}"
+      }
+    ],
+    "ResolveSelectionInput": [
+      {
+        "source": "src-tauri/src/ai.rs",
+        "line": 197,
+        "sourceSHA256": "98925aa1220c86f725c2426c85d26b5022a8035c504f56dc02a954ac37350f69",
+        "definition": "#[derive(serde::Deserialize)]\n#[serde(rename_all = \"camelCase\", deny_unknown_fields)]\npub(crate) struct ResolveSelectionInput {\n    selection: crate::llm::routes::ModelSelection,\n    expected_revision: u64,\n}"
+      }
+    ],
+    "ResolvedModel": [
+      {
+        "source": "src-tauri/src/llm/catalog.rs",
+        "line": 113,
+        "sourceSHA256": "e1e2219a12a8ed73a458ba3d33b99237c41d80f8314261c328faee2d2e4a225b",
+        "definition": "#[derive(Debug, Clone, Serialize)]\n#[serde(rename_all = \"camelCase\")]\npub(crate) struct ResolvedModel {\n    pub catalog_version: u32,\n    pub route_id: String,\n    pub provider_id: String,\n    pub profile: String,\n    pub kind: AiProviderKind,\n    pub model_id: String,\n    pub source: &'static str,\n    pub capacity_policy: &'static str,\n    #[serde(skip)]\n    pub endpoint: reqwest::Url,\n    #[serde(flatten)]\n    pub definition: ModelDefinition,\n}"
+      }
+    ],
+    "RouteModelsResult": [
+      {
+        "source": "src-tauri/src/ai.rs",
+        "line": 190,
+        "sourceSHA256": "98925aa1220c86f725c2426c85d26b5022a8035c504f56dc02a954ac37350f69",
+        "definition": "#[derive(serde::Serialize)]\n#[serde(rename_all = \"camelCase\")]\npub(crate) struct RouteModelsResult {\n    revision: u64,\n    models: Vec<crate::llm::catalog::ResolvedModel>,\n}"
+      }
+    ],
+    "RouteSnapshot": [
+      {
+        "source": "src-tauri/src/llm/routes.rs",
+        "line": 193,
+        "sourceSHA256": "463324d5c9e4785e981f2f6df59aeeb35d1988c6e11ba64a28ee1db579998c5f",
+        "definition": "#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]\n#[serde(rename_all = \"camelCase\", deny_unknown_fields)]\npub(crate) struct RouteSnapshot {\n    pub schema_version: u32,\n    pub revision: u64,\n    pub routes: Vec<ProviderRoute>,\n    pub default_selection: Option<ModelSelection>,\n    pub migration_complete: bool,\n    pub migration_issues: Vec<MigrationIssue>,\n}"
+      }
+    ],
+    "SaveRouteDocumentInput": [
+      {
+        "source": "src-tauri/src/ai.rs",
+        "line": 138,
+        "sourceSHA256": "98925aa1220c86f725c2426c85d26b5022a8035c504f56dc02a954ac37350f69",
+        "definition": "#[derive(serde::Deserialize)]\n#[serde(rename_all = \"camelCase\", deny_unknown_fields)]\npub(crate) struct SaveRouteDocumentInput {\n    routes: Vec<crate::llm::routes::ProviderRoute>,\n    #[serde(default)]\n    default_selection: Option<crate::llm::routes::ModelSelection>,\n    expected_revision: u64,\n    #[serde(default)]\n    secrets: BTreeMap<String, String>,\n}"
+      }
+    ],
+    "SessionCreateRequest": [
+      {
+        "source": "src-tauri/src/models.rs",
+        "line": 100,
+        "sourceSHA256": "5b1d2f6e9ca0c3fcd50edce39ec3baef8846212da8b84c9219a0de5f1352847b",
+        "definition": "#[derive(Debug, Deserialize)]\n#[serde(rename_all = \"camelCase\")]\npub(crate) struct SessionCreateRequest {\n    #[serde(default)]\n    pub(crate) operation_id: Option<String>,\n    pub(crate) name: String,\n    pub(crate) host: String,\n    pub(crate) port: u16,\n    pub(crate) username: String,\n    pub(crate) auth_method: AuthMethod,\n    pub(crate) password: Option<String>,\n    pub(crate) keychain_key_id: Option<String>,\n    #[serde(default)]\n    pub(crate) private_key_data: Option<String>,\n    pub(crate) passphrase: Option<String>,\n    pub(crate) terminal_cols: u32,\n    pub(crate) terminal_rows: u32,\n    pub(crate) jump_host: Option<JumpHostConfig>,\n}"
+      }
+    ],
+    "SessionMigrationStatus": [
+      {
+        "source": "src-tauri/src/ai.rs",
+        "line": 223,
+        "sourceSHA256": "98925aa1220c86f725c2426c85d26b5022a8035c504f56dc02a954ac37350f69",
+        "definition": "#[derive(serde::Serialize)]\n#[serde(rename_all = \"camelCase\")]\npub(crate) struct SessionMigrationStatus {\n    session_id: String,\n    status: String,\n}"
+      }
+    ],
+    "SessionSummary": [
+      {
+        "source": "src-tauri/src/models.rs",
+        "line": 20,
+        "sourceSHA256": "5b1d2f6e9ca0c3fcd50edce39ec3baef8846212da8b84c9219a0de5f1352847b",
+        "definition": "#[derive(Debug, Clone, Serialize)]\n#[serde(rename_all = \"camelCase\")]\npub(crate) struct SessionSummary {\n    pub(crate) session_id: String,\n    pub(crate) title: String,\n    pub(crate) host: String,\n    pub(crate) port: u16,\n    pub(crate) username: String,\n}"
+      }
+    ],
+    "SftpBookmarkRow": [
+      {
+        "source": "src-tauri/src/models.rs",
+        "line": 2124,
+        "sourceSHA256": "5b1d2f6e9ca0c3fcd50edce39ec3baef8846212da8b84c9219a0de5f1352847b",
+        "definition": "#[derive(Debug, Clone, Serialize, Deserialize)]\n#[serde(rename_all = \"camelCase\")]\npub(crate) struct SftpBookmarkRow {\n    pub(crate) id: String,\n    pub(crate) host: String,\n    pub(crate) port: u16,\n    pub(crate) username: String,\n    pub(crate) path: String,\n    pub(crate) side: String,\n    pub(crate) label: Option<String>,\n    pub(crate) created_at: i64,\n}"
+      }
+    ],
+    "SkillUserList": [
+      {
+        "source": "src-tauri/src/agent_runtime/skill_runtime.rs",
+        "line": 563,
+        "sourceSHA256": "b36ec4e1d2386bce5ce0287f8db10fb2feb5757f3270ec2aabe79135fb346d54",
+        "definition": "#[derive(Debug, Clone, Serialize)]\n#[serde(rename_all = \"camelCase\")]\npub(crate) struct SkillUserList {\n    pub(crate) session_id: String,\n    pub(crate) status: String,\n    pub(crate) revision: Option<String>,\n    pub(crate) entries: Vec<SkillEntry>,\n    pub(crate) diagnostics: Vec<SkillDiagnostic>,\n}"
+      }
+    ],
+    "StatusEvent": [
+      {
+        "source": "src-tauri/src/models.rs",
+        "line": 673,
+        "sourceSHA256": "5b1d2f6e9ca0c3fcd50edce39ec3baef8846212da8b84c9219a0de5f1352847b",
+        "definition": "#[derive(Debug, Clone, Serialize)]\n#[serde(rename_all = \"camelCase\")]\npub(crate) struct StatusEvent {\n    pub(crate) session_id: String,\n    pub(crate) status: SessionStatus,\n    pub(crate) message: Option<String>,\n}"
+      }
+    ],
+    "SystemHealth": [
+      {
+        "source": "src-tauri/src/health.rs",
+        "line": 65,
+        "sourceSHA256": "87b2c08768da4eb580639ed2e76924f8f26cc0f62ffe232274f057fb7b33b39e",
+        "definition": "#[derive(Debug, Serialize)]\n#[serde(rename_all = \"camelCase\")]\npub(crate) struct SystemHealth {\n    pub(crate) app: AppProcessInfo,\n    pub(crate) system: SystemInfo,\n    pub(crate) disk: DiskInfo,\n    pub(crate) app_info: AppInfo,\n}"
+      }
+    ],
+    "TransferBatchResult": [
+      {
+        "source": "src-tauri/src/models.rs",
+        "line": 368,
+        "sourceSHA256": "5b1d2f6e9ca0c3fcd50edce39ec3baef8846212da8b84c9219a0de5f1352847b",
+        "definition": "#[derive(Debug, Clone, Serialize)]\n#[serde(rename_all = \"camelCase\")]\npub(crate) struct TransferBatchResult {\n    pub(crate) items: Vec<TransferItemResult>,\n}"
+      }
+    ],
+    "TrustHostRequest": [
+      {
+        "source": "src-tauri/src/models.rs",
+        "line": 624,
+        "sourceSHA256": "5b1d2f6e9ca0c3fcd50edce39ec3baef8846212da8b84c9219a0de5f1352847b",
+        "definition": "#[derive(Debug, Deserialize)]\n#[serde(rename_all = \"camelCase\")]\npub(crate) struct TrustHostRequest {\n    pub(crate) host: String,\n    pub(crate) port: u16,\n    pub(crate) expected_fingerprint: String,\n}"
+      }
+    ],
+    "UpdateRemotePermissionsRequest": [
+      {
+        "source": "src-tauri/src/models.rs",
+        "line": 297,
+        "sourceSHA256": "5b1d2f6e9ca0c3fcd50edce39ec3baef8846212da8b84c9219a0de5f1352847b",
+        "definition": "#[derive(Debug, Deserialize)]\n#[serde(rename_all = \"camelCase\")]\npub(crate) struct UpdateRemotePermissionsRequest {\n    #[serde(flatten)]\n    pub(crate) connection: RemoteConnectionRequest,\n    pub(crate) path: String,\n    pub(crate) permissions: u32,\n}"
+      }
+    ],
+    "UploadLocalPathsRequest": [
+      {
+        "source": "src-tauri/src/models.rs",
+        "line": 339,
+        "sourceSHA256": "5b1d2f6e9ca0c3fcd50edce39ec3baef8846212da8b84c9219a0de5f1352847b",
+        "definition": "#[derive(Debug, Deserialize)]\n#[serde(rename_all = \"camelCase\")]\npub(crate) struct UploadLocalPathsRequest {\n    #[serde(flatten)]\n    pub(crate) connection: RemoteConnectionRequest,\n    pub(crate) destination_directory: String,\n    pub(crate) local_paths: Vec<String>,\n    #[serde(default)]\n    pub(crate) conflict_policies: Vec<UploadConflictPolicy>,\n    pub(crate) operation_id: String,\n}"
+      }
+    ]
+  },
+  "rule": "Resolve Rust paths in command source modules. Definitions and custom Serde are bound by source hash; JS does not replace native Deserialize. Ambiguous short names retain every source candidate."
+}

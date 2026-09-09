@@ -1,0 +1,20 @@
+# Dependencies, build output, and local artifacts
+node_modules/
+dist/
+dist-electron/
+release/
+artifacts/
+native/target/
+.worktrees/
+
+# Installed skills and dependency patches
+.agents/
+.claude/
+patches/
+
+# Generated contracts and lockfile
+pnpm-lock.yaml
+electron/*contract.json
+electron/commands.json
+src/lib/desktop/command-types.ts
+src/lib/desktop/contract.ts

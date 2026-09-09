@@ -1,0 +1,617 @@
+import React, { useEffect, useRef, useState } from 'react';
+import {
+  DndContext,
+  type DragEndEvent,
+  type DragMoveEvent,
+  type DragStartEvent,
+  type Modifier,
+  closestCenter,
+  useSensor,
+  useSensors,
+  DragOverlay,
+} from '@dnd-kit/core';
+import { SortableContext, useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { createPortal } from 'react-dom';
+import { PinIcon, XIcon } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { useI18n } from '@/hooks/useI18n';
+import { useAppStore } from '@/stores/appStore';
+import { Separator } from '@/components/ui/separator';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { useSftpStore, type SftpConnection } from '@/stores/sftpStore';
+import { TrackpadSafePointerSensor } from '@/lib/trackpad-safe-pointer-sensor';
+import { countActiveTransfersForOwners, useTransferStore } from '@/stores/transferStore';
+import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
+
+const DRAG_OVERLAY_CURSOR_GAP = 2;
+
+interface SftpTabBarProps {
+  onNewTabClick?: () => void;
+  onTabContextMenu?: (connection: SftpConnection, x: number, y: number) => void;
+}
+
+interface ConnectionTabProps {
+  connection: SftpConnection;
+  active: boolean;
+  dragging?: boolean;
+  showDropIndicatorLeft?: boolean;
+  showDropIndicatorRight?: boolean;
+  showSeparatorAfter?: boolean;
+  onActivate: (id: string) => void;
+  onContextMenu: (connection: SftpConnection, x: number, y: number) => void;
+  onClose: (id: string) => void;
+  onTogglePin?: (id: string) => void;
+}
+
+const ConnectionTab: React.FC<ConnectionTabProps> = ({
+  connection,
+  active,
+  dragging = false,
+  showDropIndicatorLeft = false,
+  showDropIndicatorRight = false,
+  showSeparatorAfter = false,
+  onActivate,
+  onContextMenu,
+  onClose,
+  onTogglePin,
+}) => {
+  return (
+    <div
+      role="tab"
+      tabIndex={0}
+      aria-selected={active}
+      data-sftp-tab={connection.id}
+      // Activate on pointerdown (like browser tabs) instead of click: dnd-kit
+      // swallows the click after any drag, so a trackpad tap that jitters past
+      // the sensor threshold would otherwise both start a drag and lose the
+      // activation.
+      onPointerDown={(e) => {
+        if (e.button === 0) onActivate(connection.id);
+      }}
+      onContextMenu={(e) => {
+        e.preventDefault();
+        onContextMenu(connection, e.clientX, e.clientY);
+      }}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onActivate(connection.id);
+        }
+        if ((e.key === 'ArrowLeft' || e.key === 'ArrowRight') && e.target === e.currentTarget) {
+          e.preventDefault();
+          const tabs = Array.from(
+            e.currentTarget
+              .closest('[role="tablist"]')
+              ?.querySelectorAll<HTMLElement>('[data-sftp-tab]') ?? [],
+          );
+          const index = tabs.indexOf(e.currentTarget);
+          const next = tabs[e.key === 'ArrowLeft' ? index - 1 : index + 1];
+          next?.focus();
+        }
+      }}
+      className={cn(
+        'group relative flex h-8 w-42 shrink-0 items-center gap-1.5 rounded-md border border-transparent px-2 text-left text-xs outline-none transition-[background-color,border-color,color,opacity] select-none focus-visible:ring-2 focus-visible:ring-app-tab-accent focus-visible:ring-inset',
+        active
+          ? 'bg-app-tab-active text-app-tab-accent'
+          : 'bg-transparent text-app-text-soft hover:bg-app-surface-muted hover:text-app-text',
+        dragging ? 'cursor-default opacity-80' : 'cursor-pointer',
+      )}
+    >
+      {active && (
+        <div
+          aria-hidden="true"
+          data-active-tab-indicator
+          className="pointer-events-none absolute inset-0 rounded-md border border-app-tab-accent"
+        />
+      )}
+      {showSeparatorAfter && (
+        <Separator
+          orientation="vertical"
+          aria-hidden="true"
+          data-tab-separator
+          className="pointer-events-none absolute right-[-4px] top-1/2 h-4 -translate-y-1/2 bg-app-border"
+        />
+      )}
+      {showDropIndicatorLeft && (
+        <div
+          data-drop-indicator="left"
+          // Absolute offsets start at the tab's inner border edge. Account
+          // for that 1px border when centering in the 5px outer gap.
+          className="pointer-events-none absolute left-[-3.5px] top-1/2 z-10 h-[20px] w-0.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-app-primary"
+        />
+      )}
+      {showDropIndicatorRight && (
+        <div
+          data-drop-indicator="right"
+          className="pointer-events-none absolute right-[-3.5px] top-1/2 z-10 h-[20px] w-0.5 -translate-y-1/2 translate-x-1/2 rounded-full bg-app-primary"
+        />
+      )}
+      <div className="flex min-w-0 flex-1 items-center gap-1.5">
+        <span className={cn('block flex-1 truncate text-left text-xs leading-none font-medium')}>
+          {connection.title}
+        </span>
+      </div>
+      {connection.pinned ? (
+        <button
+          type="button"
+          aria-label="unpin"
+          onPointerDown={(e) => e.stopPropagation()}
+          onClick={(e) => {
+            e.stopPropagation();
+            onTogglePin?.(connection.id);
+          }}
+          className="flex h-4 w-4 shrink-0 items-center justify-center rounded text-app-text-soft transition-all hover:bg-app-border hover:text-app-text"
+        >
+          <PinIcon className="size-3" strokeWidth={1.5} />
+        </button>
+      ) : (
+        <button
+          type="button"
+          aria-label="close"
+          onPointerDown={(e) => e.stopPropagation()}
+          onClick={(e) => {
+            e.stopPropagation();
+            onClose(connection.id);
+          }}
+          className={cn(
+            'flex h-4 w-4 shrink-0 items-center justify-center rounded text-app-text-soft transition-all hover:bg-app-border hover:text-app-text',
+            !dragging && active ? 'flex' : 'hidden group-hover:flex',
+          )}
+        >
+          <XIcon className="h-3 w-3" strokeWidth={1.5} />
+        </button>
+      )}
+    </div>
+  );
+};
+
+interface SortableTabProps {
+  connection: SftpConnection;
+  active: boolean;
+  onActivate: (id: string) => void;
+  onContextMenu: (connection: SftpConnection, x: number, y: number) => void;
+  onClose: (id: string) => void;
+  onTogglePin: (id: string) => void;
+  showDropIndicatorLeft?: boolean;
+  showDropIndicatorRight?: boolean;
+  showSeparatorAfter?: boolean;
+}
+
+const SortableTab: React.FC<SortableTabProps> = ({
+  connection,
+  active,
+  onActivate,
+  onContextMenu,
+  onClose,
+  onTogglePin,
+  showDropIndicatorLeft,
+  showDropIndicatorRight,
+  showSeparatorAfter,
+}) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: connection.id,
+    disabled: connection.pinned,
+  });
+
+  return (
+    <div
+      ref={setNodeRef}
+      {...attributes}
+      {...listeners}
+      style={{
+        transform: CSS.Transform.toString(transform),
+        transition,
+        zIndex: isDragging ? 20 : undefined,
+      }}
+    >
+      <ConnectionTab
+        connection={connection}
+        active={active}
+        dragging={isDragging}
+        showDropIndicatorLeft={showDropIndicatorLeft}
+        showDropIndicatorRight={showDropIndicatorRight}
+        showSeparatorAfter={showSeparatorAfter}
+        onActivate={onActivate}
+        onContextMenu={onContextMenu}
+        onClose={onClose}
+        onTogglePin={onTogglePin}
+      />
+    </div>
+  );
+};
+
+export const SftpTabBar: React.FC<SftpTabBarProps> = ({ onNewTabClick, onTabContextMenu }) => {
+  const { t } = useI18n();
+  const sftpHideSingleTabBar = useAppStore((state) => state.sftpHideSingleTabBar);
+  const connections = useSftpStore((state) => state.connections);
+  const activeConnectionId = useSftpStore((state) => state.activeConnectionId);
+  const setActiveConnection = useSftpStore((state) => state.setActiveConnection);
+  const removeConnection = useSftpStore((state) => state.removeConnection);
+  const reorderConnections = useSftpStore((state) => state.reorderConnections);
+  const togglePin = useSftpStore((state) => state.togglePin);
+  const pathOccupancyRevision = useTransferStore((state) => state.pathOccupancyRevision);
+  const transferOperations = React.useMemo(
+    () => useTransferStore.getState().operations,
+    [pathOccupancyRevision],
+  );
+
+  // macOS tap-to-click in WKWebView can drop the pointerdown of a tap that
+  // immediately follows another one (the single-tap gesture recognizer stays
+  // blocked until the double-tap recognizer fails). Activation already runs on
+  // pointerdown; when the pointerdown is lost the release still lands on the
+  // tab, so track the last pointerdown target and use a pointerup on a
+  // different tab as the fallback activation signal. See handleTabPointerUp.
+  const lastPointerDownTabRef = useRef<string | null>(null);
+  const activateTabRef = useRef<(id: string) => void>(() => {});
+  activateTabRef.current = setActiveConnection;
+  const tabBarConnectionsRef = useRef(connections);
+  tabBarConnectionsRef.current = connections;
+
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const dragStartPosRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+  const dragPointerStartRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+  const dragOverlayOffsetRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+  const dragStartScrollLeftRef = useRef(0);
+
+  const [draggingConnectionId, setDraggingConnectionId] = useState<string | null>(null);
+  const [insertIndex, setInsertIndex] = useState<number | null>(null);
+  const [closingConnectionId, setClosingConnectionId] = useState<string | null>(null);
+
+  const sensors = useSensors(
+    useSensor(TrackpadSafePointerSensor, {
+      // 10px dead zone: trackpad taps (tap-to-click) often jitter a few px;
+      // a low threshold misreads them as drags.
+      activationConstraint: { distance: 10 },
+    }),
+  );
+
+  const snapOverlayTopLeftToCursor = React.useCallback<Modifier>(({ transform }) => {
+    const offset = dragOverlayOffsetRef.current;
+    return {
+      ...transform,
+      x: transform.x + offset.x,
+      y: transform.y + offset.y,
+    };
+  }, []);
+
+  useEffect(() => {
+    const container = scrollRef.current;
+    if (!container || !activeConnectionId) {
+      return;
+    }
+    const target = container.querySelector<HTMLElement>(`[data-sftp-tab="${activeConnectionId}"]`);
+    if (target && typeof target.scrollIntoView === 'function') {
+      target.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+        inline: 'nearest',
+      });
+    }
+  }, [activeConnectionId, connections.length]);
+
+  // React attaches root-level wheel listeners as passive, so preventDefault
+  // inside an onWheel prop is ignored. Bind a non-passive native listener on
+  // the scroll viewport instead.
+  useEffect(() => {
+    const container = scrollRef.current;
+    if (!container) {
+      return;
+    }
+    const handleWheel = (event: WheelEvent): void => {
+      const hasHorizontalOverflow = container.scrollWidth > container.clientWidth + 4;
+      if (!hasHorizontalOverflow || Math.abs(event.deltaY) <= Math.abs(event.deltaX)) {
+        return;
+      }
+      container.scrollBy({ left: event.deltaY, behavior: 'auto' });
+      event.preventDefault();
+    };
+    container.addEventListener('wheel', handleWheel, { passive: false });
+    return () => container.removeEventListener('wheel', handleWheel);
+  }, [connections.length]);
+
+  // Force the default cursor for the whole drag via a body class (see
+  // base.css); removed automatically when the drag ends or is cancelled.
+  useEffect(() => {
+    if (!draggingConnectionId) return;
+    document.body.classList.add('tab-dragging');
+    return () => document.body.classList.remove('tab-dragging');
+  }, [draggingConnectionId]);
+
+  // Fallback tab activation for a pointerdown that WKWebView dropped (see
+  // lastPointerDownTabRef). Listeners run in the capture phase so they see the
+  // events before the close/pin buttons can stop their propagation.
+  useEffect(() => {
+    const getElement = (target: EventTarget | null): Element | null =>
+      target instanceof Element ? target : null;
+    const isInteractiveControl = (target: EventTarget | null): boolean =>
+      Boolean(getElement(target)?.closest('button, a[href], input, select, textarea'));
+    const getTabId = (target: EventTarget | null): string | null =>
+      getElement(target)?.closest('[data-sftp-tab]')?.getAttribute('data-sftp-tab') ?? null;
+
+    const handlePointerDown = (event: PointerEvent): void => {
+      lastPointerDownTabRef.current = getTabId(event.target);
+    };
+    const handlePointerUp = (event: PointerEvent): void => {
+      if (event.button !== 0) return;
+      // A release that ends a reorder drag is not an activation: dropping a tab
+      // onto another one must stay a pure reorder.
+      if (document.body.classList.contains('tab-dragging')) return;
+      // Close/pin buttons stop their own pointerdown, but this fallback exists
+      // for taps whose pointerdown was never delivered. Do not turn their
+      // release into a tab activation before the button action runs.
+      if (isInteractiveControl(event.target)) return;
+      const tabId = getTabId(event.target);
+      if (!tabId) return;
+      if (!tabBarConnectionsRef.current.some((connection) => connection.id === tabId)) return;
+      // The pointerdown for this tap was delivered on the tab itself: it
+      // already activated, nothing to do.
+      if (lastPointerDownTabRef.current === tabId) return;
+      activateTabRef.current(tabId);
+    };
+
+    document.addEventListener('pointerdown', handlePointerDown, true);
+    document.addEventListener('pointerup', handlePointerUp, true);
+    return () => {
+      document.removeEventListener('pointerdown', handlePointerDown, true);
+      document.removeEventListener('pointerup', handlePointerUp, true);
+    };
+  }, []);
+
+  const finishDrag = (): void => {
+    setDraggingConnectionId(null);
+    setInsertIndex(null);
+  };
+
+  const handleDragStart = (event: DragStartEvent): void => {
+    const nextId = String(event.active.id);
+    setDraggingConnectionId(nextId);
+    const activatorEvent = event.activatorEvent as PointerEvent;
+    dragPointerStartRef.current = {
+      x: activatorEvent.clientX ?? 0,
+      y: activatorEvent.clientY ?? 0,
+    };
+
+    const container = scrollRef.current;
+    if (container) {
+      dragStartScrollLeftRef.current = container.scrollLeft;
+      const tab = container.querySelector<HTMLElement>(`[data-sftp-tab="${nextId}"]`);
+      if (tab) {
+        const rect = tab.getBoundingClientRect();
+        dragStartPosRef.current = {
+          x: rect.left + rect.width / 2,
+          y: rect.top + rect.height / 2,
+        };
+        dragOverlayOffsetRef.current = {
+          // Keep the overlay 2px down and right from the pointer hotspot so
+          // the cursor remains visibly separate from the dragged tab.
+          x: dragPointerStartRef.current.x - rect.left + DRAG_OVERLAY_CURSOR_GAP,
+          y: dragPointerStartRef.current.y - rect.top + DRAG_OVERLAY_CURSOR_GAP,
+        };
+      }
+    }
+  };
+
+  const handleDragMove = (event: DragMoveEvent): void => {
+    if (!draggingConnectionId) {
+      return;
+    }
+
+    const container = scrollRef.current;
+    if (!container) {
+      return;
+    }
+    // dnd-kit's event.delta is scroll-adjusted: it includes the tab bar's
+    // scrollLeft change since drag start. Tab rects read below live in screen
+    // space, so subtract that scroll delta to compare in the same space —
+    // otherwise the insert indicator drifts while the bar scrolls mid-drag.
+    const scrollDeltaX = container.scrollLeft - dragStartScrollLeftRef.current;
+    const currentX = dragStartPosRef.current.x + event.delta.x - scrollDeltaX;
+
+    const tabs = Array.from(container.querySelectorAll<HTMLElement>('[data-sftp-tab]'));
+    const visibleTabs = tabs.filter((tab) => tab.dataset.sftpTab !== draggingConnectionId);
+
+    let newInsertIndex = 0;
+    for (let i = 0; i < visibleTabs.length; i++) {
+      const rect = visibleTabs[i].getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      if (currentX > centerX) {
+        newInsertIndex = i + 1;
+      }
+    }
+
+    const lastVisibleTab = visibleTabs[visibleTabs.length - 1];
+    if (lastVisibleTab) {
+      const lastRect = lastVisibleTab.getBoundingClientRect();
+      if (currentX > lastRect.right) {
+        newInsertIndex = visibleTabs.length;
+      }
+    }
+
+    const draggedConnection = connections.find((c) => c.id === draggingConnectionId);
+    const pinnedCount = connections.filter((c) => c.pinned).length;
+    const minInsertIndex = draggedConnection?.pinned ? 0 : pinnedCount;
+    // A pinned tab must stay inside the pinned region; a regular tab must not
+    // move ahead of it. Clamp on the component side too instead of relying on
+    // the store to defend the bounds.
+    const maxInsertIndex = draggedConnection?.pinned
+      ? Math.max(minInsertIndex, pinnedCount - 1)
+      : visibleTabs.length;
+    setInsertIndex(Math.min(maxInsertIndex, Math.max(minInsertIndex, newInsertIndex)));
+  };
+
+  const handleDragEnd = (event: DragEndEvent): void => {
+    const activeId = String(event.active.id);
+    if (insertIndex !== null) {
+      const dragged = connections.find((c) => c.id === activeId);
+      const pinnedCount = connections.filter((c) => c.pinned).length;
+      const minIndex = dragged?.pinned ? 0 : pinnedCount;
+      const maxIndex = dragged?.pinned
+        ? Math.max(minIndex, pinnedCount - 1)
+        : connections.length - 1;
+      reorderConnections(activeId, Math.min(maxIndex, Math.max(minIndex, insertIndex)));
+    }
+    finishDrag();
+  };
+
+  const handleDragCancel = (): void => {
+    finishDrag();
+  };
+
+  const handleCloseConnection = (id: string): void => {
+    setClosingConnectionId(id);
+  };
+
+  const confirmCloseConnection = (): void => {
+    if (closingConnectionId) {
+      removeConnection(closingConnectionId);
+    }
+    setClosingConnectionId(null);
+  };
+
+  const draggingConnection = draggingConnectionId
+    ? (connections.find((c) => c.id === draggingConnectionId) ?? null)
+    : null;
+
+  const closingConnection = closingConnectionId
+    ? (connections.find((c) => c.id === closingConnectionId) ?? null)
+    : null;
+  const closingTransferCount = closingConnection
+    ? countActiveTransfersForOwners([closingConnection.id], transferOperations)
+    : 0;
+
+  const visibleTabCount = connections.length - (draggingConnectionId ? 1 : 0);
+  const visibleConnections = draggingConnectionId
+    ? connections.filter((connection) => connection.id !== draggingConnectionId)
+    : connections;
+
+  // Dropping back into the dragged tab's own slot is a no-op, so suppress the
+  // indicator that would otherwise sit between the dragged tab and its right
+  // neighbor.
+  const draggedOriginalIndex = draggingConnectionId
+    ? connections.findIndex((c) => c.id === draggingConnectionId)
+    : -1;
+  const effectiveInsertIndex =
+    draggingConnectionId && insertIndex !== null && insertIndex !== draggedOriginalIndex
+      ? insertIndex
+      : null;
+
+  if (connections.length === 0) {
+    return null;
+  }
+
+  if (connections.length === 1 && sftpHideSingleTabBar) {
+    return null;
+  }
+
+  return (
+    <div
+      // Double-clicking empty tab bar space opens a new tab; ignore events
+      // coming from inside a tab itself.
+      onDoubleClick={(e) => {
+        if (!onNewTabClick) return;
+        if ((e.target as HTMLElement).closest('[data-sftp-tab]')) return;
+        onNewTabClick();
+      }}
+      className="group/tabbar relative flex h-10 items-start border-b border-app-border/40 bg-app-bg px-1"
+    >
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragStart={handleDragStart}
+        onDragMove={handleDragMove}
+        onDragEnd={handleDragEnd}
+        onDragCancel={handleDragCancel}
+      >
+        <SortableContext items={connections.map((c) => c.id)} strategy={() => null}>
+          <ScrollArea
+            viewportRef={scrollRef}
+            horizontal
+            vertical={false}
+            size="thin"
+            className="h-10 min-w-0 flex-1"
+          >
+            <div role="tablist" className="flex min-w-0 items-center gap-[5px] py-1">
+              {connections.map((connection, index) => {
+                const isDragging = draggingConnectionId === connection.id;
+                const draggedIndex = draggingConnectionId
+                  ? connections.findIndex((c) => c.id === draggingConnectionId)
+                  : -1;
+                const visibleIndex = isDragging
+                  ? -1
+                  : index - (draggedIndex >= 0 && draggedIndex < index ? 1 : 0);
+                const isLastVisible = visibleIndex === visibleTabCount - 1;
+                const isActive = activeConnectionId === connection.id;
+                const nextVisibleConnection =
+                  visibleIndex >= 0 ? visibleConnections[visibleIndex + 1] : undefined;
+                const showSeparatorAfter =
+                  !!nextVisibleConnection && effectiveInsertIndex !== visibleIndex + 1;
+
+                return (
+                  <SortableTab
+                    key={connection.id}
+                    connection={connection}
+                    active={isActive}
+                    onActivate={setActiveConnection}
+                    onContextMenu={(conn, x, y) => onTabContextMenu?.(conn, x, y)}
+                    onClose={handleCloseConnection}
+                    onTogglePin={togglePin}
+                    showDropIndicatorLeft={
+                      effectiveInsertIndex !== null &&
+                      visibleIndex >= 0 &&
+                      effectiveInsertIndex === visibleIndex
+                    }
+                    showDropIndicatorRight={
+                      effectiveInsertIndex !== null &&
+                      isLastVisible &&
+                      effectiveInsertIndex === visibleTabCount
+                    }
+                    showSeparatorAfter={showSeparatorAfter}
+                  />
+                );
+              })}
+            </div>
+          </ScrollArea>
+        </SortableContext>
+        {typeof document === 'undefined'
+          ? null
+          : createPortal(
+              <DragOverlay dropAnimation={null} modifiers={[snapOverlayTopLeftToCursor]}>
+                {draggingConnection && (
+                  <ConnectionTab
+                    connection={draggingConnection}
+                    active={activeConnectionId === draggingConnection.id}
+                    dragging
+                    onActivate={() => {}}
+                    onContextMenu={() => {}}
+                    onClose={() => {}}
+                    onTogglePin={() => {}}
+                  />
+                )}
+              </DragOverlay>,
+              document.body,
+            )}
+      </DndContext>
+      <ConfirmationDialog
+        open={!!closingConnectionId}
+        onOpenChange={(open) => {
+          if (!open) setClosingConnectionId(null);
+        }}
+        title={t('sftp.tab.closeConfirmTitle')}
+        description={
+          closingConnection
+            ? closingTransferCount > 0
+              ? t('sftp.tab.closeTransferWarning', {
+                  title: closingConnection.title,
+                  count: closingTransferCount,
+                })
+              : t('sftp.tab.closeConfirmMessage', { title: closingConnection.title })
+            : ''
+        }
+        confirmLabel={t('common.close')}
+        confirmVariant="destructive"
+        onConfirm={confirmCloseConnection}
+      />
+    </div>
+  );
+};

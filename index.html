@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; img-src 'self' data: blob: https://api.iconify.design; media-src 'self' data: blob:; object-src 'self' data: blob:; frame-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self' ws://localhost:1420 https://github.com https://api.iconify.design; font-src 'self' data: shellspan-font:; worker-src 'self' blob:"
+    />
+    <title>ShellSpan</title>
+    <script>
+      (function () {
+        var mode = 'system';
+        try {
+          var cached = localStorage.getItem('shellspan.theme');
+          if (cached === 'light' || cached === 'dark' || cached === 'system') {
+            mode = cached;
+          }
+        } catch (e) {}
+        var theme =
+          mode === 'system'
+            ? window.matchMedia('(prefers-color-scheme: dark)').matches
+              ? 'dark'
+              : 'light'
+            : mode;
+        document.documentElement.setAttribute('data-theme', theme);
+        document.documentElement.style.backgroundColor = theme === 'light' ? '#edf4fb' : '#020617';
+        document.documentElement.style.colorScheme = theme;
+      })();
+    </script>
+  </head>
+
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
