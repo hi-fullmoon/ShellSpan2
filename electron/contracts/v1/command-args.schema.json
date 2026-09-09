@@ -1,0 +1,4137 @@
+{
+  "$ref": "#/definitions/CommandArgs",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "AgentArtifactRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "artifactId": {
+          "type": "string"
+        },
+        "maxBytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "sessionId": {
+          "type": "string"
+        }
+      },
+      "required": ["sessionId", "artifactId", "maxBytes"],
+      "type": "object",
+      "x-serde-unknown-fields": "deny"
+    },
+    "AgentCapabilityScope": {
+      "additionalProperties": true,
+      "properties": {
+        "effects": {
+          "items": {
+            "$ref": "#/definitions/AgentSessionEffect"
+          },
+          "type": "array"
+        },
+        "targetIds": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "toolNames": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": ["toolNames", "effects", "targetIds"],
+      "type": "object"
+    },
+    "AgentChildInputRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "childSessionId": {
+          "type": "string"
+        },
+        "content": {
+          "type": "string"
+        },
+        "parentSessionId": {
+          "type": "string"
+        }
+      },
+      "required": ["parentSessionId", "childSessionId", "content"],
+      "type": "object",
+      "x-serde-unknown-fields": "deny"
+    },
+    "AgentChildRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "childSessionId": {
+          "type": "string"
+        },
+        "parentSessionId": {
+          "type": "string"
+        }
+      },
+      "required": ["parentSessionId", "childSessionId"],
+      "type": "object",
+      "x-serde-unknown-fields": "deny"
+    },
+    "AgentCommittedEventsRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "afterSeq": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "sessionId": {
+          "type": "string"
+        }
+      },
+      "required": ["sessionId", "limit"],
+      "type": "object",
+      "x-serde-unknown-fields": "deny"
+    },
+    "AgentFleetControlRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "fleetId": {
+          "type": "string"
+        },
+        "parentSessionId": {
+          "type": "string"
+        }
+      },
+      "required": ["parentSessionId", "fleetId"],
+      "type": "object",
+      "x-serde-unknown-fields": "deny"
+    },
+    "AgentFleetPlanRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "canarySize": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4294967295
+        },
+        "failureThreshold": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4294967295
+        },
+        "parentSessionId": {
+          "type": "string"
+        },
+        "targets": {
+          "items": {
+            "$ref": "#/definitions/AgentFleetTargetRequest"
+          },
+          "type": "array"
+        },
+        "waveSize": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4294967295
+        }
+      },
+      "required": ["parentSessionId", "targets", "canarySize", "waveSize", "failureThreshold"],
+      "type": "object",
+      "x-serde-unknown-fields": "deny"
+    },
+    "AgentFleetReconcileRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "evidence": {
+          "type": "string"
+        },
+        "fleetId": {
+          "type": "string"
+        },
+        "parentSessionId": {
+          "type": "string"
+        },
+        "targetId": {
+          "type": "string"
+        }
+      },
+      "required": ["evidence", "fleetId", "parentSessionId", "targetId"],
+      "type": "object",
+      "x-serde-unknown-fields": "deny"
+    },
+    "AgentFleetTargetRequest": {
+      "additionalProperties": true,
+      "properties": {
+        "goal": {
+          "type": "string"
+        },
+        "targetId": {
+          "type": "string"
+        }
+      },
+      "required": ["targetId", "goal"],
+      "type": "object"
+    },
+    "AgentImageUpload": {
+      "additionalProperties": true,
+      "properties": {
+        "data": {
+          "type": "string"
+        },
+        "mediaType": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": ["mediaType", "data", "name"],
+      "type": "object"
+    },
+    "AgentInboxMutation": {
+      "anyOf": [
+        {
+          "additionalProperties": true,
+          "properties": {
+            "itemId": {
+              "type": "string"
+            },
+            "type": {
+              "const": "resume",
+              "type": "string"
+            }
+          },
+          "required": ["type", "itemId"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": true,
+          "properties": {
+            "content": {
+              "type": "string"
+            },
+            "itemId": {
+              "type": "string"
+            },
+            "type": {
+              "const": "update",
+              "type": "string"
+            }
+          },
+          "required": ["type", "itemId", "content"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": true,
+          "properties": {
+            "itemId": {
+              "type": "string"
+            },
+            "type": {
+              "const": "remove",
+              "type": "string"
+            }
+          },
+          "required": ["type", "itemId"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": true,
+          "properties": {
+            "itemId": {
+              "type": "string"
+            },
+            "type": {
+              "const": "steer",
+              "type": "string"
+            }
+          },
+          "required": ["type", "itemId"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": true,
+          "properties": {
+            "lane": {
+              "$ref": "#/definitions/AgentSessionInboxLane"
+            },
+            "orderedItemIds": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "type": {
+              "const": "reorder",
+              "type": "string"
+            }
+          },
+          "required": ["type", "lane", "orderedItemIds"],
+          "type": "object"
+        }
+      ]
+    },
+    "AgentInboxMutationInput": {
+      "additionalProperties": false,
+      "properties": {
+        "clientOperationId": {
+          "type": "string"
+        },
+        "expectedRevision": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "mutation": {
+          "$ref": "#/definitions/AgentInboxMutation"
+        },
+        "sessionId": {
+          "type": "string"
+        }
+      },
+      "required": ["sessionId", "expectedRevision", "clientOperationId", "mutation"],
+      "type": "object",
+      "x-serde-unknown-fields": "deny"
+    },
+    "AgentRecoveryReconcileInput": {
+      "additionalProperties": false,
+      "properties": {
+        "evidence": {
+          "type": "string"
+        },
+        "outcome": {
+          "$ref": "#/definitions/AgentRecoveryReconcileOutcome"
+        },
+        "sessionId": {
+          "type": "string"
+        }
+      },
+      "required": ["sessionId", "outcome", "evidence"],
+      "type": "object",
+      "x-serde-unknown-fields": "deny"
+    },
+    "AgentRecoveryReconcileOutcome": {
+      "enum": ["probe", "confirmedApplied", "confirmedNotApplied", "unknown"],
+      "type": "string"
+    },
+    "AgentRuntimeInjectionInput": {
+      "additionalProperties": false,
+      "properties": {
+        "clientSubmissionId": {
+          "type": "string"
+        },
+        "content": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "messageId": {
+          "type": "string"
+        },
+        "sessionId": {
+          "type": "string"
+        }
+      },
+      "required": ["content", "label", "messageId", "sessionId"],
+      "type": "object",
+      "x-serde-unknown-fields": "deny"
+    },
+    "AgentRuntimeStartInput": {
+      "additionalProperties": false,
+      "properties": {
+        "selection": {
+          "$ref": "#/definitions/ModelSelection"
+        },
+        "sessionId": {
+          "type": "string"
+        }
+      },
+      "required": ["sessionId", "selection"],
+      "type": "object",
+      "x-serde-unknown-fields": "deny"
+    },
+    "AgentRuntimeToolDecisionInput": {
+      "additionalProperties": true,
+      "properties": {
+        "approvalId": {
+          "type": "string"
+        },
+        "callId": {
+          "type": "string"
+        },
+        "requestId": {
+          "type": "string"
+        },
+        "sessionId": {
+          "type": "string"
+        },
+        "stepId": {
+          "type": "string"
+        },
+        "turnId": {
+          "type": "string"
+        }
+      },
+      "required": ["sessionId", "turnId", "stepId", "requestId", "callId", "approvalId"],
+      "type": "object"
+    },
+    "AgentSessionEffect": {
+      "enum": [
+        "none",
+        "readOnly",
+        "sensitiveRead",
+        "stateChange",
+        "destructive",
+        "externalSideEffect",
+        "unknown"
+      ],
+      "type": "string"
+    },
+    "AgentSessionEventsRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "cursor": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "sessionId": {
+          "type": "string"
+        }
+      },
+      "required": ["sessionId", "limit"],
+      "type": "object",
+      "x-serde-unknown-fields": "deny"
+    },
+    "AgentSessionIdInput": {
+      "additionalProperties": false,
+      "properties": {
+        "sessionId": {
+          "type": "string"
+        }
+      },
+      "required": ["sessionId"],
+      "type": "object",
+      "x-serde-unknown-fields": "deny"
+    },
+    "AgentSessionInboxLane": {
+      "enum": ["nextTurn", "nextStep"],
+      "type": "string"
+    },
+    "AgentSessionListRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "cursor": {
+          "type": "string"
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": ["limit"],
+      "type": "object",
+      "x-serde-unknown-fields": "deny"
+    },
+    "AgentSessionMessageInput": {
+      "additionalProperties": true,
+      "properties": {
+        "clientSubmissionId": {
+          "type": "string"
+        },
+        "content": {
+          "type": "string"
+        },
+        "messageId": {
+          "type": "string"
+        },
+        "sessionId": {
+          "type": "string"
+        }
+      },
+      "required": ["sessionId", "messageId", "content"],
+      "type": "object"
+    },
+    "AgentSessionPermissionMode": {
+      "enum": ["requestApproval", "scopedAutopilot", "operator"],
+      "type": "string"
+    },
+    "AgentSessionRenameInput": {
+      "additionalProperties": false,
+      "properties": {
+        "clientOperationId": {
+          "type": "string"
+        },
+        "expectedRevision": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "sessionId": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        }
+      },
+      "required": ["sessionId", "expectedRevision", "clientOperationId", "title"],
+      "type": "object",
+      "x-serde-unknown-fields": "deny"
+    },
+    "AgentSessionTarget": {
+      "additionalProperties": true,
+      "properties": {
+        "cwd": {
+          "type": "string"
+        },
+        "host": {
+          "type": "string"
+        },
+        "kind": {
+          "enum": ["local", "remote"],
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "localRoot": {
+          "type": "string"
+        },
+        "port": {
+          "type": "number"
+        },
+        "profileId": {
+          "type": "string"
+        },
+        "rootPath": {
+          "type": "string"
+        },
+        "sessionId": {
+          "type": "string"
+        },
+        "targetId": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        }
+      },
+      "required": ["kind", "targetId", "sessionId"],
+      "type": "object"
+    },
+    "AgentSubagentBudget": {
+      "additionalProperties": true,
+      "properties": {
+        "maxStepsPerTurn": {
+          "type": "number"
+        },
+        "maxTokens": {
+          "type": "number"
+        },
+        "maxToolCalls": {
+          "type": "number"
+        },
+        "maxTurns": {
+          "type": "number"
+        },
+        "timeoutMs": {
+          "type": "number"
+        }
+      },
+      "required": ["maxStepsPerTurn", "maxTurns", "maxToolCalls", "maxTokens", "timeoutMs"],
+      "type": "object"
+    },
+    "AgentSubagentInheritance": {
+      "anyOf": [
+        {
+          "additionalProperties": true,
+          "properties": {
+            "mode": {
+              "const": "blank",
+              "type": "string"
+            }
+          },
+          "required": ["mode"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": true,
+          "properties": {
+            "mode": {
+              "const": "safePrefix",
+              "type": "string"
+            },
+            "parentThroughSeq": {
+              "type": "number"
+            }
+          },
+          "required": ["mode"],
+          "type": "object"
+        }
+      ]
+    },
+    "AgentSubagentModel": {
+      "additionalProperties": true,
+      "properties": {
+        "modelId": {
+          "type": "string"
+        },
+        "reasoningEffort": {
+          "type": "string"
+        },
+        "routeId": {
+          "type": "string"
+        },
+        "routeRevision": {
+          "type": "number"
+        }
+      },
+      "required": ["routeId", "modelId"],
+      "type": "object"
+    },
+    "AgentSubagentRole": {
+      "enum": ["general", "explorer", "diagnostician", "operator", "verifier", "reviewer"],
+      "type": "string"
+    },
+    "AgentSubagentSession": {
+      "additionalProperties": true,
+      "properties": {
+        "budget": {
+          "$ref": "#/definitions/AgentSubagentBudget"
+        },
+        "capabilityScope": {
+          "$ref": "#/definitions/AgentCapabilityScope"
+        },
+        "continuable": {
+          "type": "boolean"
+        },
+        "depth": {
+          "type": "number"
+        },
+        "descriptorId": {
+          "type": "string"
+        },
+        "inheritance": {
+          "$ref": "#/definitions/AgentSubagentInheritance"
+        },
+        "parentTaskId": {
+          "type": "string"
+        },
+        "provider": {
+          "$ref": "#/definitions/AgentSubagentModel"
+        },
+        "role": {
+          "$ref": "#/definitions/AgentSubagentRole"
+        },
+        "targetScope": {
+          "items": {
+            "$ref": "#/definitions/AgentSessionTarget"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "descriptorId",
+        "parentTaskId",
+        "role",
+        "continuable",
+        "depth",
+        "inheritance",
+        "capabilityScope",
+        "targetScope",
+        "budget",
+        "provider"
+      ],
+      "type": "object"
+    },
+    "AgentSubagentSpawnRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "budget": {
+          "$ref": "#/definitions/AgentSubagentBudget"
+        },
+        "continuable": {
+          "type": "boolean"
+        },
+        "goal": {
+          "type": "string"
+        },
+        "inheritanceMode": {
+          "enum": ["blank", "safePrefix"],
+          "type": "string"
+        },
+        "parentSessionId": {
+          "type": "string"
+        },
+        "role": {
+          "$ref": "#/definitions/AgentSubagentRole"
+        },
+        "targetIds": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": ["parentSessionId", "goal", "role", "inheritanceMode", "targetIds"],
+      "type": "object",
+      "x-serde-unknown-fields": "deny"
+    },
+    "AiProviderConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "baseUrl": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/definitions/AiProviderKind"
+        },
+        "model": {
+          "type": "string"
+        },
+        "modelDefinition": {
+          "$ref": "#/definitions/ModelDefinition"
+        },
+        "profile": {
+          "$ref": "#/definitions/ProviderProfileId"
+        },
+        "reasoningEffort": {
+          "$ref": "#/definitions/AiReasoningOption"
+        },
+        "requiresApiKey": {
+          "type": "boolean"
+        },
+        "retryPolicy": {
+          "$ref": "#/definitions/AiRetryPolicy"
+        },
+        "routeRevision": {
+          "description": "Route revision used to validate an existing Session selection.",
+          "type": "number"
+        }
+      },
+      "required": ["id", "kind", "baseUrl", "model", "requiresApiKey"],
+      "type": "object",
+      "x-serde-unknown-fields": "deny"
+    },
+    "AiProviderConnectionConfig": {
+      "additionalProperties": true,
+      "description": "Used only while testing a provider setup; the key is never persisted.",
+      "properties": {
+        "apiKey": {
+          "type": "string"
+        },
+        "baseUrl": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/definitions/AiProviderKind"
+        },
+        "model": {
+          "type": "string"
+        },
+        "modelDefinition": {
+          "$ref": "#/definitions/ModelDefinition"
+        },
+        "profile": {
+          "$ref": "#/definitions/ProviderProfileId"
+        },
+        "reasoningEffort": {
+          "$ref": "#/definitions/AiReasoningOption"
+        },
+        "requiresApiKey": {
+          "type": "boolean"
+        },
+        "retryPolicy": {
+          "$ref": "#/definitions/AiRetryPolicy"
+        },
+        "routeRevision": {
+          "description": "Route revision used to validate an existing Session selection.",
+          "type": "number"
+        }
+      },
+      "required": ["baseUrl", "id", "kind", "model", "requiresApiKey"],
+      "type": "object"
+    },
+    "AiProviderKind": {
+      "enum": ["ollama", "openAi", "openAiCompatible", "anthropicMessages"],
+      "type": "string"
+    },
+    "AiReasoningOption": {
+      "type": "string"
+    },
+    "AiRetryPolicy": {
+      "additionalProperties": true,
+      "properties": {
+        "initialDelayMs": {
+          "type": "number"
+        },
+        "jitterRatio": {
+          "type": "number"
+        },
+        "maxAttempts": {
+          "type": "number"
+        },
+        "maxDelayMs": {
+          "type": "number"
+        },
+        "maxServerDelayMs": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "maxAttempts",
+        "initialDelayMs",
+        "maxDelayMs",
+        "maxServerDelayMs",
+        "jitterRatio"
+      ],
+      "type": "object"
+    },
+    "AnswerQuestionInput": {
+      "additionalProperties": false,
+      "properties": {
+        "answers": {
+          "items": {
+            "$ref": "#/definitions/QuestionAnswer"
+          },
+          "type": "array"
+        },
+        "clientOperationId": {
+          "type": "string"
+        },
+        "identity": {
+          "$ref": "#/definitions/QuestionIdentity"
+        }
+      },
+      "required": ["identity", "clientOperationId", "answers"],
+      "type": "object",
+      "x-serde-unknown-fields": "deny"
+    },
+    "AuthMethod": {
+      "enum": ["password", "key"],
+      "type": "string"
+    },
+    "CommandArgs": {
+      "additionalProperties": false,
+      "properties": {
+        "add_profile": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeAddProfile; native/src/commands.rs",
+          "properties": {
+            "profile": {
+              "$ref": "#/definitions/ProfileRow",
+              "x-serde-unknown-fields": "ignore"
+            }
+          },
+          "required": ["profile"],
+          "type": "object"
+        },
+        "add_sftp_bookmark": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeAddSftpBookmark; native/src/commands.rs",
+          "properties": {
+            "bookmark": {
+              "$ref": "#/definitions/SftpBookmarkRow",
+              "x-serde-unknown-fields": "ignore"
+            }
+          },
+          "required": ["bookmark"],
+          "type": "object"
+        },
+        "agent_runtime_abort_recovery": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeAbortAgentRuntimeRecovery; native/src/agent_runtime/commands.rs",
+          "properties": {
+            "input": {
+              "$ref": "#/definitions/AgentSessionIdInput",
+              "x-serde-unknown-fields": "deny"
+            }
+          },
+          "required": ["input"],
+          "type": "object"
+        },
+        "agent_runtime_answer_question": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeAnswerAgentRuntimeQuestion; native/src/agent_runtime/commands.rs",
+          "properties": {
+            "input": {
+              "$ref": "#/definitions/AnswerQuestionInput"
+            }
+          },
+          "required": ["input"],
+          "type": "object"
+        },
+        "agent_runtime_approve_tool": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeApproveAgentRuntimeTool; native/src/agent_runtime/commands.rs",
+          "properties": {
+            "input": {
+              "$ref": "#/definitions/AgentRuntimeToolDecisionInput",
+              "x-serde-unknown-fields": "deny"
+            }
+          },
+          "required": ["input"],
+          "type": "object"
+        },
+        "agent_runtime_archive_session": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeArchiveAgentRuntimeSession; native/src/agent_runtime/commands.rs",
+          "properties": {
+            "input": {
+              "$ref": "#/definitions/AgentSessionIdInput",
+              "x-serde-unknown-fields": "deny"
+            }
+          },
+          "required": ["input"],
+          "type": "object"
+        },
+        "agent_runtime_cancel": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeCancelAgentRuntime; native/src/agent_runtime/commands.rs",
+          "properties": {
+            "input": {
+              "$ref": "#/definitions/AgentSessionIdInput",
+              "x-serde-unknown-fields": "deny"
+            }
+          },
+          "required": ["input"],
+          "type": "object"
+        },
+        "agent_runtime_cancel_child_agent": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeCancelAgentRuntimeChild; native/src/agent_runtime/commands.rs",
+          "properties": {
+            "request": {
+              "$ref": "#/definitions/AgentChildRequest",
+              "x-serde-unknown-fields": "deny"
+            }
+          },
+          "required": ["request"],
+          "type": "object"
+        },
+        "agent_runtime_cancel_file_references": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeListAgentFileReferences; native/src/agent_runtime/commands.rs",
+          "properties": {
+            "input": {
+              "additionalProperties": true,
+              "properties": {
+                "requestId": {
+                  "type": "string"
+                },
+                "sessionId": {
+                  "type": "string"
+                }
+              },
+              "required": ["sessionId", "requestId"],
+              "type": "object"
+            }
+          },
+          "required": ["input"],
+          "type": "object"
+        },
+        "agent_runtime_cancel_image_submission": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeCancelAgentImageSubmission; native/src/agent_runtime/commands.rs",
+          "properties": {
+            "input": {
+              "additionalProperties": true,
+              "properties": {
+                "clientOperationId": {
+                  "type": "string"
+                },
+                "sessionId": {
+                  "type": "string"
+                }
+              },
+              "required": ["sessionId", "clientOperationId"],
+              "type": "object"
+            }
+          },
+          "required": ["input"],
+          "type": "object"
+        },
+        "agent_runtime_create_session": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeCreateAgentRuntimeSession; native/src/agent_runtime/commands.rs",
+          "properties": {
+            "request": {
+              "$ref": "#/definitions/CreateAgentSessionRequest",
+              "x-serde-unknown-fields": "deny"
+            }
+          },
+          "required": ["request"],
+          "type": "object"
+        },
+        "agent_runtime_fleet_abort": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeAbortAgentRuntimeFleet; native/src/agent_runtime/commands.rs",
+          "properties": {
+            "request": {
+              "$ref": "#/definitions/AgentFleetControlRequest",
+              "x-serde-unknown-fields": "deny"
+            }
+          },
+          "required": ["request"],
+          "type": "object"
+        },
+        "agent_runtime_fleet_pause": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokePauseAgentRuntimeFleet; native/src/agent_runtime/commands.rs",
+          "properties": {
+            "request": {
+              "$ref": "#/definitions/AgentFleetControlRequest",
+              "x-serde-unknown-fields": "deny"
+            }
+          },
+          "required": ["request"],
+          "type": "object"
+        },
+        "agent_runtime_fleet_plan": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokePlanAgentRuntimeFleet; native/src/agent_runtime/commands.rs",
+          "properties": {
+            "request": {
+              "$ref": "#/definitions/AgentFleetPlanRequest",
+              "x-serde-unknown-fields": "deny"
+            }
+          },
+          "required": ["request"],
+          "type": "object"
+        },
+        "agent_runtime_fleet_reconcile": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeReconcileAgentRuntimeFleet; native/src/agent_runtime/commands.rs",
+          "properties": {
+            "request": {
+              "$ref": "#/definitions/AgentFleetReconcileRequest",
+              "x-serde-unknown-fields": "deny"
+            }
+          },
+          "required": ["request"],
+          "type": "object"
+        },
+        "agent_runtime_fleet_resume": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeResumeAgentRuntimeFleet; native/src/agent_runtime/commands.rs",
+          "properties": {
+            "request": {
+              "$ref": "#/definitions/AgentFleetControlRequest",
+              "x-serde-unknown-fields": "deny"
+            }
+          },
+          "required": ["request"],
+          "type": "object"
+        },
+        "agent_runtime_fleet_start": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeStartAgentRuntimeFleet; native/src/agent_runtime/commands.rs",
+          "properties": {
+            "request": {
+              "$ref": "#/definitions/AgentFleetControlRequest",
+              "x-serde-unknown-fields": "deny"
+            }
+          },
+          "required": ["request"],
+          "type": "object"
+        },
+        "agent_runtime_followup": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeAgentRuntimeFollowup; native/src/agent_runtime/commands.rs",
+          "properties": {
+            "input": {
+              "$ref": "#/definitions/AgentSessionMessageInput",
+              "x-serde-unknown-fields": "deny"
+            }
+          },
+          "required": ["input"],
+          "type": "object"
+        },
+        "agent_runtime_get_artifact": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeGetAgentRuntimeArtifact; native/src/agent_runtime/commands.rs",
+          "properties": {
+            "request": {
+              "$ref": "#/definitions/AgentArtifactRequest",
+              "x-serde-unknown-fields": "deny"
+            }
+          },
+          "required": ["request"],
+          "type": "object"
+        },
+        "agent_runtime_get_committed_events": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeGetCommittedAgentRuntimeEvents; native/src/agent_runtime/commands.rs",
+          "properties": {
+            "request": {
+              "$ref": "#/definitions/AgentCommittedEventsRequest",
+              "x-serde-unknown-fields": "deny"
+            }
+          },
+          "required": ["request"],
+          "type": "object"
+        },
+        "agent_runtime_get_events": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeGetAgentRuntimeEvents; native/src/agent_runtime/commands.rs",
+          "properties": {
+            "request": {
+              "$ref": "#/definitions/AgentSessionEventsRequest",
+              "x-serde-unknown-fields": "deny"
+            }
+          },
+          "required": ["request"],
+          "type": "object"
+        },
+        "agent_runtime_get_session": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeGetAgentRuntimeSession; native/src/agent_runtime/commands.rs",
+          "properties": {
+            "input": {
+              "$ref": "#/definitions/AgentSessionIdInput",
+              "x-serde-unknown-fields": "deny"
+            }
+          },
+          "required": ["input"],
+          "type": "object"
+        },
+        "agent_runtime_image_preview": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeAgentImagePreview; native/src/agent_runtime/commands.rs",
+          "properties": {
+            "input": {
+              "additionalProperties": true,
+              "properties": {
+                "sessionId": {
+                  "type": "string"
+                },
+                "sha256": {
+                  "type": "string"
+                }
+              },
+              "required": ["sessionId", "sha256"],
+              "type": "object"
+            }
+          },
+          "required": ["input"],
+          "type": "object"
+        },
+        "agent_runtime_inject": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeAgentRuntimeInject; native/src/agent_runtime/commands.rs",
+          "properties": {
+            "input": {
+              "$ref": "#/definitions/AgentRuntimeInjectionInput",
+              "x-serde-unknown-fields": "deny"
+            }
+          },
+          "required": ["input"],
+          "type": "object"
+        },
+        "agent_runtime_inspect_child_agent": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeInspectAgentRuntimeChild; native/src/agent_runtime/commands.rs",
+          "properties": {
+            "request": {
+              "$ref": "#/definitions/AgentChildRequest",
+              "x-serde-unknown-fields": "deny"
+            }
+          },
+          "required": ["request"],
+          "type": "object"
+        },
+        "agent_runtime_inspect_recovery": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeInspectAgentRuntimeRecovery; native/src/agent_runtime/commands.rs",
+          "properties": {
+            "input": {
+              "$ref": "#/definitions/AgentSessionIdInput",
+              "x-serde-unknown-fields": "deny"
+            }
+          },
+          "required": ["input"],
+          "type": "object"
+        },
+        "agent_runtime_interrupt": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeInterruptAgentRuntime; native/src/agent_runtime/commands.rs",
+          "properties": {
+            "input": {
+              "$ref": "#/definitions/AgentSessionIdInput",
+              "x-serde-unknown-fields": "deny"
+            }
+          },
+          "required": ["input"],
+          "type": "object"
+        },
+        "agent_runtime_list_file_references": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeListAgentFileReferences; native/src/agent_runtime/commands.rs",
+          "properties": {
+            "input": {
+              "additionalProperties": true,
+              "properties": {
+                "query": {
+                  "type": "string"
+                },
+                "requestId": {
+                  "type": "string"
+                },
+                "sessionId": {
+                  "type": "string"
+                }
+              },
+              "required": ["sessionId", "requestId", "query"],
+              "type": "object"
+            }
+          },
+          "required": ["input"],
+          "type": "object"
+        },
+        "agent_runtime_list_sessions": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeListAgentRuntimeSessions; native/src/agent_runtime/commands.rs",
+          "properties": {
+            "request": {
+              "$ref": "#/definitions/AgentSessionListRequest",
+              "x-serde-unknown-fields": "deny"
+            }
+          },
+          "required": ["request"],
+          "type": "object"
+        },
+        "agent_runtime_list_skills": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeListAgentRuntimeSkills; native/src/agent_runtime/commands.rs",
+          "properties": {
+            "input": {
+              "additionalProperties": false,
+              "properties": {
+                "sessionId": {
+                  "type": "string"
+                }
+              },
+              "required": ["sessionId"],
+              "type": "object",
+              "x-serde-unknown-fields": "deny"
+            }
+          },
+          "required": ["input"],
+          "type": "object"
+        },
+        "agent_runtime_mutate_inbox": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeMutateAgentRuntimeInbox; native/src/agent_runtime/commands.rs",
+          "properties": {
+            "input": {
+              "$ref": "#/definitions/AgentInboxMutationInput",
+              "x-serde-unknown-fields": "deny"
+            }
+          },
+          "required": ["input"],
+          "type": "object"
+        },
+        "agent_runtime_prepare_images": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokePrepareAgentImages; native/src/agent_runtime/commands.rs",
+          "properties": {
+            "images": {
+              "items": {
+                "$ref": "#/definitions/AgentImageUpload"
+              },
+              "type": "array"
+            }
+          },
+          "required": ["images"],
+          "type": "object"
+        },
+        "agent_runtime_reconcile_recovery": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeReconcileAgentRuntimeRecovery; native/src/agent_runtime/commands.rs",
+          "properties": {
+            "input": {
+              "$ref": "#/definitions/AgentRecoveryReconcileInput",
+              "x-serde-unknown-fields": "deny"
+            }
+          },
+          "required": ["input"],
+          "type": "object"
+        },
+        "agent_runtime_reject_tool": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeRejectAgentRuntimeTool; native/src/agent_runtime/commands.rs",
+          "properties": {
+            "input": {
+              "$ref": "#/definitions/AgentRuntimeToolDecisionInput",
+              "x-serde-unknown-fields": "deny"
+            }
+          },
+          "required": ["input"],
+          "type": "object"
+        },
+        "agent_runtime_rename_session": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeRenameAgentRuntimeSession; native/src/agent_runtime/commands.rs",
+          "properties": {
+            "input": {
+              "$ref": "#/definitions/AgentSessionRenameInput",
+              "x-serde-unknown-fields": "deny"
+            }
+          },
+          "required": ["input"],
+          "type": "object"
+        },
+        "agent_runtime_resume": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeResumeAgentRuntime; native/src/agent_runtime/commands.rs",
+          "properties": {
+            "input": {
+              "$ref": "#/definitions/AgentSessionIdInput",
+              "x-serde-unknown-fields": "deny"
+            }
+          },
+          "required": ["input"],
+          "type": "object"
+        },
+        "agent_runtime_resume_recovery": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeResumeAgentRuntimeRecovery; native/src/agent_runtime/commands.rs",
+          "properties": {
+            "input": {
+              "$ref": "#/definitions/AgentSessionIdInput",
+              "x-serde-unknown-fields": "deny"
+            }
+          },
+          "required": ["input"],
+          "type": "object"
+        },
+        "agent_runtime_select_model": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeSelectAgentRuntimeModel; native/src/agent_runtime/commands.rs",
+          "properties": {
+            "input": {
+              "additionalProperties": false,
+              "properties": {
+                "selection": {
+                  "$ref": "#/definitions/ModelSelection"
+                },
+                "sessionId": {
+                  "type": "string"
+                }
+              },
+              "required": ["sessionId", "selection"],
+              "type": "object",
+              "x-serde-unknown-fields": "deny"
+            }
+          },
+          "required": ["input"],
+          "type": "object"
+        },
+        "agent_runtime_send_child_input": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeSendAgentRuntimeChildInput; native/src/agent_runtime/commands.rs",
+          "properties": {
+            "request": {
+              "$ref": "#/definitions/AgentChildInputRequest",
+              "x-serde-unknown-fields": "deny"
+            }
+          },
+          "required": ["request"],
+          "type": "object"
+        },
+        "agent_runtime_set_permission": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeSetAgentRuntimePermission; native/src/agent_runtime/commands.rs",
+          "properties": {
+            "input": {
+              "additionalProperties": false,
+              "properties": {
+                "mode": {
+                  "$ref": "#/definitions/AgentSessionPermissionMode"
+                },
+                "sessionId": {
+                  "type": "string"
+                }
+              },
+              "required": ["sessionId", "mode"],
+              "type": "object",
+              "x-serde-unknown-fields": "deny"
+            }
+          },
+          "required": ["input"],
+          "type": "object"
+        },
+        "agent_runtime_spawn_subagent": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeSpawnAgentRuntimeSubagent; native/src/agent_runtime/commands.rs",
+          "properties": {
+            "request": {
+              "$ref": "#/definitions/AgentSubagentSpawnRequest",
+              "x-serde-unknown-fields": "deny"
+            }
+          },
+          "required": ["request"],
+          "type": "object"
+        },
+        "agent_runtime_start": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeStartAgentRuntime; native/src/agent_runtime/commands.rs",
+          "properties": {
+            "input": {
+              "$ref": "#/definitions/AgentRuntimeStartInput",
+              "x-serde-unknown-fields": "deny"
+            }
+          },
+          "required": ["input"],
+          "type": "object"
+        },
+        "agent_runtime_steer": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeAgentRuntimeSteer; native/src/agent_runtime/commands.rs",
+          "properties": {
+            "input": {
+              "$ref": "#/definitions/AgentSessionMessageInput",
+              "x-serde-unknown-fields": "deny"
+            }
+          },
+          "required": ["input"],
+          "type": "object"
+        },
+        "agent_runtime_submit_images": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeSubmitAgentImages; native/src/agent_runtime/commands.rs",
+          "properties": {
+            "input": {
+              "additionalProperties": true,
+              "properties": {
+                "clientOperationId": {
+                  "type": "string"
+                },
+                "content": {
+                  "type": "string"
+                },
+                "images": {
+                  "items": {
+                    "$ref": "#/definitions/AgentImageUpload"
+                  },
+                  "type": "array"
+                },
+                "lane": {
+                  "enum": ["nextTurn", "nextStep"],
+                  "type": "string"
+                },
+                "sessionId": {
+                  "type": "string"
+                }
+              },
+              "required": ["sessionId", "clientOperationId", "content", "lane", "images"],
+              "type": "object"
+            }
+          },
+          "required": ["input"],
+          "type": "object"
+        },
+        "ai_convert_session_v4_to_v5": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeConvertAiSessionV4; native/src/ai.rs",
+          "properties": {
+            "input": {
+              "additionalProperties": false,
+              "properties": {
+                "sessionId": {
+                  "type": "string"
+                }
+              },
+              "required": ["sessionId"],
+              "type": "object",
+              "x-serde-unknown-fields": "deny"
+            }
+          },
+          "required": ["input"],
+          "type": "object"
+        },
+        "ai_list_models": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeListAiModels; native/src/ai.rs",
+          "properties": {
+            "provider": {
+              "$ref": "#/definitions/AiProviderConnectionConfig",
+              "x-serde-unknown-fields": "deny"
+            }
+          },
+          "required": ["provider"],
+          "type": "object"
+        },
+        "ai_list_route_models": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeListAiRouteModels; native/src/ai.rs",
+          "properties": {
+            "routeId": {
+              "type": "string"
+            }
+          },
+          "required": ["routeId"],
+          "type": "object"
+        },
+        "ai_list_routes": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeListAiRoutes; native/src/ai.rs",
+          "type": "object"
+        },
+        "ai_list_session_migrations": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeListAiSessionMigrations; native/src/ai.rs",
+          "type": "object"
+        },
+        "ai_model_declaration_template": {
+          "additionalProperties": true,
+          "description": "src/components/ai/provider-setup-dialog.tsx ; native/src/ai.rs",
+          "properties": {
+            "provider": {
+              "$ref": "#/definitions/AiProviderConfig",
+              "x-serde-unknown-fields": "deny"
+            }
+          },
+          "required": ["provider"],
+          "type": "object"
+        },
+        "ai_resolve_model": {
+          "additionalProperties": true,
+          "description": "src/lib/ai/provider-contract.ts loadResolvedModel; native/src/ai.rs",
+          "properties": {
+            "provider": {
+              "$ref": "#/definitions/AiProviderConfig",
+              "x-serde-unknown-fields": "deny"
+            }
+          },
+          "required": ["provider"],
+          "type": "object"
+        },
+        "ai_resolve_selection": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeResolveAiSelection; native/src/ai.rs",
+          "properties": {
+            "input": {
+              "additionalProperties": false,
+              "properties": {
+                "expectedRevision": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "selection": {
+                  "$ref": "#/definitions/ModelSelection"
+                }
+              },
+              "required": ["selection", "expectedRevision"],
+              "type": "object",
+              "x-serde-unknown-fields": "deny"
+            }
+          },
+          "required": ["input"],
+          "type": "object"
+        },
+        "ai_save_routes": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeSaveAiRoutes; native/src/ai.rs",
+          "properties": {
+            "input": {
+              "additionalProperties": false,
+              "properties": {
+                "defaultSelection": {
+                  "$ref": "#/definitions/ModelSelection"
+                },
+                "expectedRevision": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "routes": {
+                  "items": {
+                    "$ref": "#/definitions/ProviderRoute"
+                  },
+                  "type": "array"
+                },
+                "secrets": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object"
+                }
+              },
+              "required": ["routes", "expectedRevision"],
+              "type": "object",
+              "x-serde-unknown-fields": "deny"
+            }
+          },
+          "required": ["input"],
+          "type": "object"
+        },
+        "cancel_connection_preflight": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeCancelConnectionPreflight; native/src/commands.rs",
+          "properties": {
+            "operationId": {
+              "type": "string"
+            }
+          },
+          "required": ["operationId"],
+          "type": "object"
+        },
+        "cancel_delete": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeCancelDelete; native/src/commands.rs",
+          "properties": {
+            "operationId": {
+              "type": "string"
+            }
+          },
+          "required": ["operationId"],
+          "type": "object"
+        },
+        "cancel_download": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeCancelDownload; native/src/commands.rs",
+          "properties": {
+            "operationId": {
+              "type": "string"
+            }
+          },
+          "required": ["operationId"],
+          "type": "object"
+        },
+        "cancel_remote_copy": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeCancelRemoteCopy; native/src/commands.rs",
+          "properties": {
+            "operationId": {
+              "type": "string"
+            }
+          },
+          "required": ["operationId"],
+          "type": "object"
+        },
+        "cancel_remote_file_read": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeCancelRemoteFileRead; native/src/commands.rs",
+          "properties": {
+            "operationId": {
+              "type": "string"
+            }
+          },
+          "required": ["operationId"],
+          "type": "object"
+        },
+        "cancel_remote_health_snapshot": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeCancelRemoteHealthSnapshot; native/src/remote_health.rs",
+          "properties": {
+            "operationId": {
+              "type": "string"
+            }
+          },
+          "required": ["operationId"],
+          "type": "object"
+        },
+        "cancel_upload": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeCancelUpload; native/src/commands.rs",
+          "properties": {
+            "operationId": {
+              "type": "string"
+            }
+          },
+          "required": ["operationId"],
+          "type": "object"
+        },
+        "check_host_key": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeCheckHostKey; native/src/commands.rs",
+          "properties": {
+            "request": {
+              "additionalProperties": true,
+              "properties": {
+                "host": {
+                  "type": "string"
+                },
+                "port": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 65535
+                }
+              },
+              "required": ["host", "port"],
+              "type": "object",
+              "x-serde-unknown-fields": "ignore"
+            }
+          },
+          "required": ["request"],
+          "type": "object"
+        },
+        "clear_sftp_workspace": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeClearSftpWorkspace; native/src/commands.rs",
+          "type": "object"
+        },
+        "clear_terminal_workspace": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeClearTerminalWorkspace; native/src/commands.rs",
+          "type": "object"
+        },
+        "close_session": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeCloseSession; native/src/commands.rs",
+          "properties": {
+            "sessionId": {
+              "type": "string"
+            }
+          },
+          "required": ["sessionId"],
+          "type": "object"
+        },
+        "collect_remote_health_snapshot": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeCollectRemoteHealthSnapshot; native/src/remote_health.rs",
+          "properties": {
+            "request": {
+              "$ref": "#/definitions/RemoteHealthSnapshotRequest",
+              "x-serde-unknown-fields": "ignore"
+            }
+          },
+          "required": ["request"],
+          "type": "object"
+        },
+        "copy_local_paths": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeCopyLocalPaths; native/src/commands.rs",
+          "properties": {
+            "request": {
+              "$ref": "#/definitions/CopyLocalPathsRequest",
+              "x-serde-unknown-fields": "ignore"
+            }
+          },
+          "required": ["request"],
+          "type": "object"
+        },
+        "copy_remote_path": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeCopyRemotePath; native/src/commands.rs",
+          "properties": {
+            "request": {
+              "$ref": "#/definitions/CopyRemotePathRequest",
+              "x-serde-unknown-fields": "ignore"
+            }
+          },
+          "required": ["request"],
+          "type": "object"
+        },
+        "copy_remote_to_remote": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeCopyRemoteToRemote; native/src/commands.rs",
+          "properties": {
+            "request": {
+              "$ref": "#/definitions/CopyRemoteToRemoteRequest",
+              "x-serde-unknown-fields": "ignore"
+            }
+          },
+          "required": ["request"],
+          "type": "object"
+        },
+        "create_local_session": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeCreateLocalSession; native/src/commands.rs",
+          "properties": {
+            "cols": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 65535
+            },
+            "rows": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 65535
+            }
+          },
+          "required": ["cols", "rows"],
+          "type": "object"
+        },
+        "create_remote_entry": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeCreateRemoteEntry; native/src/commands.rs",
+          "properties": {
+            "request": {
+              "$ref": "#/definitions/CreateRemoteEntryRequest",
+              "x-serde-unknown-fields": "ignore"
+            }
+          },
+          "required": ["request"],
+          "type": "object"
+        },
+        "create_session": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeCreateSession; native/src/commands.rs",
+          "properties": {
+            "request": {
+              "$ref": "#/definitions/SessionCreateRequest",
+              "x-serde-unknown-fields": "ignore"
+            }
+          },
+          "required": ["request"],
+          "type": "object"
+        },
+        "delete_key_credential": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeDeleteKeyCredential; native/src/commands.rs",
+          "properties": {
+            "id": {
+              "type": "string"
+            }
+          },
+          "required": ["id"],
+          "type": "object"
+        },
+        "delete_profile_password": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeDeleteProfilePassword; native/src/commands.rs",
+          "properties": {
+            "profileId": {
+              "type": "string"
+            }
+          },
+          "required": ["profileId"],
+          "type": "object"
+        },
+        "delete_profile_secret": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeDeleteProfileSecret; native/src/commands.rs",
+          "properties": {
+            "kind": {
+              "$ref": "#/definitions/ProfileSecretKind"
+            },
+            "profileId": {
+              "type": "string"
+            }
+          },
+          "required": ["profileId", "kind"],
+          "type": "object"
+        },
+        "delete_profile_secrets": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeDeleteProfileSecrets; native/src/commands.rs",
+          "properties": {
+            "profileId": {
+              "type": "string"
+            }
+          },
+          "required": ["profileId"],
+          "type": "object"
+        },
+        "delete_remote_path": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeDeleteRemotePath; native/src/commands.rs",
+          "properties": {
+            "request": {
+              "$ref": "#/definitions/DeleteRemotePathRequest",
+              "x-serde-unknown-fields": "ignore"
+            }
+          },
+          "required": ["request"],
+          "type": "object"
+        },
+        "disconnect_sftp": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeDisconnectSftp; native/src/commands.rs",
+          "properties": {
+            "request": {
+              "$ref": "#/definitions/RemoteConnectionRequest",
+              "x-serde-unknown-fields": "ignore"
+            }
+          },
+          "required": ["request"],
+          "type": "object"
+        },
+        "download_remote_paths": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeDownloadRemotePaths; native/src/commands.rs",
+          "properties": {
+            "request": {
+              "$ref": "#/definitions/DownloadRemotePathsRequest",
+              "x-serde-unknown-fields": "ignore"
+            }
+          },
+          "required": ["request"],
+          "type": "object"
+        },
+        "export_log_file": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeExportLogFile; native/src/commands.rs",
+          "properties": {
+            "content": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            }
+          },
+          "required": ["name", "content"],
+          "type": "object"
+        },
+        "get_session_status": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeGetSessionStatus; native/src/commands.rs",
+          "properties": {
+            "sessionId": {
+              "type": "string"
+            }
+          },
+          "required": ["sessionId"],
+          "type": "object"
+        },
+        "get_system_health": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeGetSystemHealth; native/src/health.rs",
+          "type": "object"
+        },
+        "list_key_credentials": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeListKeyCredentials; native/src/commands.rs",
+          "type": "object"
+        },
+        "list_known_hosts": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeListKnownHosts; native/src/commands.rs",
+          "type": "object"
+        },
+        "list_local_directory": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeListLocalDirectory; native/src/commands.rs",
+          "properties": {
+            "path": {
+              "type": "string"
+            }
+          },
+          "required": ["path"],
+          "type": "object"
+        },
+        "list_log_files": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeListLogFiles; native/src/commands.rs",
+          "type": "object"
+        },
+        "list_port_forwards": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeListPortForwards; native/src/commands.rs",
+          "type": "object"
+        },
+        "list_profiles": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeListProfiles; native/src/commands.rs",
+          "type": "object"
+        },
+        "list_recent_profiles": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeListRecentProfiles; native/src/commands.rs",
+          "type": "object"
+        },
+        "list_remote_directory": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeListRemoteDirectory; native/src/commands.rs",
+          "properties": {
+            "request": {
+              "$ref": "#/definitions/RemoteDirectoryRequest",
+              "x-serde-unknown-fields": "ignore"
+            }
+          },
+          "required": ["request"],
+          "type": "object"
+        },
+        "list_sftp_bookmarks": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeListSftpBookmarks; native/src/commands.rs",
+          "properties": {
+            "host": {
+              "type": "string"
+            },
+            "port": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 65535
+            },
+            "username": {
+              "type": "string"
+            }
+          },
+          "required": ["host", "port", "username"],
+          "type": "object"
+        },
+        "load_preferences": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeLoadPreferences; native/src/commands.rs",
+          "type": "object"
+        },
+        "load_sftp_workspace": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeLoadSftpWorkspace; native/src/commands.rs",
+          "type": "object"
+        },
+        "load_terminal_workspace": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeLoadTerminalWorkspace; native/src/commands.rs",
+          "type": "object"
+        },
+        "mark_session_ready": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeMarkSessionReady; native/src/commands.rs",
+          "properties": {
+            "sessionId": {
+              "type": "string"
+            }
+          },
+          "required": ["sessionId"],
+          "type": "object"
+        },
+        "open_path": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeOpenPath; native/src/commands.rs",
+          "properties": {
+            "path": {
+              "type": "string"
+            }
+          },
+          "required": ["path"],
+          "type": "object"
+        },
+        "open_remote_file": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeOpenRemoteFile; native/src/commands.rs",
+          "properties": {
+            "request": {
+              "$ref": "#/definitions/OpenRemoteFileRequest",
+              "x-serde-unknown-fields": "ignore"
+            }
+          },
+          "required": ["request"],
+          "type": "object"
+        },
+        "open_url": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeOpenUrl; native/src/commands.rs",
+          "properties": {
+            "url": {
+              "type": "string"
+            }
+          },
+          "required": ["url"],
+          "type": "object"
+        },
+        "paste_local_paths": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokePasteLocalPaths; native/src/commands.rs",
+          "properties": {
+            "copySuffix": {
+              "type": "string"
+            },
+            "destinationDirectory": {
+              "type": "string"
+            },
+            "sourcePaths": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          },
+          "required": ["sourcePaths", "destinationDirectory", "copySuffix"],
+          "type": "object"
+        },
+        "petdex_get_status": {
+          "additionalProperties": true,
+          "description": "src/lib/petdex/petdex.ts getPetdexStatus; native/src/petdex.rs",
+          "type": "object"
+        },
+        "petdex_set_enabled": {
+          "additionalProperties": true,
+          "description": "src/lib/petdex/petdex.ts configurePetdex; native/src/petdex.rs",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            }
+          },
+          "required": ["enabled"],
+          "type": "object"
+        },
+        "petdex_test_connection": {
+          "additionalProperties": true,
+          "description": "src/lib/petdex/petdex.ts testPetdexConnection; native/src/petdex.rs",
+          "type": "object"
+        },
+        "pick_local_files": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokePickLocalFiles; native/src/commands.rs",
+          "type": "object"
+        },
+        "pick_local_folder": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokePickLocalFolder; native/src/commands.rs",
+          "properties": {
+            "title": {
+              "type": ["string", "null"]
+            }
+          },
+          "type": "object"
+        },
+        "pick_private_key_file": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokePickPrivateKeyFile; native/src/commands.rs",
+          "type": "object"
+        },
+        "preflight_connection": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokePreflightConnection; native/src/commands.rs",
+          "properties": {
+            "request": {
+              "$ref": "#/definitions/ConnectionPreflightRequest",
+              "x-serde-unknown-fields": "ignore"
+            }
+          },
+          "required": ["request"],
+          "type": "object"
+        },
+        "preview_local_file": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokePreviewLocalFile; native/src/commands.rs",
+          "properties": {
+            "path": {
+              "type": "string"
+            }
+          },
+          "required": ["path"],
+          "type": "object"
+        },
+        "preview_remote_file": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokePreviewRemoteFile; native/src/commands.rs",
+          "properties": {
+            "request": {
+              "$ref": "#/definitions/ReadRemoteFileRequest",
+              "x-serde-unknown-fields": "ignore"
+            }
+          },
+          "required": ["request"],
+          "type": "object"
+        },
+        "read_log_file": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeReadLogFile; native/src/commands.rs",
+          "properties": {
+            "name": {
+              "type": "string"
+            }
+          },
+          "required": ["name"],
+          "type": "object"
+        },
+        "read_text_file": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeReadTextFile; native/src/commands.rs",
+          "properties": {
+            "path": {
+              "type": "string"
+            }
+          },
+          "required": ["path"],
+          "type": "object"
+        },
+        "remove_known_host": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeRemoveKnownHost; native/src/commands.rs",
+          "properties": {
+            "host": {
+              "type": "string"
+            },
+            "port": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 65535
+            }
+          },
+          "required": ["host", "port"],
+          "type": "object"
+        },
+        "remove_profile": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeRemoveProfile; native/src/commands.rs",
+          "properties": {
+            "id": {
+              "type": "string"
+            }
+          },
+          "required": ["id"],
+          "type": "object"
+        },
+        "remove_recent_profile": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeRemoveRecentProfile; native/src/commands.rs",
+          "properties": {
+            "profileId": {
+              "type": "string"
+            }
+          },
+          "required": ["profileId"],
+          "type": "object"
+        },
+        "remove_sftp_bookmark": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeRemoveSftpBookmark; native/src/commands.rs",
+          "properties": {
+            "id": {
+              "type": "string"
+            }
+          },
+          "required": ["id"],
+          "type": "object"
+        },
+        "rename_local_path": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeRenameLocalPath; native/src/commands.rs",
+          "properties": {
+            "newName": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string"
+            }
+          },
+          "required": ["path", "newName"],
+          "type": "object"
+        },
+        "rename_remote_path": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeRenameRemotePath; native/src/commands.rs",
+          "properties": {
+            "request": {
+              "$ref": "#/definitions/RenameRemotePathRequest",
+              "x-serde-unknown-fields": "ignore"
+            }
+          },
+          "required": ["request"],
+          "type": "object"
+        },
+        "request_app_exit": {
+          "additionalProperties": true,
+          "description": "src/App.tsx ; native/src/commands.rs",
+          "type": "object"
+        },
+        "request_app_restart": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeRequestAppRestart; native/src/commands.rs",
+          "type": "object"
+        },
+        "resize_session": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeResizeSession; native/src/commands.rs",
+          "properties": {
+            "cols": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 4294967295
+            },
+            "rows": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 4294967295
+            },
+            "sessionId": {
+              "type": "string"
+            }
+          },
+          "required": ["sessionId", "cols", "rows"],
+          "type": "object"
+        },
+        "resolve_remote_entry_owners": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeResolveRemoteEntryOwners; native/src/commands.rs",
+          "properties": {
+            "request": {
+              "$ref": "#/definitions/RemoteEntryOwnersRequest",
+              "x-serde-unknown-fields": "ignore"
+            }
+          },
+          "required": ["request"],
+          "type": "object"
+        },
+        "retrieve_key_credential": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeRetrieveKeyCredential; native/src/commands.rs",
+          "properties": {
+            "id": {
+              "type": "string"
+            }
+          },
+          "required": ["id"],
+          "type": "object"
+        },
+        "retrieve_profile_password": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeRetrieveProfilePassword; native/src/commands.rs",
+          "properties": {
+            "profileId": {
+              "type": "string"
+            }
+          },
+          "required": ["profileId"],
+          "type": "object"
+        },
+        "retrieve_profile_secret": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeRetrieveProfileSecret; native/src/commands.rs",
+          "properties": {
+            "kind": {
+              "$ref": "#/definitions/ProfileSecretKind"
+            },
+            "profileId": {
+              "type": "string"
+            }
+          },
+          "required": ["profileId", "kind"],
+          "type": "object"
+        },
+        "save_preferences": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeSavePreferences; native/src/commands.rs",
+          "properties": {
+            "entries": {
+              "items": {
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 2,
+                "minItems": 2,
+                "type": "array"
+              },
+              "type": "array"
+            }
+          },
+          "required": ["entries"],
+          "type": "object"
+        },
+        "save_sftp_workspace": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeSaveSftpWorkspace; native/src/commands.rs",
+          "properties": {
+            "workspaceJson": {
+              "type": "string"
+            }
+          },
+          "required": ["workspaceJson"],
+          "type": "object"
+        },
+        "save_terminal_workspace": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeSaveTerminalWorkspace; native/src/commands.rs",
+          "properties": {
+            "sessionsJson": {
+              "type": "string"
+            }
+          },
+          "required": ["sessionsJson"],
+          "type": "object"
+        },
+        "set_session_output_paused": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeSetSessionOutputPaused; native/src/commands.rs",
+          "properties": {
+            "paused": {
+              "type": "boolean"
+            },
+            "sessionId": {
+              "type": "string"
+            }
+          },
+          "required": ["sessionId", "paused"],
+          "type": "object"
+        },
+        "start_port_forward": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeStartPortForward; native/src/commands.rs",
+          "properties": {
+            "request": {
+              "$ref": "#/definitions/PortForwardStartRequest",
+              "x-serde-unknown-fields": "ignore"
+            }
+          },
+          "required": ["request"],
+          "type": "object"
+        },
+        "stop_all_port_forwards": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeStopAllPortForwards; native/src/commands.rs",
+          "type": "object"
+        },
+        "stop_port_forward": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeStopPortForward; native/src/commands.rs",
+          "properties": {
+            "operationId": {
+              "type": "string"
+            }
+          },
+          "required": ["operationId"],
+          "type": "object"
+        },
+        "store_key_credential": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeStoreKeyCredential; native/src/commands.rs",
+          "properties": {
+            "request": {
+              "$ref": "#/definitions/KeyCredentialRequest",
+              "x-serde-unknown-fields": "ignore"
+            }
+          },
+          "required": ["request"],
+          "type": "object"
+        },
+        "store_profile_password": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeStoreProfilePassword; native/src/commands.rs",
+          "properties": {
+            "password": {
+              "type": "string"
+            },
+            "profileId": {
+              "type": "string"
+            }
+          },
+          "required": ["profileId", "password"],
+          "type": "object"
+        },
+        "store_profile_secret": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeStoreProfileSecret; native/src/commands.rs",
+          "properties": {
+            "kind": {
+              "$ref": "#/definitions/ProfileSecretKind"
+            },
+            "profileId": {
+              "type": "string"
+            },
+            "value": {
+              "type": "string"
+            }
+          },
+          "required": ["profileId", "kind", "value"],
+          "type": "object"
+        },
+        "supersede_remote_directory_request": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeSupersedeRemoteDirectoryRequest; native/src/commands.rs",
+          "properties": {
+            "requestId": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "requestKey": {
+              "type": "string"
+            }
+          },
+          "required": ["requestKey", "requestId"],
+          "type": "object"
+        },
+        "touch_recent_profile": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeTouchRecentProfile; native/src/commands.rs",
+          "properties": {
+            "profileId": {
+              "type": "string"
+            }
+          },
+          "required": ["profileId"],
+          "type": "object"
+        },
+        "trash_local_paths": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeTrashLocalPaths; native/src/commands.rs",
+          "properties": {
+            "paths": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          },
+          "required": ["paths"],
+          "type": "object"
+        },
+        "trust_host": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeTrustHost; native/src/commands.rs",
+          "properties": {
+            "request": {
+              "additionalProperties": true,
+              "properties": {
+                "expectedFingerprint": {
+                  "type": "string"
+                },
+                "host": {
+                  "type": "string"
+                },
+                "port": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 65535
+                }
+              },
+              "required": ["host", "port", "expectedFingerprint"],
+              "type": "object",
+              "x-serde-unknown-fields": "ignore"
+            }
+          },
+          "required": ["request"],
+          "type": "object"
+        },
+        "update_profile": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeUpdateProfile; native/src/commands.rs",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "profile": {
+              "$ref": "#/definitions/ProfileRow",
+              "x-serde-unknown-fields": "ignore"
+            }
+          },
+          "required": ["id", "profile"],
+          "type": "object"
+        },
+        "update_remote_permissions": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeUpdateRemotePermissions; native/src/commands.rs",
+          "properties": {
+            "request": {
+              "$ref": "#/definitions/UpdateRemotePermissionsRequest",
+              "x-serde-unknown-fields": "ignore"
+            }
+          },
+          "required": ["request"],
+          "type": "object"
+        },
+        "upload_local_paths": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeUploadLocalPaths; native/src/commands.rs",
+          "properties": {
+            "request": {
+              "$ref": "#/definitions/UploadLocalPathsRequest",
+              "x-serde-unknown-fields": "ignore"
+            }
+          },
+          "required": ["request"],
+          "type": "object"
+        },
+        "warm_remote_connection": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeWarmRemoteConnection; native/src/commands.rs",
+          "properties": {
+            "request": {
+              "$ref": "#/definitions/RemoteConnectionRequest",
+              "x-serde-unknown-fields": "ignore"
+            }
+          },
+          "required": ["request"],
+          "type": "object"
+        },
+        "write_session": {
+          "additionalProperties": true,
+          "description": "src/lib/ipc/tauri.ts invokeWriteSession; native/src/commands.rs",
+          "properties": {
+            "data": {
+              "type": "string"
+            },
+            "sessionId": {
+              "type": "string"
+            }
+          },
+          "required": ["sessionId", "data"],
+          "type": "object"
+        }
+      },
+      "required": [
+        "petdex_set_enabled",
+        "petdex_get_status",
+        "petdex_test_connection",
+        "get_system_health",
+        "ai_list_routes",
+        "ai_save_routes",
+        "ai_list_route_models",
+        "ai_resolve_selection",
+        "ai_list_session_migrations",
+        "ai_convert_session_v4_to_v5",
+        "ai_list_models",
+        "ai_resolve_model",
+        "ai_model_declaration_template",
+        "create_session",
+        "create_local_session",
+        "write_session",
+        "get_session_status",
+        "mark_session_ready",
+        "set_session_output_paused",
+        "resize_session",
+        "close_session",
+        "request_app_restart",
+        "request_app_exit",
+        "list_remote_directory",
+        "supersede_remote_directory_request",
+        "resolve_remote_entry_owners",
+        "warm_remote_connection",
+        "create_remote_entry",
+        "rename_remote_path",
+        "delete_remote_path",
+        "copy_remote_path",
+        "copy_remote_to_remote",
+        "cancel_remote_copy",
+        "upload_local_paths",
+        "copy_local_paths",
+        "rename_local_path",
+        "paste_local_paths",
+        "trash_local_paths",
+        "cancel_upload",
+        "cancel_delete",
+        "download_remote_paths",
+        "cancel_download",
+        "disconnect_sftp",
+        "open_path",
+        "pick_local_files",
+        "pick_local_folder",
+        "pick_private_key_file",
+        "open_remote_file",
+        "preview_local_file",
+        "preview_remote_file",
+        "cancel_remote_file_read",
+        "update_remote_permissions",
+        "store_key_credential",
+        "list_key_credentials",
+        "retrieve_key_credential",
+        "delete_key_credential",
+        "read_text_file",
+        "store_profile_password",
+        "retrieve_profile_password",
+        "delete_profile_password",
+        "store_profile_secret",
+        "retrieve_profile_secret",
+        "delete_profile_secrets",
+        "delete_profile_secret",
+        "start_port_forward",
+        "stop_port_forward",
+        "stop_all_port_forwards",
+        "list_port_forwards",
+        "check_host_key",
+        "preflight_connection",
+        "cancel_connection_preflight",
+        "trust_host",
+        "open_url",
+        "list_known_hosts",
+        "remove_known_host",
+        "list_log_files",
+        "read_log_file",
+        "export_log_file",
+        "list_local_directory",
+        "list_profiles",
+        "add_profile",
+        "update_profile",
+        "remove_profile",
+        "load_preferences",
+        "save_preferences",
+        "list_recent_profiles",
+        "touch_recent_profile",
+        "remove_recent_profile",
+        "list_sftp_bookmarks",
+        "add_sftp_bookmark",
+        "remove_sftp_bookmark",
+        "load_terminal_workspace",
+        "save_terminal_workspace",
+        "clear_terminal_workspace",
+        "load_sftp_workspace",
+        "save_sftp_workspace",
+        "clear_sftp_workspace",
+        "collect_remote_health_snapshot",
+        "cancel_remote_health_snapshot",
+        "agent_runtime_prepare_images",
+        "agent_runtime_submit_images",
+        "agent_runtime_cancel_image_submission",
+        "agent_runtime_image_preview",
+        "agent_runtime_create_session",
+        "agent_runtime_spawn_subagent",
+        "agent_runtime_send_child_input",
+        "agent_runtime_inspect_child_agent",
+        "agent_runtime_cancel_child_agent",
+        "agent_runtime_fleet_plan",
+        "agent_runtime_fleet_start",
+        "agent_runtime_fleet_resume",
+        "agent_runtime_fleet_pause",
+        "agent_runtime_fleet_abort",
+        "agent_runtime_fleet_reconcile",
+        "agent_runtime_start",
+        "agent_runtime_select_model",
+        "agent_runtime_set_permission",
+        "agent_runtime_answer_question",
+        "agent_runtime_followup",
+        "agent_runtime_steer",
+        "agent_runtime_mutate_inbox",
+        "agent_runtime_rename_session",
+        "agent_runtime_inject",
+        "agent_runtime_interrupt",
+        "agent_runtime_resume",
+        "agent_runtime_cancel",
+        "agent_runtime_approve_tool",
+        "agent_runtime_reject_tool",
+        "agent_runtime_get_session",
+        "agent_runtime_list_sessions",
+        "agent_runtime_archive_session",
+        "agent_runtime_get_events",
+        "agent_runtime_get_committed_events",
+        "agent_runtime_get_artifact",
+        "agent_runtime_inspect_recovery",
+        "agent_runtime_resume_recovery",
+        "agent_runtime_reconcile_recovery",
+        "agent_runtime_abort_recovery",
+        "agent_runtime_list_skills",
+        "agent_runtime_list_file_references",
+        "agent_runtime_cancel_file_references"
+      ],
+      "type": "object"
+    },
+    "ConnectionPreflightRequest": {
+      "additionalProperties": true,
+      "properties": {
+        "authMethod": {
+          "$ref": "#/definitions/AuthMethod"
+        },
+        "host": {
+          "type": "string"
+        },
+        "jumpHost": {
+          "$ref": "#/definitions/JumpHostConfig"
+        },
+        "keychainKeyId": {
+          "type": "string"
+        },
+        "operationId": {
+          "type": "string"
+        },
+        "passphrase": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "port": {
+          "type": "number"
+        },
+        "privateKeyData": {
+          "type": "string"
+        },
+        "profileId": {
+          "description": "Frontend-only audit identity; the backend authenticates from the explicit host fields.",
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        }
+      },
+      "required": ["authMethod", "host", "operationId", "port", "username"],
+      "type": "object",
+      "x-serde-unknown-fields": "ignore"
+    },
+    "CopyLocalPathsRequest": {
+      "additionalProperties": true,
+      "properties": {
+        "conflictPolicies": {
+          "items": {
+            "$ref": "#/definitions/UploadConflictPolicy"
+          },
+          "type": "array"
+        },
+        "destinationDirectory": {
+          "type": "string"
+        },
+        "operationId": {
+          "type": "string"
+        },
+        "sourcePaths": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": ["sourcePaths", "destinationDirectory", "conflictPolicies", "operationId"],
+      "type": "object",
+      "x-serde-unknown-fields": "ignore"
+    },
+    "CopyRemotePathRequest": {
+      "additionalProperties": true,
+      "properties": {
+        "authMethod": {
+          "$ref": "#/definitions/AuthMethod"
+        },
+        "destinationDirectory": {
+          "type": "string"
+        },
+        "host": {
+          "type": "string"
+        },
+        "jumpHost": {
+          "$ref": "#/definitions/JumpHostConfig"
+        },
+        "keychainKeyId": {
+          "type": "string"
+        },
+        "operationId": {
+          "type": "string"
+        },
+        "passphrase": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "port": {
+          "type": "number"
+        },
+        "privateKeyData": {
+          "type": "string"
+        },
+        "profileId": {
+          "description": "Frontend-only audit identity; the backend authenticates from the explicit host fields.",
+          "type": "string"
+        },
+        "sourcePath": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "authMethod",
+        "destinationDirectory",
+        "host",
+        "operationId",
+        "port",
+        "sourcePath",
+        "username"
+      ],
+      "type": "object",
+      "x-serde-unknown-fields": "ignore"
+    },
+    "CopyRemoteToRemoteRequest": {
+      "additionalProperties": true,
+      "properties": {
+        "conflictPolicies": {
+          "items": {
+            "$ref": "#/definitions/UploadConflictPolicy"
+          },
+          "type": "array"
+        },
+        "destinationConnection": {
+          "$ref": "#/definitions/RemoteConnectionRequest"
+        },
+        "destinationDirectory": {
+          "type": "string"
+        },
+        "operationId": {
+          "type": "string"
+        },
+        "sourceConnection": {
+          "$ref": "#/definitions/RemoteConnectionRequest"
+        },
+        "sourcePaths": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "sourceConnection",
+        "destinationConnection",
+        "sourcePaths",
+        "destinationDirectory",
+        "conflictPolicies",
+        "operationId"
+      ],
+      "type": "object",
+      "x-serde-unknown-fields": "ignore"
+    },
+    "CreateAgentSessionRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "capabilityScope": {
+          "$ref": "#/definitions/AgentCapabilityScope"
+        },
+        "goal": {
+          "type": "string"
+        },
+        "parentSessionId": {
+          "type": "string"
+        },
+        "permissionMode": {
+          "$ref": "#/definitions/AgentSessionPermissionMode"
+        },
+        "sessionId": {
+          "type": "string"
+        },
+        "subagent": {
+          "$ref": "#/definitions/AgentSubagentSession"
+        },
+        "successCriteria": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "target": {
+          "$ref": "#/definitions/AgentSessionTarget"
+        },
+        "taskId": {
+          "type": "string"
+        }
+      },
+      "required": ["sessionId", "taskId", "goal"],
+      "type": "object",
+      "x-serde-unknown-fields": "deny"
+    },
+    "CreateRemoteEntryRequest": {
+      "additionalProperties": true,
+      "properties": {
+        "authMethod": {
+          "$ref": "#/definitions/AuthMethod"
+        },
+        "host": {
+          "type": "string"
+        },
+        "jumpHost": {
+          "$ref": "#/definitions/JumpHostConfig"
+        },
+        "keychainKeyId": {
+          "type": "string"
+        },
+        "kind": {
+          "enum": ["file", "directory"],
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "parentPath": {
+          "type": "string"
+        },
+        "passphrase": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "port": {
+          "type": "number"
+        },
+        "privateKeyData": {
+          "type": "string"
+        },
+        "profileId": {
+          "description": "Frontend-only audit identity; the backend authenticates from the explicit host fields.",
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        }
+      },
+      "required": ["authMethod", "host", "kind", "name", "parentPath", "port", "username"],
+      "type": "object",
+      "x-serde-unknown-fields": "ignore"
+    },
+    "DeleteRemotePathRequest": {
+      "additionalProperties": true,
+      "properties": {
+        "authMethod": {
+          "$ref": "#/definitions/AuthMethod"
+        },
+        "host": {
+          "type": "string"
+        },
+        "jumpHost": {
+          "$ref": "#/definitions/JumpHostConfig"
+        },
+        "keychainKeyId": {
+          "type": "string"
+        },
+        "operationId": {
+          "type": "string"
+        },
+        "passphrase": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "paths": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "port": {
+          "type": "number"
+        },
+        "privateKeyData": {
+          "type": "string"
+        },
+        "profileId": {
+          "description": "Frontend-only audit identity; the backend authenticates from the explicit host fields.",
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        }
+      },
+      "required": ["authMethod", "host", "operationId", "paths", "port", "username"],
+      "type": "object",
+      "x-serde-unknown-fields": "ignore"
+    },
+    "DownloadRemotePathsRequest": {
+      "additionalProperties": true,
+      "properties": {
+        "authMethod": {
+          "$ref": "#/definitions/AuthMethod"
+        },
+        "conflictPolicies": {
+          "items": {
+            "$ref": "#/definitions/UploadConflictPolicy"
+          },
+          "type": "array"
+        },
+        "destinationDirectory": {
+          "type": "string"
+        },
+        "host": {
+          "type": "string"
+        },
+        "jumpHost": {
+          "$ref": "#/definitions/JumpHostConfig"
+        },
+        "keychainKeyId": {
+          "type": "string"
+        },
+        "operationId": {
+          "type": "string"
+        },
+        "passphrase": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "port": {
+          "type": "number"
+        },
+        "privateKeyData": {
+          "type": "string"
+        },
+        "profileId": {
+          "description": "Frontend-only audit identity; the backend authenticates from the explicit host fields.",
+          "type": "string"
+        },
+        "remotePaths": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "username": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "authMethod",
+        "conflictPolicies",
+        "destinationDirectory",
+        "host",
+        "operationId",
+        "port",
+        "remotePaths",
+        "username"
+      ],
+      "type": "object",
+      "x-serde-unknown-fields": "ignore"
+    },
+    "JumpHostConfig": {
+      "additionalProperties": true,
+      "properties": {
+        "authMethod": {
+          "$ref": "#/definitions/AuthMethod"
+        },
+        "host": {
+          "type": "string"
+        },
+        "keychainKeyId": {
+          "type": "string"
+        },
+        "passphrase": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "port": {
+          "type": "number"
+        },
+        "privateKeyData": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        }
+      },
+      "required": ["host", "port", "username", "authMethod"],
+      "type": "object"
+    },
+    "KeyCredentialKind": {
+      "enum": ["password", "keyfile"],
+      "type": "string"
+    },
+    "KeyCredentialRequest": {
+      "additionalProperties": true,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "keyType": {
+          "type": ["string", "null"]
+        },
+        "kind": {
+          "$ref": "#/definitions/KeyCredentialKind"
+        },
+        "label": {
+          "type": "string"
+        },
+        "privateKey": {
+          "type": ["string", "null"]
+        },
+        "publicKey": {
+          "type": ["string", "null"]
+        }
+      },
+      "required": ["id", "label", "kind"],
+      "type": "object",
+      "x-serde-unknown-fields": "ignore"
+    },
+    "ModelCompat": {
+      "additionalProperties": true,
+      "properties": {
+        "clearThinking": {
+          "type": "boolean"
+        },
+        "cumulativeStream": {
+          "type": "boolean"
+        },
+        "defaultThinking": {
+          "type": "boolean"
+        },
+        "nativeReasoning": {
+          "type": "boolean"
+        },
+        "parallelToolCalls": {
+          "type": "boolean"
+        },
+        "preservesReasoningAcrossTurns": {
+          "type": "boolean"
+        },
+        "protocol": {
+          "$ref": "#/definitions/AiProviderKind"
+        },
+        "reasoningEncoding": {
+          "enum": [
+            "none",
+            "responses",
+            "enableThinking",
+            "thinking",
+            "adaptive",
+            "thinkingEffort",
+            "effort",
+            "ollama",
+            "anthropicAdaptive"
+          ],
+          "type": "string"
+        },
+        "replayReasoningContent": {
+          "type": "boolean"
+        },
+        "splitReasoning": {
+          "type": "boolean"
+        },
+        "strictSchema": {
+          "type": "boolean"
+        },
+        "supportsStreamUsage": {
+          "type": "boolean"
+        },
+        "thinkTagFallback": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "protocol",
+        "cumulativeStream",
+        "supportsStreamUsage",
+        "nativeReasoning",
+        "splitReasoning",
+        "replayReasoningContent",
+        "thinkTagFallback",
+        "parallelToolCalls",
+        "strictSchema",
+        "preservesReasoningAcrossTurns",
+        "reasoningEncoding",
+        "clearThinking",
+        "defaultThinking"
+      ],
+      "type": "object"
+    },
+    "ModelDefinition": {
+      "additionalProperties": false,
+      "properties": {
+        "compat": {
+          "$ref": "#/definitions/ModelCompat"
+        },
+        "contextWindow": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "imageInput": {
+          "$ref": "#/definitions/Support"
+        },
+        "maxOutputTokens": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "reasoning": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "displayName": {
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": ["id", "displayName"],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "textInput": {
+          "$ref": "#/definitions/Support"
+        },
+        "toolCalling": {
+          "$ref": "#/definitions/Support"
+        },
+        "vision": {
+          "$ref": "#/definitions/VisionBudget"
+        }
+      },
+      "required": [
+        "contextWindow",
+        "maxOutputTokens",
+        "toolCalling",
+        "textInput",
+        "imageInput",
+        "reasoning",
+        "compat"
+      ],
+      "type": "object",
+      "x-serde-unknown-fields": "deny"
+    },
+    "ModelSelection": {
+      "additionalProperties": true,
+      "properties": {
+        "modelId": {
+          "type": "string"
+        },
+        "reasoningEffort": {
+          "type": "string"
+        },
+        "routeId": {
+          "type": "string"
+        }
+      },
+      "required": ["routeId", "modelId"],
+      "type": "object"
+    },
+    "OpenRemoteFileRequest": {
+      "additionalProperties": true,
+      "properties": {
+        "authMethod": {
+          "$ref": "#/definitions/AuthMethod"
+        },
+        "host": {
+          "type": "string"
+        },
+        "jumpHost": {
+          "$ref": "#/definitions/JumpHostConfig"
+        },
+        "keychainKeyId": {
+          "type": "string"
+        },
+        "operationId": {
+          "type": "string"
+        },
+        "passphrase": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "port": {
+          "type": "number"
+        },
+        "privateKeyData": {
+          "type": "string"
+        },
+        "profileId": {
+          "description": "Frontend-only audit identity; the backend authenticates from the explicit host fields.",
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        }
+      },
+      "required": ["authMethod", "host", "operationId", "path", "port", "username"],
+      "type": "object",
+      "x-serde-unknown-fields": "ignore"
+    },
+    "PortForwardKind": {
+      "enum": ["local", "remote"],
+      "type": "string"
+    },
+    "PortForwardStartMode": {
+      "enum": ["manual", "auto"],
+      "type": "string"
+    },
+    "PortForwardStartRequest": {
+      "additionalProperties": true,
+      "properties": {
+        "connection": {
+          "$ref": "#/definitions/RemoteConnectionRequest"
+        },
+        "forward": {
+          "additionalProperties": true,
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "kind": {
+              "$ref": "#/definitions/PortForwardKind"
+            },
+            "localPort": {
+              "type": "number"
+            },
+            "name": {
+              "type": "string"
+            },
+            "remoteHost": {
+              "type": "string"
+            },
+            "remotePort": {
+              "type": "number"
+            }
+          },
+          "required": ["id", "name", "kind", "localPort", "remoteHost", "remotePort"],
+          "type": "object"
+        },
+        "mode": {
+          "$ref": "#/definitions/PortForwardStartMode"
+        },
+        "operationId": {
+          "type": "string"
+        },
+        "profileId": {
+          "type": "string"
+        }
+      },
+      "required": ["operationId", "profileId", "mode", "connection", "forward"],
+      "type": "object",
+      "x-serde-unknown-fields": "ignore"
+    },
+    "ProfileRow": {
+      "additionalProperties": true,
+      "properties": {
+        "authMethod": {
+          "$ref": "#/definitions/AuthMethod"
+        },
+        "createdAt": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "host": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "jumpHostConfig": {
+          "type": "string"
+        },
+        "keychainKeyId": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "organizationJson": {
+          "type": "string"
+        },
+        "port": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 65535
+        },
+        "updatedAt": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "username": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "host",
+        "port",
+        "username",
+        "authMethod",
+        "createdAt",
+        "updatedAt"
+      ],
+      "type": "object",
+      "x-serde-unknown-fields": "ignore"
+    },
+    "ProfileSecretKind": {
+      "description": "Per-profile secrets stored in the OS keychain besides the main password.",
+      "enum": ["passphrase", "jump-password", "jump-passphrase"],
+      "type": "string",
+      "x-serde-unknown-fields": "ignore"
+    },
+    "ProviderProfileId": {
+      "enum": [
+        "openai",
+        "anthropic",
+        "ollama",
+        "deepseek",
+        "minimax",
+        "qwen",
+        "glm",
+        "kimi",
+        "generic"
+      ],
+      "type": "string"
+    },
+    "ProviderRoute": {
+      "additionalProperties": true,
+      "properties": {
+        "adapterId": {
+          "enum": ["responses", "chat-completions", "ollama", "anthropic-messages"],
+          "type": "string"
+        },
+        "auth": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "properties": {
+                "kind": {
+                  "const": "none",
+                  "type": "string"
+                }
+              },
+              "required": ["kind"],
+              "type": "object"
+            },
+            {
+              "additionalProperties": true,
+              "properties": {
+                "kind": {
+                  "const": "keychain",
+                  "type": "string"
+                },
+                "reference": {
+                  "type": "string"
+                }
+              },
+              "required": ["kind", "reference"],
+              "type": "object"
+            }
+          ]
+        },
+        "baseUrl": {
+          "type": "string"
+        },
+        "defaults": {
+          "$ref": "#/definitions/ModelSelection"
+        },
+        "displayName": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "modelOverrides": {
+          "additionalProperties": {
+            "$ref": "#/definitions/ModelDefinition"
+          },
+          "type": "object"
+        },
+        "models": {
+          "additionalProperties": {
+            "$ref": "#/definitions/ModelDefinition"
+          },
+          "type": "object"
+        },
+        "presetId": {
+          "type": "string"
+        },
+        "replayDomainId": {
+          "type": "string"
+        },
+        "retryPolicy": {
+          "$ref": "#/definitions/AiRetryPolicy"
+        },
+        "revision": {
+          "type": "number"
+        },
+        "timeouts": {
+          "additionalProperties": true,
+          "properties": {
+            "firstByteMs": {
+              "type": "number"
+            },
+            "requestHeadersMs": {
+              "type": "number"
+            },
+            "streamIdleMs": {
+              "type": "number"
+            }
+          },
+          "required": ["requestHeadersMs", "firstByteMs", "streamIdleMs"],
+          "type": "object"
+        }
+      },
+      "required": [
+        "id",
+        "revision",
+        "displayName",
+        "adapterId",
+        "baseUrl",
+        "auth",
+        "replayDomainId",
+        "retryPolicy",
+        "timeouts"
+      ],
+      "type": "object"
+    },
+    "QuestionAnswer": {
+      "additionalProperties": true,
+      "properties": {
+        "custom": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "selected": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": ["id", "selected"],
+      "type": "object"
+    },
+    "QuestionIdentity": {
+      "additionalProperties": true,
+      "properties": {
+        "callId": {
+          "type": "string"
+        },
+        "questionRequestId": {
+          "type": "string"
+        },
+        "requestId": {
+          "type": "string"
+        },
+        "sessionId": {
+          "type": "string"
+        },
+        "stepId": {
+          "type": "string"
+        },
+        "turnId": {
+          "type": "string"
+        }
+      },
+      "required": ["sessionId", "turnId", "stepId", "requestId", "callId", "questionRequestId"],
+      "type": "object"
+    },
+    "ReadRemoteFileRequest": {
+      "additionalProperties": true,
+      "properties": {
+        "authMethod": {
+          "$ref": "#/definitions/AuthMethod"
+        },
+        "host": {
+          "type": "string"
+        },
+        "jumpHost": {
+          "$ref": "#/definitions/JumpHostConfig"
+        },
+        "keychainKeyId": {
+          "type": "string"
+        },
+        "operationId": {
+          "type": "string"
+        },
+        "passphrase": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "port": {
+          "type": "number"
+        },
+        "privateKeyData": {
+          "type": "string"
+        },
+        "profileId": {
+          "description": "Frontend-only audit identity; the backend authenticates from the explicit host fields.",
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        }
+      },
+      "required": ["authMethod", "host", "operationId", "path", "port", "username"],
+      "type": "object",
+      "x-serde-unknown-fields": "ignore"
+    },
+    "RemoteConnectionRequest": {
+      "additionalProperties": true,
+      "properties": {
+        "authMethod": {
+          "$ref": "#/definitions/AuthMethod"
+        },
+        "host": {
+          "type": "string"
+        },
+        "jumpHost": {
+          "$ref": "#/definitions/JumpHostConfig"
+        },
+        "keychainKeyId": {
+          "type": "string"
+        },
+        "passphrase": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "port": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 65535
+        },
+        "privateKeyData": {
+          "type": "string"
+        },
+        "profileId": {
+          "description": "Frontend-only audit identity; the backend authenticates from the explicit host fields.",
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        }
+      },
+      "required": ["host", "port", "username", "authMethod"],
+      "type": "object",
+      "x-serde-unknown-fields": "ignore"
+    },
+    "RemoteDirectoryRequest": {
+      "additionalProperties": true,
+      "properties": {
+        "authMethod": {
+          "$ref": "#/definitions/AuthMethod"
+        },
+        "host": {
+          "type": "string"
+        },
+        "jumpHost": {
+          "$ref": "#/definitions/JumpHostConfig"
+        },
+        "keychainKeyId": {
+          "type": "string"
+        },
+        "passphrase": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "port": {
+          "type": "number"
+        },
+        "privateKeyData": {
+          "type": "string"
+        },
+        "profileId": {
+          "description": "Frontend-only audit identity; the backend authenticates from the explicit host fields.",
+          "type": "string"
+        },
+        "requestId": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "requestKey": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        }
+      },
+      "required": ["authMethod", "host", "port", "requestId", "requestKey", "username"],
+      "type": "object",
+      "x-serde-unknown-fields": "ignore"
+    },
+    "RemoteEntryOwnersRequest": {
+      "additionalProperties": true,
+      "properties": {
+        "authMethod": {
+          "$ref": "#/definitions/AuthMethod"
+        },
+        "groupIds": {
+          "items": {
+            "type": "number"
+          },
+          "type": "array"
+        },
+        "host": {
+          "type": "string"
+        },
+        "jumpHost": {
+          "$ref": "#/definitions/JumpHostConfig"
+        },
+        "keychainKeyId": {
+          "type": "string"
+        },
+        "ownerIds": {
+          "items": {
+            "type": "number"
+          },
+          "type": "array"
+        },
+        "passphrase": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "port": {
+          "type": "number"
+        },
+        "privateKeyData": {
+          "type": "string"
+        },
+        "profileId": {
+          "description": "Frontend-only audit identity; the backend authenticates from the explicit host fields.",
+          "type": "string"
+        },
+        "requestId": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "requestKey": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "authMethod",
+        "groupIds",
+        "host",
+        "ownerIds",
+        "port",
+        "requestId",
+        "requestKey",
+        "username"
+      ],
+      "type": "object",
+      "x-serde-unknown-fields": "ignore"
+    },
+    "RemoteHealthSnapshotRequest": {
+      "additionalProperties": true,
+      "properties": {
+        "authorized": {
+          "type": "boolean"
+        },
+        "connection": {
+          "$ref": "#/definitions/RemoteConnectionRequest"
+        },
+        "operationId": {
+          "type": "string"
+        },
+        "profileId": {
+          "type": "string"
+        },
+        "timeoutMs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": ["operationId", "profileId", "authorized", "timeoutMs", "connection"],
+      "type": "object",
+      "x-serde-unknown-fields": "ignore"
+    },
+    "RenameRemotePathRequest": {
+      "additionalProperties": true,
+      "properties": {
+        "authMethod": {
+          "$ref": "#/definitions/AuthMethod"
+        },
+        "host": {
+          "type": "string"
+        },
+        "jumpHost": {
+          "$ref": "#/definitions/JumpHostConfig"
+        },
+        "keychainKeyId": {
+          "type": "string"
+        },
+        "newName": {
+          "type": "string"
+        },
+        "passphrase": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "port": {
+          "type": "number"
+        },
+        "privateKeyData": {
+          "type": "string"
+        },
+        "profileId": {
+          "description": "Frontend-only audit identity; the backend authenticates from the explicit host fields.",
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        }
+      },
+      "required": ["authMethod", "host", "newName", "path", "port", "username"],
+      "type": "object",
+      "x-serde-unknown-fields": "ignore"
+    },
+    "SessionCreateRequest": {
+      "additionalProperties": true,
+      "properties": {
+        "authMethod": {
+          "$ref": "#/definitions/AuthMethod"
+        },
+        "host": {
+          "type": "string"
+        },
+        "jumpHost": {
+          "$ref": "#/definitions/JumpHostConfig"
+        },
+        "keychainKeyId": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "operationId": {
+          "type": "string"
+        },
+        "passphrase": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "port": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 65535
+        },
+        "privateKeyData": {
+          "type": "string"
+        },
+        "profileId": {
+          "description": "Frontend-only audit identity; older backends safely ignore this field.",
+          "type": "string"
+        },
+        "terminalCols": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4294967295
+        },
+        "terminalRows": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4294967295
+        },
+        "username": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "host",
+        "port",
+        "username",
+        "authMethod",
+        "terminalCols",
+        "terminalRows"
+      ],
+      "type": "object",
+      "x-serde-unknown-fields": "ignore"
+    },
+    "SftpBookmarkRow": {
+      "additionalProperties": true,
+      "properties": {
+        "createdAt": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "host": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "port": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 65535
+        },
+        "side": {
+          "enum": ["local", "remote"],
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        }
+      },
+      "required": ["id", "host", "port", "username", "path", "side", "createdAt"],
+      "type": "object",
+      "x-serde-unknown-fields": "ignore"
+    },
+    "Support": {
+      "enum": ["supported", "unsupported", "unknown"],
+      "type": "string"
+    },
+    "UpdateRemotePermissionsRequest": {
+      "additionalProperties": true,
+      "properties": {
+        "authMethod": {
+          "$ref": "#/definitions/AuthMethod"
+        },
+        "host": {
+          "type": "string"
+        },
+        "jumpHost": {
+          "$ref": "#/definitions/JumpHostConfig"
+        },
+        "keychainKeyId": {
+          "type": "string"
+        },
+        "passphrase": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "permissions": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4294967295
+        },
+        "port": {
+          "type": "number"
+        },
+        "privateKeyData": {
+          "type": "string"
+        },
+        "profileId": {
+          "description": "Frontend-only audit identity; the backend authenticates from the explicit host fields.",
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        }
+      },
+      "required": ["authMethod", "host", "path", "permissions", "port", "username"],
+      "type": "object",
+      "x-serde-unknown-fields": "ignore"
+    },
+    "UploadConflictPolicy": {
+      "enum": ["overwrite", "replace", "skip", "fail"],
+      "type": "string"
+    },
+    "UploadLocalPathsRequest": {
+      "additionalProperties": true,
+      "properties": {
+        "authMethod": {
+          "$ref": "#/definitions/AuthMethod"
+        },
+        "conflictPolicies": {
+          "items": {
+            "$ref": "#/definitions/UploadConflictPolicy"
+          },
+          "type": "array"
+        },
+        "destinationDirectory": {
+          "type": "string"
+        },
+        "host": {
+          "type": "string"
+        },
+        "jumpHost": {
+          "$ref": "#/definitions/JumpHostConfig"
+        },
+        "keychainKeyId": {
+          "type": "string"
+        },
+        "localPaths": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "operationId": {
+          "type": "string"
+        },
+        "passphrase": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "port": {
+          "type": "number"
+        },
+        "privateKeyData": {
+          "type": "string"
+        },
+        "profileId": {
+          "description": "Frontend-only audit identity; the backend authenticates from the explicit host fields.",
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "authMethod",
+        "conflictPolicies",
+        "destinationDirectory",
+        "host",
+        "localPaths",
+        "operationId",
+        "port",
+        "username"
+      ],
+      "type": "object",
+      "x-serde-unknown-fields": "ignore"
+    },
+    "VisionBudget": {
+      "additionalProperties": true,
+      "properties": {
+        "imageTokenBudgetPolicy": {
+          "type": "string"
+        },
+        "maxRequestImageBytes": {
+          "type": "number"
+        },
+        "maxRequestImages": {
+          "type": "number"
+        },
+        "reservedTokensPerImage": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "maxRequestImages",
+        "maxRequestImageBytes",
+        "reservedTokensPerImage",
+        "imageTokenBudgetPolicy"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "https://shellspan.local/contracts/v1/command-args.schema.json",
+  "title": "ShellSpan desktop contract v1: CommandArgs",
+  "x-shellspan-contract-version": 1,
+  "x-shellspan-bootstrap-source": "src/lib/desktop/command-types.ts"
+}

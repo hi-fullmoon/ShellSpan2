@@ -1,4 +1,4 @@
-import type { ProviderProfileId } from '@/lib/ai/provider-contract';
+import type { ModelDefinition, ProviderProfileId } from '@/lib/ai/provider-contract';
 import type { AiRetryPolicy } from '@/lib/ai/retry-policy';
 
 export type AiProviderKind = 'ollama' | 'openAi' | 'openAiCompatible' | 'anthropicMessages';
@@ -18,7 +18,7 @@ export type AiReasoningOption = string;
 export interface AiProviderConfig {
   /** Route revision used to validate an existing Session selection. */
   routeRevision?: number;
-  modelDefinition?: import('@/lib/ai/provider-contract').ModelDefinition;
+  modelDefinition?: ModelDefinition;
   retryPolicy?: AiRetryPolicy;
   id: string;
   kind: AiProviderKind;
@@ -53,8 +53,8 @@ export interface ProviderRoute {
   auth: { kind: 'none' } | { kind: 'keychain'; reference: string };
   replayDomainId: string;
   presetId?: string;
-  models?: Record<string, import('@/lib/ai/provider-contract').ModelDefinition>;
-  modelOverrides?: Record<string, import('@/lib/ai/provider-contract').ModelDefinition>;
+  models?: Record<string, ModelDefinition>;
+  modelOverrides?: Record<string, ModelDefinition>;
   defaults?: ModelSelection;
   retryPolicy: AiRetryPolicy;
   timeouts: { requestHeadersMs: number; firstByteMs: number; streamIdleMs: number };

@@ -19,6 +19,7 @@
     "scripts/electron-dev.ts",
     "scripts/electron-smoke.ts",
     "scripts/native-smoke.ts",
+    "scripts/capture-native-core-baseline.ts",
     "electron/tests/types/bridge-types.ts"
   ],
   "extends": "./tsconfig.json"

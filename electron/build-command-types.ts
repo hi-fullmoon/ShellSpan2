@@ -1,124 +1,94 @@
-// Read the existing business wrappers through the TypeScript checker. No invented
-// duplicate interfaces: generated types import the original model declarations.
-import ts from 'typescript';
+import assert from 'node:assert/strict';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import assert from 'node:assert/strict';
-import contracts from './contract.json' with { type: 'json' };
+import { compile } from 'json-schema-to-typescript';
+import { format, resolveConfig } from 'prettier';
+import commandArgsSchema from './contracts/v1/command-args.schema.json' with { type: 'json' };
+import commandValuesSchema from './contracts/v1/command-values.schema.json' with { type: 'json' };
+import eventPayloadsSchema from './contracts/v1/event-payloads.schema.json' with { type: 'json' };
 
-const __dirname = import.meta.dirname;
-const root = path.resolve(__dirname, '..');
-const byName = new Map(contracts.map((c) => [c.command, c]));
-const config = ts.readConfigFile(path.join(root, 'tsconfig.json'), ts.sys.readFile);
-const parsed = ts.parseJsonConfigFileContent(config.config, ts.sys, root);
-const program = ts.createProgram(parsed.fileNames, parsed.options);
-const checker = program.getTypeChecker();
-const found = new Map<
-  string,
-  { args: string; result: string; preferred: boolean; source: string; wrapper?: string }
->();
-const flags = ts.TypeFormatFlags.NoTruncation | ts.TypeFormatFlags.UseFullyQualifiedType;
-const text = (t: ts.Type) =>
-  checker
-    .typeToString(t, undefined, flags)
-    .replaceAll(root + '/src/', '@/')
-    .replace(/`\$\{string\}-\$\{string\}-\$\{string\}-\$\{string\}-\$\{string\}`/g, 'string');
-for (const source of program.getSourceFiles())
-  if (source.fileName.startsWith(root + '/src/') && !source.fileName.includes('__tests__')) {
-    function visit(n: ts.Node) {
-      if (
-        ts.isCallExpression(n) &&
-        n.arguments[0] &&
-        ts.isStringLiteral(n.arguments[0]) &&
-        byName.has(n.arguments[0].text) &&
-        /^(invoke|invokeLogged|invokeTerminalHotPath)$/.test(n.expression.getText(source))
-      ) {
-        const name = n.arguments[0].text;
-        const c = byName.get(name)!;
-        const previous = found.get(name);
-        if (previous && (!source.fileName.endsWith('/lib/ipc/tauri.ts') || previous.preferred))
-          return;
-        const obj = n.arguments[1] ? checker.getTypeAtLocation(n.arguments[1]) : null;
-        const args = c.args
-          .map((a) => {
-            const prop = obj?.getProperty(a.name);
-            assert.ok(prop, `${name}.${a.name} not present in business wrapper`);
-            const rust = a.rustType.replace(/^Option<(.*)>$/, '$1');
-            let typ =
-              rust === 'String'
-                ? 'string'
-                : rust === 'bool'
-                  ? 'boolean'
-                  : /^[uif]\d+$/.test(rust)
-                    ? 'number'
-                    : text(checker.getTypeOfSymbolAtLocation(prop, n.arguments[1]!));
-            if (a.optional) typ = typ.replace(/ \| undefined/g, '') + ' | null';
-            return `${a.name}${a.optional ? '?' : ''}: ${typ};`;
-          })
-          .join(' ');
-        let fn: ts.Node | undefined = n.parent;
-        while (fn && !ts.isFunctionDeclaration(fn)) fn = fn.parent;
-        const annotated =
-          fn && ts.isFunctionDeclaration(fn) && fn.type
-            ? checker.getTypeFromTypeNode(fn.type)
-            : null;
-        let result = text(
-          n.typeArguments?.[0]
-            ? checker.getTypeFromTypeNode(n.typeArguments[0])
-            : checker.getAwaitedType(annotated || checker.getTypeAtLocation(n))!,
-        );
-        if (c.returns === '()' || c.returns.startsWith('Result<(),')) result = 'void';
-        if (c.returns.startsWith('Result<Option<'))
-          result =
-            result
-              .replace(/ \| undefined/g, '')
-              .replace(/undefined \| /g, '')
-              .replace(/ \| null/g, '') + ' | null';
-        if (name === 'ai_model_declaration_template') {
-          /* Same AiProviderConfig as ai_resolve_model, before UI declaration transformation. */
-        }
-        if (c.returns === 'PetdexConnectionStatus')
-          result = 'import("@/types").PetdexConnectionStatus';
-        if (name === 'retrieve_key_credential')
-          result = 'import("@/lib/desktop/wire-types").KeyCredentialResponse | null';
-        if (name === 'list_key_credentials')
-          result = 'import("@/lib/desktop/wire-types").KeyCredentialSummary[]';
-        assert.ok(!['unknown', 'any'].includes(result), `${name} has no concrete model`);
-        found.set(name, {
-          args:
-            name === 'store_key_credential'
-              ? '{ request: import("@/lib/desktop/wire-types").KeyCredentialRequest; }'
-              : name === 'ai_model_declaration_template'
-                ? '{ provider: import("@/types/ai").AiProviderConfig; }'
-                : `{ ${args} }`,
-          result,
-          preferred: source.fileName.endsWith('/lib/ipc/tauri.ts'),
-          source: path.relative(root, source.fileName),
-          wrapper: fn && ts.isFunctionDeclaration(fn) ? fn.name?.text : undefined,
-        });
-      }
-      ts.forEachChild(n, visit);
+const root = path.resolve(import.meta.dirname, '..');
+function namespacedDefinitions(
+  source: { definitions: Record<string, unknown> },
+  rootName: string,
+  prefix: string,
+) {
+  const definitions = structuredClone(source.definitions);
+  const names = new Map(
+    Object.keys(definitions).map((name) => [name, name === rootName ? name : `${prefix}${name}`]),
+  );
+  const rewrite = (node: unknown) => {
+    if (!node || typeof node !== 'object') return;
+    if ('$ref' in node && typeof node.$ref === 'string') {
+      const name = node.$ref.match(/^#\/definitions\/(.+)$/)?.[1];
+      if (name && names.has(name)) node.$ref = `#/definitions/${names.get(name)}`;
     }
-    visit(source);
-  }
-assert.equal(found.size, 141);
-let output = '// Generated by electron/build-command-types.ts from existing business wrappers.\n';
-for (const [map, field] of [
-  ['CommandArgs', 'args'],
-  ['CommandValues', 'result'],
-] as const) {
-  output += `export interface ${map} {\n`;
-  for (const c of contracts) {
-    const row = found.get(c.command)!;
-    output += `  /** ${row.source} ${row.wrapper || ''}; ${c.source} */\n  ${c.command}: ${row[field]};\n`;
-  }
-  output += '}\n';
+    for (const value of Object.values(node)) rewrite(value);
+  };
+  rewrite(definitions);
+  return Object.fromEntries(
+    Object.entries(definitions).map(([name, definition]) => [names.get(name), definition]),
+  );
 }
-output +=
-  'export type CommandInput<C extends keyof CommandArgs> = {} extends CommandArgs[C] ? [args?: CommandArgs[C]] : [args: CommandArgs[C]];\n';
-output += 'export type WireValue<T> = [T] extends [void] ? null : T;\n';
-const file = path.join(root, 'src/lib/desktop/command-types.ts');
-if (process.argv.includes('--check'))
-  assert.equal(fs.readFileSync(file, 'utf8'), output, 'Command types drift; regenerate and review');
-else fs.writeFileSync(file, output);
-console.log('Derived 141 argument/result model pairs from business wrapper declarations');
+
+const definitions = {
+  ...namespacedDefinitions(commandArgsSchema, 'CommandArgs', 'Args'),
+  ...namespacedDefinitions(commandValuesSchema, 'CommandValues', 'Values'),
+  ...namespacedDefinitions(eventPayloadsSchema, 'DesktopEventPayloads', 'Events'),
+};
+
+const args = commandArgsSchema.definitions.CommandArgs.properties;
+const values = commandValuesSchema.definitions.CommandValues.properties;
+const eventPayloads = eventPayloadsSchema.definitions.DesktopEventPayloads.properties;
+assert.equal(Object.keys(args).length, 141, 'Expected 141 command argument schemas');
+assert.deepEqual(Object.keys(args), Object.keys(values), 'Command argument/value schema drift');
+assert.equal(Object.keys(eventPayloads).length, 17, 'Expected 17 fixed renderer event schemas');
+
+const combinedSchema = {
+  $schema: 'http://json-schema.org/draft-07/schema#',
+  title: 'DesktopContractTypes',
+  type: 'object',
+  additionalProperties: false,
+  properties: {
+    commandArgs: { $ref: '#/definitions/CommandArgs' },
+    commandValues: { $ref: '#/definitions/CommandValues' },
+    eventPayloads: { $ref: '#/definitions/DesktopEventPayloads' },
+  },
+  required: ['commandArgs', 'commandValues', 'eventPayloads'],
+  definitions,
+};
+
+const generatedSource = await compile(
+  combinedSchema as Parameters<typeof compile>[0],
+  'DesktopContractTypes',
+  {
+    bannerComment:
+      '// Generated from electron/contracts/v1/*.schema.json. Do not edit this file directly.',
+    style: { singleQuote: true },
+    unreachableDefinitions: false,
+  },
+);
+const generated = await format(generatedSource, {
+  ...(await resolveConfig(path.join(root, 'src/lib/desktop/generated-contract-types.ts'))),
+  parser: 'typescript',
+});
+const commandNames = Object.keys(args);
+const eventNames = Object.keys(eventPayloads);
+const artifacts = new Map([
+  [path.join(root, 'src/lib/desktop/generated-contract-types.ts'), generated],
+  [path.join(root, 'electron/commands.json'), `${JSON.stringify(commandNames, null, 2)}\n`],
+  [path.join(root, 'electron/events.json'), `${JSON.stringify(eventNames, null, 2)}\n`],
+  [
+    path.join(root, 'src/lib/desktop/contract.ts'),
+    '// Generated from electron/contracts/v1/*.schema.json. Do not edit directly.\n' +
+      `export type DesktopCommand = ${commandNames.map((name) => JSON.stringify(name)).join(' | ')};\n` +
+      `export type DesktopEvent = ${eventNames.map((name) => JSON.stringify(name)).join(' | ')} | \`ssh-data:\${string}\`;\n`,
+  ],
+]);
+
+for (const [file, contents] of artifacts)
+  if (process.argv.includes('--check'))
+    assert.equal(fs.readFileSync(file, 'utf8'), contents, `${path.relative(root, file)} drift`);
+  else fs.writeFileSync(file, contents);
+
+console.log('Generated 141 command and 17 fixed event model pairs from contract schema v1');

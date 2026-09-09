@@ -170,7 +170,7 @@ impl FixedFixtureCommand {
                 vec![FIXTURE_SECRET.to_string()],
             ),
             Self::SecretEchoAcrossCaptureReassembly => (
-                "sh -c 'printf XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXTERMBRID; head -c 80 /dev/zero | tr \"\\000\" M; printf GE_SECRET_ABCDEF; printf SHELLSPAN_SECRET_ABCDEF >&2'",
+                "sh -c 'head -c 41 /dev/zero | tr \"\\000\" X; printf SHELLSP; head -c 80 /dev/zero | tr \"\\000\" M; printf AN_SECRET_ABCDEF; printf SHELLSPAN_SECRET_ABCDEF >&2'",
                 "fixture-secret-echo",
                 vec![FIXTURE_SECRET.to_string()],
             ),
@@ -623,7 +623,11 @@ fn isolated_ssh_sftp_end_to_end_reviewed_execution_secret_redaction() {
     assert_eq!(result.status, ExecutionStatus::Completed);
     assert_eq!(result.exit_code, Some(0));
     assert!(result.stdout_truncated);
-    assert!(result.stdout.ends_with("[REDACTED]"));
+    assert!(
+        result.stdout.ends_with("[REDACTED]"),
+        "unexpected redacted stdout: {:?}",
+        result.stdout
+    );
     assert_eq!(result.stderr, "[REDACTED]");
     assert!(!result.stdout.contains(FIXTURE_SECRET));
     assert!(!result.stderr.contains(FIXTURE_SECRET));

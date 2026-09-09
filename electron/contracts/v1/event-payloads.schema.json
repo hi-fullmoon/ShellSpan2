@@ -1,0 +1,4519 @@
+{
+  "$ref": "#/definitions/DesktopEventPayloads",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "AgentCapabilityScope": {
+      "additionalProperties": false,
+      "properties": {
+        "effects": {
+          "items": {
+            "$ref": "#/definitions/AgentSessionEffect"
+          },
+          "type": "array"
+        },
+        "targetIds": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "toolNames": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": ["toolNames", "effects", "targetIds"],
+      "type": "object"
+    },
+    "AgentImageRef": {
+      "additionalProperties": false,
+      "properties": {
+        "bytes": {
+          "type": "number"
+        },
+        "height": {
+          "type": "number"
+        },
+        "mediaType": {
+          "const": "image/png",
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "sha256": {
+          "type": "string"
+        },
+        "version": {
+          "const": 1,
+          "type": "number"
+        },
+        "width": {
+          "type": "number"
+        }
+      },
+      "required": ["version", "sha256", "mediaType", "bytes", "width", "height", "name"],
+      "type": "object"
+    },
+    "AgentQuestion": {
+      "additionalProperties": false,
+      "properties": {
+        "header": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "multi_select": {
+          "type": "boolean"
+        },
+        "options": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "description": {
+                "type": "string"
+              },
+              "label": {
+                "type": "string"
+              }
+            },
+            "required": ["label"],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "question": {
+          "type": "string"
+        }
+      },
+      "required": ["id", "question", "multi_select"],
+      "type": "object"
+    },
+    "AgentReplayEnvelope": {
+      "anyOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "archivedProviderItems": {
+              "type": "boolean"
+            },
+            "status": {
+              "const": "legacyUnknown",
+              "type": "string"
+            }
+          },
+          "required": ["status", "archivedProviderItems"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "adapterId": {
+              "type": "string"
+            },
+            "blocks": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "contentHash": {
+                    "type": "string"
+                  },
+                  "index": {
+                    "type": "number"
+                  },
+                  "kind": {
+                    "enum": ["text", "reasoning", "toolCall"],
+                    "type": "string"
+                  },
+                  "metadata": {
+                    "additionalProperties": false,
+                    "type": "object"
+                  }
+                },
+                "required": ["index", "kind", "contentHash", "metadata"],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "replayFormatVersion": {
+              "type": "number"
+            },
+            "response": {
+              "additionalProperties": false,
+              "type": "object"
+            },
+            "source": {
+              "additionalProperties": false,
+              "properties": {
+                "assistantContentHash": {
+                  "type": "string"
+                },
+                "imageProjectionHash": {
+                  "type": "string"
+                },
+                "imageProjectionRefs": {
+                  "items": {
+                    "$ref": "#/definitions/AgentImageRef"
+                  },
+                  "type": "array"
+                },
+                "modelId": {
+                  "type": "string"
+                },
+                "preparationVersion": {
+                  "type": "number"
+                },
+                "projectionPolicy": {
+                  "type": "string"
+                },
+                "replayDomainId": {
+                  "type": "string"
+                },
+                "requestContentHash": {
+                  "type": "string"
+                },
+                "requestId": {
+                  "type": "string"
+                },
+                "requestSnapshotDigest": {
+                  "type": "string"
+                },
+                "routeId": {
+                  "type": "string"
+                },
+                "routeRevision": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "requestId",
+                "requestSnapshotDigest",
+                "routeId",
+                "routeRevision",
+                "modelId",
+                "replayDomainId",
+                "requestContentHash",
+                "preparationVersion",
+                "projectionPolicy",
+                "imageProjectionRefs",
+                "imageProjectionHash",
+                "assistantContentHash"
+              ],
+              "type": "object"
+            },
+            "status": {
+              "const": "prepared",
+              "type": "string"
+            },
+            "version": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "status",
+            "version",
+            "adapterId",
+            "replayFormatVersion",
+            "source",
+            "response",
+            "blocks"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "AgentRequestSnapshot": {
+      "anyOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "status": {
+              "const": "legacyUnknown",
+              "type": "string"
+            }
+          },
+          "required": ["status"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "adapterId": {
+              "type": "string"
+            },
+            "capabilities": {
+              "$ref": "#/definitions/ModelDefinition"
+            },
+            "catalogVersion": {
+              "type": "number"
+            },
+            "contentHash": {
+              "type": "string"
+            },
+            "endpointIdentity": {
+              "type": "string"
+            },
+            "images": {
+              "items": {
+                "$ref": "#/definitions/AgentImageRef"
+              },
+              "type": "array"
+            },
+            "modelId": {
+              "type": "string"
+            },
+            "outputTokens": {
+              "type": "number"
+            },
+            "preparationVersion": {
+              "type": "number"
+            },
+            "projectionPolicy": {
+              "type": "string"
+            },
+            "purpose": {
+              "type": "string"
+            },
+            "reasoningEffort": {
+              "type": "string"
+            },
+            "replayDomainId": {
+              "type": "string"
+            },
+            "retryPolicy": {
+              "$ref": "#/definitions/AiRetryPolicy"
+            },
+            "routeId": {
+              "type": "string"
+            },
+            "routeRevision": {
+              "type": "number"
+            },
+            "status": {
+              "const": "prepared",
+              "type": "string"
+            },
+            "timeouts": {
+              "additionalProperties": false,
+              "properties": {
+                "firstByteMs": {
+                  "type": "number"
+                },
+                "requestHeadersMs": {
+                  "type": "number"
+                },
+                "streamIdleMs": {
+                  "type": "number"
+                }
+              },
+              "required": ["requestHeadersMs", "firstByteMs", "streamIdleMs"],
+              "type": "object"
+            }
+          },
+          "required": [
+            "status",
+            "routeId",
+            "routeRevision",
+            "adapterId",
+            "modelId",
+            "catalogVersion",
+            "capabilities",
+            "endpointIdentity",
+            "replayDomainId",
+            "outputTokens",
+            "retryPolicy",
+            "timeouts",
+            "purpose",
+            "preparationVersion",
+            "projectionPolicy",
+            "contentHash",
+            "images"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "AgentSessionAssistantContentBlock": {
+      "anyOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "text": {
+              "type": "string"
+            },
+            "type": {
+              "const": "text",
+              "type": "string"
+            }
+          },
+          "required": ["type", "text"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "providerItem": {},
+            "text": {
+              "type": "string"
+            },
+            "type": {
+              "const": "reasoning",
+              "type": "string"
+            }
+          },
+          "required": ["type", "text"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "call": {
+              "$ref": "#/definitions/AgentSessionRecordedToolCall"
+            },
+            "type": {
+              "const": "toolCall",
+              "type": "string"
+            }
+          },
+          "required": ["type", "call"],
+          "type": "object"
+        }
+      ]
+    },
+    "AgentSessionEffect": {
+      "enum": [
+        "none",
+        "readOnly",
+        "sensitiveRead",
+        "stateChange",
+        "destructive",
+        "externalSideEffect",
+        "unknown"
+      ],
+      "type": "string"
+    },
+    "AgentSessionEvent": {
+      "anyOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "data": {
+              "additionalProperties": {
+                "not": {}
+              },
+              "type": "object"
+            },
+            "seq": {
+              "type": "number"
+            },
+            "sessionId": {
+              "type": "string"
+            },
+            "stepId": {
+              "type": "string"
+            },
+            "timeUnixMs": {
+              "type": "number"
+            },
+            "turnId": {
+              "type": "string"
+            },
+            "type": {
+              "const": "session/resumed",
+              "type": "string"
+            },
+            "version": {
+              "$ref": "#/definitions/AgentSessionEventVersion"
+            }
+          },
+          "required": ["data", "seq", "sessionId", "timeUnixMs", "type", "version"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "data": {
+              "additionalProperties": false,
+              "properties": {
+                "itemIds": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              },
+              "required": ["itemIds"],
+              "type": "object"
+            },
+            "seq": {
+              "type": "number"
+            },
+            "sessionId": {
+              "type": "string"
+            },
+            "stepId": {
+              "type": "string"
+            },
+            "timeUnixMs": {
+              "type": "number"
+            },
+            "turnId": {
+              "type": "string"
+            },
+            "type": {
+              "const": "agent/inbox/paused",
+              "type": "string"
+            },
+            "version": {
+              "$ref": "#/definitions/AgentSessionEventVersion"
+            }
+          },
+          "required": ["data", "seq", "sessionId", "timeUnixMs", "type", "version"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "data": {
+              "additionalProperties": false,
+              "properties": {
+                "clientOperationId": {
+                  "type": "string"
+                },
+                "itemId": {
+                  "type": "string"
+                },
+                "previousRevision": {
+                  "type": "number"
+                }
+              },
+              "required": ["itemId", "previousRevision", "clientOperationId"],
+              "type": "object"
+            },
+            "seq": {
+              "type": "number"
+            },
+            "sessionId": {
+              "type": "string"
+            },
+            "stepId": {
+              "type": "string"
+            },
+            "timeUnixMs": {
+              "type": "number"
+            },
+            "turnId": {
+              "type": "string"
+            },
+            "type": {
+              "const": "agent/inbox/item_resumed",
+              "type": "string"
+            },
+            "version": {
+              "$ref": "#/definitions/AgentSessionEventVersion"
+            }
+          },
+          "required": ["data", "seq", "sessionId", "timeUnixMs", "type", "version"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "data": {
+              "additionalProperties": false,
+              "properties": {
+                "capabilityScope": {
+                  "$ref": "#/definitions/AgentCapabilityScope"
+                },
+                "goal": {
+                  "type": "string"
+                },
+                "parentSessionId": {
+                  "type": "string"
+                },
+                "permissionMode": {
+                  "$ref": "#/definitions/AgentSessionPermissionMode"
+                },
+                "subagent": {
+                  "$ref": "#/definitions/AgentSubagentSession"
+                },
+                "successCriteria": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "target": {
+                  "$ref": "#/definitions/AgentSessionTarget"
+                },
+                "taskId": {
+                  "type": "string"
+                }
+              },
+              "required": ["taskId", "goal"],
+              "type": "object"
+            },
+            "seq": {
+              "type": "number"
+            },
+            "sessionId": {
+              "type": "string"
+            },
+            "stepId": {
+              "type": "string"
+            },
+            "timeUnixMs": {
+              "type": "number"
+            },
+            "turnId": {
+              "type": "string"
+            },
+            "type": {
+              "const": "session/created",
+              "type": "string"
+            },
+            "version": {
+              "$ref": "#/definitions/AgentSessionEventVersion"
+            }
+          },
+          "required": ["data", "seq", "sessionId", "timeUnixMs", "type", "version"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "data": {
+              "additionalProperties": false,
+              "properties": {
+                "agentId": {
+                  "type": "string"
+                },
+                "parentAgentId": {
+                  "type": "string"
+                }
+              },
+              "required": ["agentId"],
+              "type": "object"
+            },
+            "seq": {
+              "type": "number"
+            },
+            "sessionId": {
+              "type": "string"
+            },
+            "stepId": {
+              "type": "string"
+            },
+            "timeUnixMs": {
+              "type": "number"
+            },
+            "turnId": {
+              "type": "string"
+            },
+            "type": {
+              "const": "agent/created",
+              "type": "string"
+            },
+            "version": {
+              "$ref": "#/definitions/AgentSessionEventVersion"
+            }
+          },
+          "required": ["data", "seq", "sessionId", "timeUnixMs", "type", "version"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "data": {
+              "additionalProperties": false,
+              "properties": {
+                "reason": {
+                  "type": "string"
+                },
+                "status": {
+                  "$ref": "#/definitions/AgentSessionRuntimeStatus"
+                }
+              },
+              "required": ["status"],
+              "type": "object"
+            },
+            "seq": {
+              "type": "number"
+            },
+            "sessionId": {
+              "type": "string"
+            },
+            "stepId": {
+              "type": "string"
+            },
+            "timeUnixMs": {
+              "type": "number"
+            },
+            "turnId": {
+              "type": "string"
+            },
+            "type": {
+              "const": "agent/status",
+              "type": "string"
+            },
+            "version": {
+              "$ref": "#/definitions/AgentSessionEventVersion"
+            }
+          },
+          "required": ["data", "seq", "sessionId", "timeUnixMs", "type", "version"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "data": {
+              "additionalProperties": false,
+              "properties": {
+                "reason": {
+                  "type": "string"
+                },
+                "status": {
+                  "enum": ["cancelled", "completed", "failed"],
+                  "type": "string"
+                }
+              },
+              "required": ["status"],
+              "type": "object"
+            },
+            "seq": {
+              "type": "number"
+            },
+            "sessionId": {
+              "type": "string"
+            },
+            "stepId": {
+              "type": "string"
+            },
+            "timeUnixMs": {
+              "type": "number"
+            },
+            "turnId": {
+              "type": "string"
+            },
+            "type": {
+              "const": "session/ended",
+              "type": "string"
+            },
+            "version": {
+              "$ref": "#/definitions/AgentSessionEventVersion"
+            }
+          },
+          "required": ["data", "seq", "sessionId", "timeUnixMs", "type", "version"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "data": {
+              "additionalProperties": false,
+              "properties": {
+                "lane": {
+                  "$ref": "#/definitions/AgentSessionInboxLane"
+                },
+                "messages": {
+                  "items": {
+                    "$ref": "#/definitions/AgentSessionInboxMessage"
+                  },
+                  "type": "array"
+                },
+                "operation": {
+                  "$ref": "#/definitions/AgentSessionInboxOperation"
+                }
+              },
+              "required": ["operation", "lane", "messages"],
+              "type": "object"
+            },
+            "seq": {
+              "type": "number"
+            },
+            "sessionId": {
+              "type": "string"
+            },
+            "stepId": {
+              "type": "string"
+            },
+            "timeUnixMs": {
+              "type": "number"
+            },
+            "turnId": {
+              "type": "string"
+            },
+            "type": {
+              "const": "agent/inbox/spliced",
+              "type": "string"
+            },
+            "version": {
+              "$ref": "#/definitions/AgentSessionEventVersion"
+            }
+          },
+          "required": ["data", "seq", "sessionId", "timeUnixMs", "type", "version"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "data": {
+              "additionalProperties": false,
+              "properties": {
+                "clientOperationId": {
+                  "type": "string"
+                },
+                "content": {
+                  "type": "string"
+                },
+                "itemId": {
+                  "type": "string"
+                },
+                "lane": {
+                  "$ref": "#/definitions/AgentSessionInboxLane"
+                },
+                "previousRevision": {
+                  "type": "number"
+                }
+              },
+              "required": ["itemId", "lane", "content", "previousRevision", "clientOperationId"],
+              "type": "object"
+            },
+            "seq": {
+              "type": "number"
+            },
+            "sessionId": {
+              "type": "string"
+            },
+            "stepId": {
+              "type": "string"
+            },
+            "timeUnixMs": {
+              "type": "number"
+            },
+            "turnId": {
+              "type": "string"
+            },
+            "type": {
+              "const": "agent/inbox/item_updated",
+              "type": "string"
+            },
+            "version": {
+              "$ref": "#/definitions/AgentSessionEventVersion"
+            }
+          },
+          "required": ["data", "seq", "sessionId", "timeUnixMs", "type", "version"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "data": {
+              "additionalProperties": false,
+              "properties": {
+                "clientOperationId": {
+                  "type": "string"
+                },
+                "itemId": {
+                  "type": "string"
+                },
+                "lane": {
+                  "$ref": "#/definitions/AgentSessionInboxLane"
+                },
+                "previousRevision": {
+                  "type": "number"
+                }
+              },
+              "required": ["itemId", "lane", "previousRevision", "clientOperationId"],
+              "type": "object"
+            },
+            "seq": {
+              "type": "number"
+            },
+            "sessionId": {
+              "type": "string"
+            },
+            "stepId": {
+              "type": "string"
+            },
+            "timeUnixMs": {
+              "type": "number"
+            },
+            "turnId": {
+              "type": "string"
+            },
+            "type": {
+              "const": "agent/inbox/item_removed",
+              "type": "string"
+            },
+            "version": {
+              "$ref": "#/definitions/AgentSessionEventVersion"
+            }
+          },
+          "required": ["data", "seq", "sessionId", "timeUnixMs", "type", "version"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "data": {
+              "additionalProperties": false,
+              "properties": {
+                "clientOperationId": {
+                  "type": "string"
+                },
+                "lane": {
+                  "$ref": "#/definitions/AgentSessionInboxLane"
+                },
+                "orderedItemIds": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "previousRevision": {
+                  "type": "number"
+                }
+              },
+              "required": ["lane", "orderedItemIds", "previousRevision", "clientOperationId"],
+              "type": "object"
+            },
+            "seq": {
+              "type": "number"
+            },
+            "sessionId": {
+              "type": "string"
+            },
+            "stepId": {
+              "type": "string"
+            },
+            "timeUnixMs": {
+              "type": "number"
+            },
+            "turnId": {
+              "type": "string"
+            },
+            "type": {
+              "const": "agent/inbox/reordered",
+              "type": "string"
+            },
+            "version": {
+              "$ref": "#/definitions/AgentSessionEventVersion"
+            }
+          },
+          "required": ["data", "seq", "sessionId", "timeUnixMs", "type", "version"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "data": {
+              "additionalProperties": false,
+              "properties": {
+                "clientOperationId": {
+                  "type": "string"
+                },
+                "itemId": {
+                  "type": "string"
+                },
+                "previousRevision": {
+                  "type": "number"
+                }
+              },
+              "required": ["itemId", "previousRevision", "clientOperationId"],
+              "type": "object"
+            },
+            "seq": {
+              "type": "number"
+            },
+            "sessionId": {
+              "type": "string"
+            },
+            "stepId": {
+              "type": "string"
+            },
+            "timeUnixMs": {
+              "type": "number"
+            },
+            "turnId": {
+              "type": "string"
+            },
+            "type": {
+              "const": "agent/inbox/item_steered",
+              "type": "string"
+            },
+            "version": {
+              "$ref": "#/definitions/AgentSessionEventVersion"
+            }
+          },
+          "required": ["data", "seq", "sessionId", "timeUnixMs", "type", "version"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "data": {
+              "additionalProperties": false,
+              "properties": {
+                "provider": {
+                  "$ref": "#/definitions/AgentSubagentModel"
+                }
+              },
+              "required": ["provider"],
+              "type": "object"
+            },
+            "seq": {
+              "type": "number"
+            },
+            "sessionId": {
+              "type": "string"
+            },
+            "stepId": {
+              "type": "string"
+            },
+            "timeUnixMs": {
+              "type": "number"
+            },
+            "turnId": {
+              "type": "string"
+            },
+            "type": {
+              "const": "session/model_selected",
+              "type": "string"
+            },
+            "version": {
+              "$ref": "#/definitions/AgentSessionEventVersion"
+            }
+          },
+          "required": ["data", "seq", "sessionId", "timeUnixMs", "type", "version"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "data": {
+              "additionalProperties": false,
+              "properties": {
+                "mode": {
+                  "$ref": "#/definitions/AgentSessionPermissionMode"
+                }
+              },
+              "required": ["mode"],
+              "type": "object"
+            },
+            "seq": {
+              "type": "number"
+            },
+            "sessionId": {
+              "type": "string"
+            },
+            "stepId": {
+              "type": "string"
+            },
+            "timeUnixMs": {
+              "type": "number"
+            },
+            "turnId": {
+              "type": "string"
+            },
+            "type": {
+              "const": "session/permission_changed",
+              "type": "string"
+            },
+            "version": {
+              "$ref": "#/definitions/AgentSessionEventVersion"
+            }
+          },
+          "required": ["data", "seq", "sessionId", "timeUnixMs", "type", "version"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "data": {
+              "additionalProperties": false,
+              "properties": {
+                "clientOperationId": {
+                  "type": "string"
+                },
+                "previousRevision": {
+                  "type": "number"
+                },
+                "title": {
+                  "type": "string"
+                }
+              },
+              "required": ["title", "previousRevision", "clientOperationId"],
+              "type": "object"
+            },
+            "seq": {
+              "type": "number"
+            },
+            "sessionId": {
+              "type": "string"
+            },
+            "stepId": {
+              "type": "string"
+            },
+            "timeUnixMs": {
+              "type": "number"
+            },
+            "turnId": {
+              "type": "string"
+            },
+            "type": {
+              "const": "session/renamed",
+              "type": "string"
+            },
+            "version": {
+              "$ref": "#/definitions/AgentSessionEventVersion"
+            }
+          },
+          "required": ["data", "seq", "sessionId", "timeUnixMs", "type", "version"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "seq": {
+              "type": "number"
+            },
+            "sessionId": {
+              "type": "string"
+            },
+            "stepId": {
+              "type": "string"
+            },
+            "timeUnixMs": {
+              "type": "number"
+            },
+            "turnId": {
+              "type": "string"
+            },
+            "type": {
+              "const": "turn/start",
+              "type": "string"
+            },
+            "version": {
+              "$ref": "#/definitions/AgentSessionEventVersion"
+            }
+          },
+          "required": ["seq", "sessionId", "timeUnixMs", "type", "version"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "data": {
+              "additionalProperties": false,
+              "properties": {
+                "reason": {
+                  "type": "string"
+                }
+              },
+              "required": ["reason"],
+              "type": "object"
+            },
+            "seq": {
+              "type": "number"
+            },
+            "sessionId": {
+              "type": "string"
+            },
+            "stepId": {
+              "type": "string"
+            },
+            "timeUnixMs": {
+              "type": "number"
+            },
+            "turnId": {
+              "type": "string"
+            },
+            "type": {
+              "const": "turn/end",
+              "type": "string"
+            },
+            "version": {
+              "$ref": "#/definitions/AgentSessionEventVersion"
+            }
+          },
+          "required": ["data", "seq", "sessionId", "timeUnixMs", "type", "version"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "seq": {
+              "type": "number"
+            },
+            "sessionId": {
+              "type": "string"
+            },
+            "stepId": {
+              "type": "string"
+            },
+            "timeUnixMs": {
+              "type": "number"
+            },
+            "turnId": {
+              "type": "string"
+            },
+            "type": {
+              "const": "step/start",
+              "type": "string"
+            },
+            "version": {
+              "$ref": "#/definitions/AgentSessionEventVersion"
+            }
+          },
+          "required": ["seq", "sessionId", "timeUnixMs", "type", "version"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "data": {
+              "additionalProperties": false,
+              "properties": {
+                "reason": {
+                  "type": "string"
+                }
+              },
+              "required": ["reason"],
+              "type": "object"
+            },
+            "seq": {
+              "type": "number"
+            },
+            "sessionId": {
+              "type": "string"
+            },
+            "stepId": {
+              "type": "string"
+            },
+            "timeUnixMs": {
+              "type": "number"
+            },
+            "turnId": {
+              "type": "string"
+            },
+            "type": {
+              "const": "step/end",
+              "type": "string"
+            },
+            "version": {
+              "$ref": "#/definitions/AgentSessionEventVersion"
+            }
+          },
+          "required": ["data", "seq", "sessionId", "timeUnixMs", "type", "version"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "data": {
+              "additionalProperties": false,
+              "properties": {
+                "startTurn": {
+                  "type": "boolean"
+                },
+                "stepMessages": {
+                  "items": {
+                    "$ref": "#/definitions/AgentSessionInboxMessage"
+                  },
+                  "type": "array"
+                },
+                "turnMessages": {
+                  "items": {
+                    "$ref": "#/definitions/AgentSessionInboxMessage"
+                  },
+                  "type": "array"
+                }
+              },
+              "required": ["startTurn", "turnMessages", "stepMessages"],
+              "type": "object"
+            },
+            "seq": {
+              "type": "number"
+            },
+            "sessionId": {
+              "type": "string"
+            },
+            "stepId": {
+              "type": "string"
+            },
+            "timeUnixMs": {
+              "type": "number"
+            },
+            "turnId": {
+              "type": "string"
+            },
+            "type": {
+              "const": "step/input_claim",
+              "type": "string"
+            },
+            "version": {
+              "$ref": "#/definitions/AgentSessionEventVersion"
+            }
+          },
+          "required": ["data", "seq", "sessionId", "timeUnixMs", "type", "version"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "data": {
+              "additionalProperties": false,
+              "properties": {
+                "scope": {
+                  "$ref": "#/definitions/SkillScope"
+                }
+              },
+              "required": ["scope"],
+              "type": "object"
+            },
+            "seq": {
+              "type": "number"
+            },
+            "sessionId": {
+              "type": "string"
+            },
+            "stepId": {
+              "type": "string"
+            },
+            "timeUnixMs": {
+              "type": "number"
+            },
+            "turnId": {
+              "type": "string"
+            },
+            "type": {
+              "const": "file_reference/scope_bound",
+              "type": "string"
+            },
+            "version": {
+              "$ref": "#/definitions/AgentSessionEventVersion"
+            }
+          },
+          "required": ["data", "seq", "sessionId", "timeUnixMs", "type", "version"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "data": {
+              "additionalProperties": false,
+              "properties": {
+                "observation": {
+                  "$ref": "#/definitions/SkillObservation"
+                }
+              },
+              "required": ["observation"],
+              "type": "object"
+            },
+            "seq": {
+              "type": "number"
+            },
+            "sessionId": {
+              "type": "string"
+            },
+            "stepId": {
+              "type": "string"
+            },
+            "timeUnixMs": {
+              "type": "number"
+            },
+            "turnId": {
+              "type": "string"
+            },
+            "type": {
+              "const": "skill/catalog_observed",
+              "type": "string"
+            },
+            "version": {
+              "$ref": "#/definitions/AgentSessionEventVersion"
+            }
+          },
+          "required": ["data", "seq", "sessionId", "timeUnixMs", "type", "version"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "data": {
+              "additionalProperties": false,
+              "properties": {
+                "catalog": {
+                  "$ref": "#/definitions/SkillCatalogPublication"
+                }
+              },
+              "required": ["catalog"],
+              "type": "object"
+            },
+            "seq": {
+              "type": "number"
+            },
+            "sessionId": {
+              "type": "string"
+            },
+            "stepId": {
+              "type": "string"
+            },
+            "timeUnixMs": {
+              "type": "number"
+            },
+            "turnId": {
+              "type": "string"
+            },
+            "type": {
+              "const": "skill/catalog_published",
+              "type": "string"
+            },
+            "version": {
+              "$ref": "#/definitions/AgentSessionEventVersion"
+            }
+          },
+          "required": ["data", "seq", "sessionId", "timeUnixMs", "type", "version"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "data": {
+              "additionalProperties": false,
+              "properties": {
+                "prepared": {
+                  "$ref": "#/definitions/SkillStepPrepared"
+                }
+              },
+              "required": ["prepared"],
+              "type": "object"
+            },
+            "seq": {
+              "type": "number"
+            },
+            "sessionId": {
+              "type": "string"
+            },
+            "stepId": {
+              "type": "string"
+            },
+            "timeUnixMs": {
+              "type": "number"
+            },
+            "turnId": {
+              "type": "string"
+            },
+            "type": {
+              "const": "skill/step_prepared",
+              "type": "string"
+            },
+            "version": {
+              "$ref": "#/definitions/AgentSessionEventVersion"
+            }
+          },
+          "required": ["data", "seq", "sessionId", "timeUnixMs", "type", "version"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "data": {
+              "additionalProperties": false,
+              "properties": {
+                "message": {
+                  "$ref": "#/definitions/AgentSessionInboxMessage"
+                }
+              },
+              "required": ["message"],
+              "type": "object"
+            },
+            "seq": {
+              "type": "number"
+            },
+            "sessionId": {
+              "type": "string"
+            },
+            "stepId": {
+              "type": "string"
+            },
+            "timeUnixMs": {
+              "type": "number"
+            },
+            "turnId": {
+              "type": "string"
+            },
+            "type": {
+              "const": "user/message",
+              "type": "string"
+            },
+            "version": {
+              "$ref": "#/definitions/AgentSessionEventVersion"
+            }
+          },
+          "required": ["data", "seq", "sessionId", "timeUnixMs", "type", "version"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "data": {
+              "additionalProperties": false,
+              "properties": {
+                "reasoningDelta": {
+                  "type": "string"
+                },
+                "requestId": {
+                  "type": "string"
+                },
+                "textDelta": {
+                  "type": "string"
+                },
+                "toolCallDelta": {
+                  "$ref": "#/definitions/AgentSessionToolCallDelta"
+                },
+                "usage": {
+                  "$ref": "#/definitions/AgentSessionTokenUsage"
+                }
+              },
+              "required": ["requestId"],
+              "type": "object"
+            },
+            "seq": {
+              "type": "number"
+            },
+            "sessionId": {
+              "type": "string"
+            },
+            "stepId": {
+              "type": "string"
+            },
+            "timeUnixMs": {
+              "type": "number"
+            },
+            "turnId": {
+              "type": "string"
+            },
+            "type": {
+              "const": "assistant/chunk",
+              "type": "string"
+            },
+            "version": {
+              "$ref": "#/definitions/AgentSessionEventVersion"
+            }
+          },
+          "required": ["data", "seq", "sessionId", "timeUnixMs", "type", "version"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "data": {
+              "additionalProperties": false,
+              "properties": {
+                "content": {
+                  "items": {
+                    "$ref": "#/definitions/AgentSessionAssistantContentBlock"
+                  },
+                  "type": "array"
+                },
+                "interrupted": {
+                  "type": "boolean"
+                },
+                "messageId": {
+                  "type": "string"
+                },
+                "replay": {
+                  "$ref": "#/definitions/AgentReplayEnvelope"
+                },
+                "stopReason": {
+                  "$ref": "#/definitions/AgentSessionStopReason"
+                },
+                "usage": {
+                  "$ref": "#/definitions/AgentSessionTokenUsage"
+                }
+              },
+              "required": ["messageId", "content", "usage", "stopReason", "interrupted"],
+              "type": "object"
+            },
+            "seq": {
+              "type": "number"
+            },
+            "sessionId": {
+              "type": "string"
+            },
+            "stepId": {
+              "type": "string"
+            },
+            "timeUnixMs": {
+              "type": "number"
+            },
+            "turnId": {
+              "type": "string"
+            },
+            "type": {
+              "const": "assistant/message",
+              "type": "string"
+            },
+            "version": {
+              "$ref": "#/definitions/AgentSessionEventVersion"
+            }
+          },
+          "required": ["data", "seq", "sessionId", "timeUnixMs", "type", "version"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "data": {
+              "additionalProperties": false,
+              "properties": {
+                "attempt": {
+                  "type": "number"
+                },
+                "model": {
+                  "type": "string"
+                },
+                "providerId": {
+                  "type": "string"
+                },
+                "reason": {
+                  "$ref": "#/definitions/AgentSessionRequestReason"
+                },
+                "reasoningEffort": {
+                  "type": "string"
+                },
+                "requestId": {
+                  "type": "string"
+                },
+                "series": {
+                  "$ref": "#/definitions/AgentSessionRequestSeries"
+                },
+                "snapshot": {
+                  "$ref": "#/definitions/AgentRequestSnapshot",
+                  "description": "Runtime validation requires both fields on every committed v5 header."
+                },
+                "snapshotDigest": {
+                  "type": "string"
+                },
+                "snapshotReason": {
+                  "description": "Why a full snapshot was recorded; absent in older per-request headers.",
+                  "enum": ["initial", "change", "resume", "series"],
+                  "type": "string"
+                },
+                "systemPrompt": {
+                  "type": "string"
+                },
+                "toolSchemas": {
+                  "items": {
+                    "$ref": "#/definitions/AgentSessionRequestToolSchema"
+                  },
+                  "type": "array"
+                }
+              },
+              "required": [
+                "requestId",
+                "providerId",
+                "model",
+                "reason",
+                "series",
+                "systemPrompt",
+                "toolSchemas",
+                "attempt"
+              ],
+              "type": "object"
+            },
+            "seq": {
+              "type": "number"
+            },
+            "sessionId": {
+              "type": "string"
+            },
+            "stepId": {
+              "type": "string"
+            },
+            "timeUnixMs": {
+              "type": "number"
+            },
+            "turnId": {
+              "type": "string"
+            },
+            "type": {
+              "const": "request/header",
+              "type": "string"
+            },
+            "version": {
+              "$ref": "#/definitions/AgentSessionEventVersion"
+            }
+          },
+          "required": ["data", "seq", "sessionId", "timeUnixMs", "type", "version"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "data": {
+              "additionalProperties": false,
+              "properties": {
+                "attempt": {
+                  "type": "number"
+                },
+                "headerRequestId": {
+                  "type": "string"
+                },
+                "model": {
+                  "type": "string"
+                },
+                "providerId": {
+                  "type": "string"
+                },
+                "reason": {
+                  "$ref": "#/definitions/AgentSessionRequestReason"
+                },
+                "reasoningEffort": {
+                  "type": "string"
+                },
+                "requestId": {
+                  "type": "string"
+                },
+                "series": {
+                  "$ref": "#/definitions/AgentSessionRequestSeries"
+                }
+              },
+              "required": [
+                "requestId",
+                "headerRequestId",
+                "providerId",
+                "model",
+                "reason",
+                "series",
+                "attempt"
+              ],
+              "type": "object"
+            },
+            "seq": {
+              "type": "number"
+            },
+            "sessionId": {
+              "type": "string"
+            },
+            "stepId": {
+              "type": "string"
+            },
+            "timeUnixMs": {
+              "type": "number"
+            },
+            "turnId": {
+              "type": "string"
+            },
+            "type": {
+              "const": "request/start",
+              "type": "string"
+            },
+            "version": {
+              "$ref": "#/definitions/AgentSessionEventVersion"
+            }
+          },
+          "required": ["data", "seq", "sessionId", "timeUnixMs", "type", "version"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "data": {
+              "additionalProperties": false,
+              "properties": {
+                "contextWindow": {
+                  "type": "number"
+                },
+                "inputTokens": {
+                  "type": "number"
+                },
+                "limited": {
+                  "type": "boolean"
+                },
+                "messageTokens": {
+                  "type": "number"
+                },
+                "omittedMessages": {
+                  "type": "number"
+                },
+                "requestId": {
+                  "type": "string"
+                },
+                "surfaceGeneration": {
+                  "type": "number"
+                },
+                "systemTokens": {
+                  "type": "number"
+                },
+                "toolSchemaTokens": {
+                  "type": "number"
+                }
+              },
+              "required": ["requestId", "surfaceGeneration"],
+              "type": "object"
+            },
+            "seq": {
+              "type": "number"
+            },
+            "sessionId": {
+              "type": "string"
+            },
+            "stepId": {
+              "type": "string"
+            },
+            "timeUnixMs": {
+              "type": "number"
+            },
+            "turnId": {
+              "type": "string"
+            },
+            "type": {
+              "const": "request/context",
+              "type": "string"
+            },
+            "version": {
+              "$ref": "#/definitions/AgentSessionEventVersion"
+            }
+          },
+          "required": ["data", "seq", "sessionId", "timeUnixMs", "type", "version"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "data": {
+              "additionalProperties": false,
+              "properties": {
+                "attempt": {
+                  "type": "number"
+                },
+                "cumulativeDelayMs": {
+                  "type": "number"
+                },
+                "delayMs": {
+                  "type": "number"
+                },
+                "errorCode": {
+                  "type": "string"
+                },
+                "errorKind": {
+                  "type": "string"
+                },
+                "errorStatus": {
+                  "type": "number"
+                },
+                "previousRequestId": {
+                  "type": "string"
+                },
+                "reason": {
+                  "type": "string"
+                },
+                "requestId": {
+                  "type": "string"
+                },
+                "serverHintCapped": {
+                  "type": "boolean"
+                },
+                "serverRetryAfterMs": {
+                  "type": "number"
+                }
+              },
+              "required": ["requestId", "attempt", "reason"],
+              "type": "object"
+            },
+            "seq": {
+              "type": "number"
+            },
+            "sessionId": {
+              "type": "string"
+            },
+            "stepId": {
+              "type": "string"
+            },
+            "timeUnixMs": {
+              "type": "number"
+            },
+            "turnId": {
+              "type": "string"
+            },
+            "type": {
+              "const": "request/retry",
+              "type": "string"
+            },
+            "version": {
+              "$ref": "#/definitions/AgentSessionEventVersion"
+            }
+          },
+          "required": ["data", "seq", "sessionId", "timeUnixMs", "type", "version"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "data": {
+              "additionalProperties": false,
+              "properties": {
+                "finishReason": {
+                  "$ref": "#/definitions/AgentSessionStopReason"
+                },
+                "requestId": {
+                  "type": "string"
+                },
+                "usage": {
+                  "$ref": "#/definitions/AgentSessionTokenUsage"
+                }
+              },
+              "required": ["requestId", "usage", "finishReason"],
+              "type": "object"
+            },
+            "seq": {
+              "type": "number"
+            },
+            "sessionId": {
+              "type": "string"
+            },
+            "stepId": {
+              "type": "string"
+            },
+            "timeUnixMs": {
+              "type": "number"
+            },
+            "turnId": {
+              "type": "string"
+            },
+            "type": {
+              "const": "request/usage",
+              "type": "string"
+            },
+            "version": {
+              "$ref": "#/definitions/AgentSessionEventVersion"
+            }
+          },
+          "required": ["data", "seq", "sessionId", "timeUnixMs", "type", "version"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "data": {
+              "additionalProperties": false,
+              "properties": {
+                "attempt": {
+                  "type": "number"
+                },
+                "cumulativeDelayMs": {
+                  "type": "number"
+                },
+                "failure": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "kind": {
+                      "enum": [
+                        "cancelled",
+                        "retryable",
+                        "transport",
+                        "timeout",
+                        "emptyResponse",
+                        "protocol",
+                        "contextTooLarge",
+                        "authentication",
+                        "rateLimited",
+                        "terminal"
+                      ],
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "retryAfterMs": {
+                      "type": "number"
+                    },
+                    "status": {
+                      "type": "number"
+                    }
+                  },
+                  "required": ["kind", "message"],
+                  "type": "object"
+                },
+                "interrupted": {
+                  "type": "boolean"
+                },
+                "maxAttempts": {
+                  "type": "number"
+                },
+                "requestId": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "requestId",
+                "attempt",
+                "maxAttempts",
+                "cumulativeDelayMs",
+                "interrupted",
+                "failure"
+              ],
+              "type": "object"
+            },
+            "seq": {
+              "type": "number"
+            },
+            "sessionId": {
+              "type": "string"
+            },
+            "stepId": {
+              "type": "string"
+            },
+            "timeUnixMs": {
+              "type": "number"
+            },
+            "turnId": {
+              "type": "string"
+            },
+            "type": {
+              "const": "request/failure",
+              "type": "string"
+            },
+            "version": {
+              "$ref": "#/definitions/AgentSessionEventVersion"
+            }
+          },
+          "required": ["data", "seq", "sessionId", "timeUnixMs", "type", "version"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "data": {
+              "additionalProperties": false,
+              "properties": {
+                "call": {
+                  "$ref": "#/definitions/AgentSessionRecordedToolCall"
+                }
+              },
+              "required": ["call"],
+              "type": "object"
+            },
+            "seq": {
+              "type": "number"
+            },
+            "sessionId": {
+              "type": "string"
+            },
+            "stepId": {
+              "type": "string"
+            },
+            "timeUnixMs": {
+              "type": "number"
+            },
+            "turnId": {
+              "type": "string"
+            },
+            "type": {
+              "const": "tool/call",
+              "type": "string"
+            },
+            "version": {
+              "$ref": "#/definitions/AgentSessionEventVersion"
+            }
+          },
+          "required": ["data", "seq", "sessionId", "timeUnixMs", "type", "version"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "data": {
+              "additionalProperties": false,
+              "properties": {
+                "arguments": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "questions": {
+                      "items": {
+                        "$ref": "#/definitions/AgentQuestion"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": ["questions"],
+                  "type": "object"
+                },
+                "identity": {
+                  "$ref": "#/definitions/QuestionIdentity"
+                },
+                "provider": {
+                  "$ref": "#/definitions/AgentSubagentModel"
+                }
+              },
+              "required": ["identity", "arguments", "provider"],
+              "type": "object"
+            },
+            "seq": {
+              "type": "number"
+            },
+            "sessionId": {
+              "type": "string"
+            },
+            "stepId": {
+              "type": "string"
+            },
+            "timeUnixMs": {
+              "type": "number"
+            },
+            "turnId": {
+              "type": "string"
+            },
+            "type": {
+              "const": "question/requested",
+              "type": "string"
+            },
+            "version": {
+              "$ref": "#/definitions/AgentSessionEventVersion"
+            }
+          },
+          "required": ["data", "seq", "sessionId", "timeUnixMs", "type", "version"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "data": {
+              "additionalProperties": false,
+              "properties": {
+                "fingerprint": {
+                  "type": "string"
+                },
+                "submission": {
+                  "$ref": "#/definitions/AnswerQuestionInput"
+                }
+              },
+              "required": ["submission", "fingerprint"],
+              "type": "object"
+            },
+            "seq": {
+              "type": "number"
+            },
+            "sessionId": {
+              "type": "string"
+            },
+            "stepId": {
+              "type": "string"
+            },
+            "timeUnixMs": {
+              "type": "number"
+            },
+            "turnId": {
+              "type": "string"
+            },
+            "type": {
+              "const": "question/answered",
+              "type": "string"
+            },
+            "version": {
+              "$ref": "#/definitions/AgentSessionEventVersion"
+            }
+          },
+          "required": ["data", "seq", "sessionId", "timeUnixMs", "type", "version"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "data": {
+              "additionalProperties": false,
+              "properties": {
+                "identity": {
+                  "$ref": "#/definitions/QuestionIdentity"
+                }
+              },
+              "required": ["identity"],
+              "type": "object"
+            },
+            "seq": {
+              "type": "number"
+            },
+            "sessionId": {
+              "type": "string"
+            },
+            "stepId": {
+              "type": "string"
+            },
+            "timeUnixMs": {
+              "type": "number"
+            },
+            "turnId": {
+              "type": "string"
+            },
+            "type": {
+              "const": "question/cancelled",
+              "type": "string"
+            },
+            "version": {
+              "$ref": "#/definitions/AgentSessionEventVersion"
+            }
+          },
+          "required": ["data", "seq", "sessionId", "timeUnixMs", "type", "version"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "data": {
+              "additionalProperties": false,
+              "properties": {
+                "approvalId": {
+                  "type": "string"
+                },
+                "callId": {
+                  "type": "string"
+                },
+                "expiresAtUnixMs": {
+                  "type": "number"
+                },
+                "prompt": {
+                  "type": "string"
+                },
+                "reason": {
+                  "type": "string"
+                },
+                "requestId": {
+                  "type": "string"
+                },
+                "risk": {
+                  "$ref": "#/definitions/AgentSessionEffect"
+                },
+                "status": {
+                  "enum": ["requested", "approved", "rejected", "expired", "cancelled"],
+                  "type": "string"
+                }
+              },
+              "required": ["requestId", "callId", "status"],
+              "type": "object"
+            },
+            "seq": {
+              "type": "number"
+            },
+            "sessionId": {
+              "type": "string"
+            },
+            "stepId": {
+              "type": "string"
+            },
+            "timeUnixMs": {
+              "type": "number"
+            },
+            "turnId": {
+              "type": "string"
+            },
+            "type": {
+              "const": "tool/approval",
+              "type": "string"
+            },
+            "version": {
+              "$ref": "#/definitions/AgentSessionEventVersion"
+            }
+          },
+          "required": ["data", "seq", "sessionId", "timeUnixMs", "type", "version"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "data": {
+              "additionalProperties": false,
+              "properties": {
+                "callId": {
+                  "type": "string"
+                },
+                "idempotency": {
+                  "enum": ["yes", "no", "conditional"],
+                  "type": "string"
+                },
+                "status": {
+                  "const": "dispatched",
+                  "type": "string"
+                }
+              },
+              "required": ["callId", "status", "idempotency"],
+              "type": "object"
+            },
+            "seq": {
+              "type": "number"
+            },
+            "sessionId": {
+              "type": "string"
+            },
+            "stepId": {
+              "type": "string"
+            },
+            "timeUnixMs": {
+              "type": "number"
+            },
+            "turnId": {
+              "type": "string"
+            },
+            "type": {
+              "const": "tool/execution",
+              "type": "string"
+            },
+            "version": {
+              "$ref": "#/definitions/AgentSessionEventVersion"
+            }
+          },
+          "required": ["data", "seq", "sessionId", "timeUnixMs", "type", "version"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "data": {
+              "additionalProperties": false,
+              "properties": {
+                "callId": {
+                  "type": "string"
+                },
+                "data": {},
+                "durationMs": {
+                  "type": "number"
+                },
+                "evidenceRefs": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "status": {
+                  "enum": ["completed", "rejected", "failed", "timedOut", "cancelled"],
+                  "type": "string"
+                },
+                "summary": {
+                  "type": "string"
+                }
+              },
+              "required": ["callId", "name", "status", "summary"],
+              "type": "object"
+            },
+            "seq": {
+              "type": "number"
+            },
+            "sessionId": {
+              "type": "string"
+            },
+            "stepId": {
+              "type": "string"
+            },
+            "timeUnixMs": {
+              "type": "number"
+            },
+            "turnId": {
+              "type": "string"
+            },
+            "type": {
+              "const": "tool/result",
+              "type": "string"
+            },
+            "version": {
+              "$ref": "#/definitions/AgentSessionEventVersion"
+            }
+          },
+          "required": ["data", "seq", "sessionId", "timeUnixMs", "type", "version"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "data": {
+              "additionalProperties": false,
+              "properties": {
+                "artifactId": {
+                  "type": "string"
+                },
+                "kind": {
+                  "type": "string"
+                },
+                "mediaType": {
+                  "type": "string"
+                },
+                "sensitivity": {
+                  "enum": ["internal", "sensitiveRedacted"],
+                  "type": "string"
+                },
+                "sha256": {
+                  "type": "string"
+                },
+                "sizeBytes": {
+                  "type": "number"
+                },
+                "title": {
+                  "type": "string"
+                }
+              },
+              "required": ["artifactId", "kind", "title"],
+              "type": "object"
+            },
+            "seq": {
+              "type": "number"
+            },
+            "sessionId": {
+              "type": "string"
+            },
+            "stepId": {
+              "type": "string"
+            },
+            "timeUnixMs": {
+              "type": "number"
+            },
+            "turnId": {
+              "type": "string"
+            },
+            "type": {
+              "const": "context/artifact",
+              "type": "string"
+            },
+            "version": {
+              "$ref": "#/definitions/AgentSessionEventVersion"
+            }
+          },
+          "required": ["data", "seq", "sessionId", "timeUnixMs", "type", "version"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "data": {
+              "additionalProperties": false,
+              "properties": {
+                "reason": {
+                  "type": "string"
+                }
+              },
+              "required": ["reason"],
+              "type": "object"
+            },
+            "seq": {
+              "type": "number"
+            },
+            "sessionId": {
+              "type": "string"
+            },
+            "stepId": {
+              "type": "string"
+            },
+            "timeUnixMs": {
+              "type": "number"
+            },
+            "turnId": {
+              "type": "string"
+            },
+            "type": {
+              "const": "compaction/start",
+              "type": "string"
+            },
+            "version": {
+              "$ref": "#/definitions/AgentSessionEventVersion"
+            }
+          },
+          "required": ["data", "seq", "sessionId", "timeUnixMs", "type", "version"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "data": {
+              "additionalProperties": false,
+              "properties": {
+                "replacedThroughSeq": {
+                  "type": "number"
+                },
+                "summary": {
+                  "type": "string"
+                },
+                "surfaceGeneration": {
+                  "type": "number"
+                }
+              },
+              "required": ["summary", "replacedThroughSeq", "surfaceGeneration"],
+              "type": "object"
+            },
+            "seq": {
+              "type": "number"
+            },
+            "sessionId": {
+              "type": "string"
+            },
+            "stepId": {
+              "type": "string"
+            },
+            "timeUnixMs": {
+              "type": "number"
+            },
+            "turnId": {
+              "type": "string"
+            },
+            "type": {
+              "const": "compaction/summary",
+              "type": "string"
+            },
+            "version": {
+              "$ref": "#/definitions/AgentSessionEventVersion"
+            }
+          },
+          "required": ["data", "seq", "sessionId", "timeUnixMs", "type", "version"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "data": {
+              "additionalProperties": false,
+              "properties": {
+                "replacedThroughSeq": {
+                  "type": "number"
+                },
+                "status": {
+                  "enum": ["completed", "failed"],
+                  "type": "string"
+                },
+                "surfaceGeneration": {
+                  "type": "number"
+                }
+              },
+              "required": ["surfaceGeneration", "replacedThroughSeq", "status"],
+              "type": "object"
+            },
+            "seq": {
+              "type": "number"
+            },
+            "sessionId": {
+              "type": "string"
+            },
+            "stepId": {
+              "type": "string"
+            },
+            "timeUnixMs": {
+              "type": "number"
+            },
+            "turnId": {
+              "type": "string"
+            },
+            "type": {
+              "const": "compaction/end",
+              "type": "string"
+            },
+            "version": {
+              "$ref": "#/definitions/AgentSessionEventVersion"
+            }
+          },
+          "required": ["data", "seq", "sessionId", "timeUnixMs", "type", "version"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "data": {
+              "additionalProperties": false,
+              "properties": {
+                "budget": {
+                  "$ref": "#/definitions/AgentSubagentBudget"
+                },
+                "capabilityScope": {
+                  "$ref": "#/definitions/AgentCapabilityScope"
+                },
+                "childSessionId": {
+                  "type": "string"
+                },
+                "continuable": {
+                  "type": "boolean"
+                },
+                "depth": {
+                  "type": "number"
+                },
+                "descriptorId": {
+                  "type": "string"
+                },
+                "inheritance": {
+                  "$ref": "#/definitions/AgentSubagentInheritance"
+                },
+                "parentSessionId": {
+                  "type": "string"
+                },
+                "parentTaskId": {
+                  "type": "string"
+                },
+                "role": {
+                  "$ref": "#/definitions/AgentSubagentRole"
+                },
+                "targetScope": {
+                  "items": {
+                    "$ref": "#/definitions/AgentSessionTarget"
+                  },
+                  "type": "array"
+                }
+              },
+              "required": [
+                "descriptorId",
+                "childSessionId",
+                "parentSessionId",
+                "parentTaskId",
+                "role",
+                "continuable",
+                "depth",
+                "inheritance",
+                "capabilityScope",
+                "targetScope",
+                "budget"
+              ],
+              "type": "object"
+            },
+            "seq": {
+              "type": "number"
+            },
+            "sessionId": {
+              "type": "string"
+            },
+            "stepId": {
+              "type": "string"
+            },
+            "timeUnixMs": {
+              "type": "number"
+            },
+            "turnId": {
+              "type": "string"
+            },
+            "type": {
+              "const": "subagent/descriptor",
+              "type": "string"
+            },
+            "version": {
+              "$ref": "#/definitions/AgentSessionEventVersion"
+            }
+          },
+          "required": ["data", "seq", "sessionId", "timeUnixMs", "type", "version"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "data": {
+              "additionalProperties": false,
+              "properties": {
+                "childSessionId": {
+                  "type": "string"
+                },
+                "descriptorId": {
+                  "type": "string"
+                },
+                "direction": {
+                  "enum": ["inbound", "outbound"],
+                  "type": "string"
+                },
+                "route": {
+                  "enum": ["steer", "followup", "inject", "toolResult"],
+                  "type": "string"
+                },
+                "summary": {
+                  "type": "string"
+                }
+              },
+              "required": ["descriptorId", "childSessionId", "direction", "route", "summary"],
+              "type": "object"
+            },
+            "seq": {
+              "type": "number"
+            },
+            "sessionId": {
+              "type": "string"
+            },
+            "stepId": {
+              "type": "string"
+            },
+            "timeUnixMs": {
+              "type": "number"
+            },
+            "turnId": {
+              "type": "string"
+            },
+            "type": {
+              "const": "subagent/message",
+              "type": "string"
+            },
+            "version": {
+              "$ref": "#/definitions/AgentSessionEventVersion"
+            }
+          },
+          "required": ["data", "seq", "sessionId", "timeUnixMs", "type", "version"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "data": {
+              "additionalProperties": false,
+              "properties": {
+                "childSessionId": {
+                  "type": "string"
+                },
+                "descriptorId": {
+                  "type": "string"
+                },
+                "evidenceRefs": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "settlementId": {
+                  "type": "string"
+                },
+                "status": {
+                  "$ref": "#/definitions/AgentSessionRuntimeStatus"
+                },
+                "summary": {
+                  "type": "string"
+                }
+              },
+              "required": ["descriptorId", "settlementId", "childSessionId", "status", "summary"],
+              "type": "object"
+            },
+            "seq": {
+              "type": "number"
+            },
+            "sessionId": {
+              "type": "string"
+            },
+            "stepId": {
+              "type": "string"
+            },
+            "timeUnixMs": {
+              "type": "number"
+            },
+            "turnId": {
+              "type": "string"
+            },
+            "type": {
+              "const": "subagent/settled",
+              "type": "string"
+            },
+            "version": {
+              "$ref": "#/definitions/AgentSessionEventVersion"
+            }
+          },
+          "required": ["data", "seq", "sessionId", "timeUnixMs", "type", "version"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "data": {
+              "additionalProperties": false,
+              "properties": {
+                "childSessionId": {
+                  "type": "string"
+                },
+                "descriptorId": {
+                  "type": "string"
+                },
+                "reason": {
+                  "type": "string"
+                }
+              },
+              "required": ["descriptorId", "childSessionId", "reason"],
+              "type": "object"
+            },
+            "seq": {
+              "type": "number"
+            },
+            "sessionId": {
+              "type": "string"
+            },
+            "stepId": {
+              "type": "string"
+            },
+            "timeUnixMs": {
+              "type": "number"
+            },
+            "turnId": {
+              "type": "string"
+            },
+            "type": {
+              "const": "subagent/detached",
+              "type": "string"
+            },
+            "version": {
+              "$ref": "#/definitions/AgentSessionEventVersion"
+            }
+          },
+          "required": ["data", "seq", "sessionId", "timeUnixMs", "type", "version"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "data": {
+              "additionalProperties": false,
+              "properties": {
+                "goal": {
+                  "type": "string"
+                },
+                "taskId": {
+                  "type": "string"
+                }
+              },
+              "required": ["taskId"],
+              "type": "object"
+            },
+            "seq": {
+              "type": "number"
+            },
+            "sessionId": {
+              "type": "string"
+            },
+            "stepId": {
+              "type": "string"
+            },
+            "timeUnixMs": {
+              "type": "number"
+            },
+            "turnId": {
+              "type": "string"
+            },
+            "type": {
+              "const": "task/linked",
+              "type": "string"
+            },
+            "version": {
+              "$ref": "#/definitions/AgentSessionEventVersion"
+            }
+          },
+          "required": ["data", "seq", "sessionId", "timeUnixMs", "type", "version"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "data": {
+              "additionalProperties": false,
+              "properties": {
+                "steps": {
+                  "items": {
+                    "$ref": "#/definitions/AgentSessionPlanStep"
+                  },
+                  "type": "array"
+                },
+                "version": {
+                  "type": "number"
+                }
+              },
+              "required": ["version", "steps"],
+              "type": "object"
+            },
+            "seq": {
+              "type": "number"
+            },
+            "sessionId": {
+              "type": "string"
+            },
+            "stepId": {
+              "type": "string"
+            },
+            "timeUnixMs": {
+              "type": "number"
+            },
+            "turnId": {
+              "type": "string"
+            },
+            "type": {
+              "const": "task/plan",
+              "type": "string"
+            },
+            "version": {
+              "$ref": "#/definitions/AgentSessionEventVersion"
+            }
+          },
+          "required": ["data", "seq", "sessionId", "timeUnixMs", "type", "version"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "data": {
+              "additionalProperties": false,
+              "properties": {
+                "fleet": {
+                  "$ref": "#/definitions/AgentSessionFleetState"
+                },
+                "phase": {
+                  "type": "string"
+                },
+                "progress": {
+                  "type": "number"
+                },
+                "recovery": {
+                  "$ref": "#/definitions/AgentSessionRecoveryState"
+                },
+                "status": {
+                  "type": "string"
+                }
+              },
+              "required": ["status"],
+              "type": "object"
+            },
+            "seq": {
+              "type": "number"
+            },
+            "sessionId": {
+              "type": "string"
+            },
+            "stepId": {
+              "type": "string"
+            },
+            "timeUnixMs": {
+              "type": "number"
+            },
+            "turnId": {
+              "type": "string"
+            },
+            "type": {
+              "const": "task/state",
+              "type": "string"
+            },
+            "version": {
+              "$ref": "#/definitions/AgentSessionEventVersion"
+            }
+          },
+          "required": ["data", "seq", "sessionId", "timeUnixMs", "type", "version"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "data": {
+              "additionalProperties": false,
+              "properties": {
+                "evidenceId": {
+                  "type": "string"
+                },
+                "kind": {
+                  "type": "string"
+                },
+                "summary": {
+                  "type": "string"
+                }
+              },
+              "required": ["evidenceId", "kind", "summary"],
+              "type": "object"
+            },
+            "seq": {
+              "type": "number"
+            },
+            "sessionId": {
+              "type": "string"
+            },
+            "stepId": {
+              "type": "string"
+            },
+            "timeUnixMs": {
+              "type": "number"
+            },
+            "turnId": {
+              "type": "string"
+            },
+            "type": {
+              "const": "task/evidence",
+              "type": "string"
+            },
+            "version": {
+              "$ref": "#/definitions/AgentSessionEventVersion"
+            }
+          },
+          "required": ["data", "seq", "sessionId", "timeUnixMs", "type", "version"],
+          "type": "object"
+        }
+      ],
+      "description": "Canonical UI wire contract for the append-only Agent Session Event Log. The envelope deliberately matches the Rust serde representation so fixtures, durable replay, and live events all use the same v4 data model."
+    },
+    "AgentSessionEventVersion": {
+      "const": 5,
+      "type": "number"
+    },
+    "AgentSessionFleetState": {
+      "additionalProperties": false,
+      "properties": {
+        "canarySize": {
+          "type": "number"
+        },
+        "failureThreshold": {
+          "type": "number"
+        },
+        "failures": {
+          "type": "number"
+        },
+        "fleetId": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "targets": {
+          "items": {
+            "$ref": "#/definitions/AgentSessionFleetTargetState"
+          },
+          "type": "array"
+        },
+        "targetsCompleted": {
+          "type": "number"
+        },
+        "targetsTotal": {
+          "type": "number"
+        },
+        "totalWaves": {
+          "type": "number"
+        },
+        "wave": {
+          "type": "number"
+        },
+        "waveSize": {
+          "type": "number"
+        }
+      },
+      "required": ["wave", "totalWaves", "targetsCompleted", "targetsTotal"],
+      "type": "object"
+    },
+    "AgentSessionFleetTargetState": {
+      "additionalProperties": false,
+      "properties": {
+        "childSessionIds": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "evidenceRefs": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "goal": {
+          "type": "string"
+        },
+        "recovery": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "targetId": {
+          "type": "string"
+        },
+        "taskId": {
+          "type": "string"
+        },
+        "wave": {
+          "type": "number"
+        }
+      },
+      "required": ["targetId", "taskId", "goal", "wave", "state"],
+      "type": "object"
+    },
+    "AgentSessionInboxLane": {
+      "enum": ["nextTurn", "nextStep"],
+      "type": "string"
+    },
+    "AgentSessionInboxMessage": {
+      "additionalProperties": false,
+      "properties": {
+        "clientSubmissionId": {
+          "type": "string"
+        },
+        "content": {
+          "type": "string"
+        },
+        "images": {
+          "items": {
+            "$ref": "#/definitions/AgentImageRef"
+          },
+          "type": "array"
+        },
+        "messageId": {
+          "type": "string"
+        },
+        "source": {
+          "$ref": "#/definitions/AgentSessionMessageSource"
+        }
+      },
+      "required": ["messageId", "content", "source"],
+      "type": "object"
+    },
+    "AgentSessionInboxOperation": {
+      "enum": ["enqueued", "claimed", "discarded"],
+      "type": "string"
+    },
+    "AgentSessionMessageSource": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "$ref": "#/definitions/AgentSessionProvenanceKind"
+        },
+        "label": {
+          "type": "string"
+        },
+        "metadata": {
+          "additionalProperties": false,
+          "type": "object"
+        },
+        "producerId": {
+          "type": "string"
+        }
+      },
+      "required": ["kind", "label", "producerId"],
+      "type": "object"
+    },
+    "AgentSessionPermissionMode": {
+      "enum": ["requestApproval", "scopedAutopilot", "operator"],
+      "type": "string"
+    },
+    "AgentSessionPlanStep": {
+      "additionalProperties": false,
+      "properties": {
+        "detail": {
+          "type": "string"
+        },
+        "evidenceRefs": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "id": {
+          "type": "string"
+        },
+        "status": {
+          "enum": ["pending", "inProgress", "completed", "blocked", "failed"],
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        }
+      },
+      "required": ["id", "title", "status"],
+      "type": "object"
+    },
+    "AgentSessionProvenanceKind": {
+      "enum": [
+        "user",
+        "runtime",
+        "plugin",
+        "skill-catalog",
+        "agent-instructions",
+        "skill-invocation",
+        "session-reference",
+        "form"
+      ],
+      "type": "string"
+    },
+    "AgentSessionRecordedToolCall": {
+      "additionalProperties": false,
+      "properties": {
+        "arguments": {},
+        "callId": {
+          "type": "string"
+        },
+        "effect": {
+          "$ref": "#/definitions/AgentSessionEffect"
+        },
+        "name": {
+          "type": "string"
+        },
+        "nativeName": {
+          "type": "string"
+        },
+        "providerCallId": {
+          "type": "string"
+        },
+        "target": {
+          "$ref": "#/definitions/AgentSessionTarget"
+        },
+        "title": {
+          "type": "string"
+        }
+      },
+      "required": ["callId", "name", "arguments"],
+      "type": "object"
+    },
+    "AgentSessionRecoveryState": {
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "enum": ["none", "available", "required", "reconciling", "completed"],
+          "type": "string"
+        },
+        "summary": {
+          "type": "string"
+        }
+      },
+      "required": ["status"],
+      "type": "object"
+    },
+    "AgentSessionRequestReason": {
+      "enum": ["initial", "retry", "toolContinuation", "recovery"],
+      "type": "string"
+    },
+    "AgentSessionRequestSeries": {
+      "additionalProperties": false,
+      "properties": {
+        "requestIndex": {
+          "type": "number"
+        },
+        "seriesId": {
+          "type": "string"
+        },
+        "startsSeries": {
+          "type": "boolean"
+        }
+      },
+      "required": ["seriesId", "requestIndex", "startsSeries"],
+      "type": "object"
+    },
+    "AgentSessionRequestToolSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "inputSchema": {},
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": ["name", "description", "inputSchema"],
+      "type": "object"
+    },
+    "AgentSessionRuntimeStatus": {
+      "enum": ["idle", "running", "waiting", "cancelled", "completed", "failed"],
+      "type": "string"
+    },
+    "AgentSessionStopReason": {
+      "enum": ["stop", "toolCalls", "length", "contentFilter", "cancelled", "error", "other"],
+      "type": "string"
+    },
+    "AgentSessionTarget": {
+      "additionalProperties": false,
+      "properties": {
+        "cwd": {
+          "type": "string"
+        },
+        "host": {
+          "type": "string"
+        },
+        "kind": {
+          "enum": ["local", "remote"],
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "localRoot": {
+          "type": "string"
+        },
+        "port": {
+          "type": "number"
+        },
+        "profileId": {
+          "type": "string"
+        },
+        "rootPath": {
+          "type": "string"
+        },
+        "sessionId": {
+          "type": "string"
+        },
+        "targetId": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        }
+      },
+      "required": ["kind", "targetId", "sessionId"],
+      "type": "object"
+    },
+    "AgentSessionTokenUsage": {
+      "additionalProperties": false,
+      "properties": {
+        "cacheReadTokens": {
+          "description": "Provider-reported input tokens served from cache. Missing means unknown.",
+          "type": "number"
+        },
+        "cacheWriteTokens": {
+          "description": "Provider-reported input tokens written to cache. Missing means unknown.",
+          "type": "number"
+        },
+        "outputTokens": {
+          "description": "Provider-reported generated output tokens. Missing means unknown.",
+          "type": "number"
+        },
+        "reasoningTokens": {
+          "description": "Provider-reported reasoning tokens. Missing means unknown.",
+          "type": "number"
+        },
+        "totalTokens": {
+          "description": "Provider-reported total tokens. Missing means unknown.",
+          "type": "number"
+        },
+        "uncachedInputTokens": {
+          "description": "Provider-reported input tokens that were not read from cache. Missing means unknown.",
+          "type": "number"
+        }
+      },
+      "type": "object"
+    },
+    "AgentSessionToolCallDelta": {
+      "additionalProperties": false,
+      "properties": {
+        "argumentsDelta": {
+          "type": "string"
+        },
+        "callId": {
+          "type": "string"
+        },
+        "index": {
+          "type": "number"
+        },
+        "nameDelta": {
+          "type": "string"
+        }
+      },
+      "required": ["index"],
+      "type": "object"
+    },
+    "AgentSubagentBudget": {
+      "additionalProperties": false,
+      "properties": {
+        "maxStepsPerTurn": {
+          "type": "number"
+        },
+        "maxTokens": {
+          "type": "number"
+        },
+        "maxToolCalls": {
+          "type": "number"
+        },
+        "maxTurns": {
+          "type": "number"
+        },
+        "timeoutMs": {
+          "type": "number"
+        }
+      },
+      "required": ["maxStepsPerTurn", "maxTurns", "maxToolCalls", "maxTokens", "timeoutMs"],
+      "type": "object"
+    },
+    "AgentSubagentInheritance": {
+      "anyOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "mode": {
+              "const": "blank",
+              "type": "string"
+            }
+          },
+          "required": ["mode"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "mode": {
+              "const": "safePrefix",
+              "type": "string"
+            },
+            "parentThroughSeq": {
+              "type": "number"
+            }
+          },
+          "required": ["mode"],
+          "type": "object"
+        }
+      ]
+    },
+    "AgentSubagentModel": {
+      "additionalProperties": false,
+      "properties": {
+        "modelId": {
+          "type": "string"
+        },
+        "reasoningEffort": {
+          "type": "string"
+        },
+        "routeId": {
+          "type": "string"
+        },
+        "routeRevision": {
+          "type": "number"
+        }
+      },
+      "required": ["routeId", "modelId"],
+      "type": "object"
+    },
+    "AgentSubagentRole": {
+      "enum": ["general", "explorer", "diagnostician", "operator", "verifier", "reviewer"],
+      "type": "string"
+    },
+    "AgentSubagentSession": {
+      "additionalProperties": false,
+      "properties": {
+        "budget": {
+          "$ref": "#/definitions/AgentSubagentBudget"
+        },
+        "capabilityScope": {
+          "$ref": "#/definitions/AgentCapabilityScope"
+        },
+        "continuable": {
+          "type": "boolean"
+        },
+        "depth": {
+          "type": "number"
+        },
+        "descriptorId": {
+          "type": "string"
+        },
+        "inheritance": {
+          "$ref": "#/definitions/AgentSubagentInheritance"
+        },
+        "parentTaskId": {
+          "type": "string"
+        },
+        "provider": {
+          "$ref": "#/definitions/AgentSubagentModel"
+        },
+        "role": {
+          "$ref": "#/definitions/AgentSubagentRole"
+        },
+        "targetScope": {
+          "items": {
+            "$ref": "#/definitions/AgentSessionTarget"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "descriptorId",
+        "parentTaskId",
+        "role",
+        "continuable",
+        "depth",
+        "inheritance",
+        "capabilityScope",
+        "targetScope",
+        "budget",
+        "provider"
+      ],
+      "type": "object"
+    },
+    "AiProviderKind": {
+      "enum": ["ollama", "openAi", "openAiCompatible", "anthropicMessages"],
+      "type": "string"
+    },
+    "AiRetryPolicy": {
+      "additionalProperties": false,
+      "properties": {
+        "initialDelayMs": {
+          "type": "number"
+        },
+        "jitterRatio": {
+          "type": "number"
+        },
+        "maxAttempts": {
+          "type": "number"
+        },
+        "maxDelayMs": {
+          "type": "number"
+        },
+        "maxServerDelayMs": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "maxAttempts",
+        "initialDelayMs",
+        "maxDelayMs",
+        "maxServerDelayMs",
+        "jitterRatio"
+      ],
+      "type": "object"
+    },
+    "AnswerQuestionInput": {
+      "additionalProperties": false,
+      "properties": {
+        "answers": {
+          "items": {
+            "$ref": "#/definitions/QuestionAnswer"
+          },
+          "type": "array"
+        },
+        "clientOperationId": {
+          "type": "string"
+        },
+        "identity": {
+          "$ref": "#/definitions/QuestionIdentity"
+        }
+      },
+      "required": ["identity", "clientOperationId", "answers"],
+      "type": "object",
+      "x-serde-unknown-fields": "deny"
+    },
+    "ClosedEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "identity": {
+          "additionalProperties": false,
+          "description": "Host identity carried by the backend so the disconnect is labeled even if the store record is gone.",
+          "properties": {
+            "host": {
+              "type": "string"
+            },
+            "port": {
+              "type": "number"
+            },
+            "title": {
+              "type": "string"
+            },
+            "username": {
+              "type": "string"
+            }
+          },
+          "required": ["title", "host", "port", "username"],
+          "type": "object"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "reasonKind": {
+          "$ref": "#/definitions/ClosedReasonKind"
+        },
+        "retryable": {
+          "type": "boolean"
+        },
+        "sessionId": {
+          "type": "string"
+        }
+      },
+      "required": ["sessionId", "reasonKind", "retryable"],
+      "type": "object"
+    },
+    "ClosedReasonKind": {
+      "enum": ["local_close", "controller_dropped", "remote_exit", "transport_disconnect", "error"],
+      "type": "string"
+    },
+    "DeleteProgressEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "completedSteps": {
+          "type": "number"
+        },
+        "currentPath": {
+          "type": "string"
+        },
+        "operationId": {
+          "type": "string"
+        },
+        "totalSteps": {
+          "type": "number"
+        }
+      },
+      "required": ["operationId", "totalSteps", "completedSteps"],
+      "type": "object"
+    },
+    "DesktopEventPayloads": {
+      "additionalProperties": false,
+      "properties": {
+        "agent-runtime-session-event": {
+          "$ref": "#/definitions/AgentSessionEvent"
+        },
+        "delete-progress": {
+          "$ref": "#/definitions/DeleteProgressEvent"
+        },
+        "desktop-drag-drop": {
+          "$ref": "#/definitions/DragDropEvent"
+        },
+        "desktop-resized": {
+          "type": "null"
+        },
+        "desktop-update-progress": {
+          "$ref": "#/definitions/DownloadEvent"
+        },
+        "download-progress": {
+          "$ref": "#/definitions/DownloadProgressEvent"
+        },
+        "petdex-status": {
+          "$ref": "#/definitions/PetdexConnectionStatus"
+        },
+        "port-forward-event": {
+          "$ref": "#/definitions/PortForwardRuntime"
+        },
+        "remote-copy-progress": {
+          "$ref": "#/definitions/RemoteCopyProgressEvent"
+        },
+        "ssh-closed": {
+          "$ref": "#/definitions/ClosedEvent"
+        },
+        "ssh-session-error": {
+          "$ref": "#/definitions/SessionErrorEvent"
+        },
+        "ssh-status": {
+          "$ref": "#/definitions/StatusEvent"
+        },
+        "system-about": {
+          "type": "null"
+        },
+        "system-check-update": {
+          "type": "null"
+        },
+        "system-open-settings": {
+          "type": "null"
+        },
+        "system-request-app-exit": {
+          "type": "null"
+        },
+        "upload-progress": {
+          "$ref": "#/definitions/UploadProgressEvent"
+        }
+      },
+      "required": [
+        "ssh-status",
+        "ssh-closed",
+        "ssh-session-error",
+        "upload-progress",
+        "download-progress",
+        "delete-progress",
+        "remote-copy-progress",
+        "agent-runtime-session-event",
+        "port-forward-event",
+        "petdex-status",
+        "system-open-settings",
+        "system-about",
+        "system-check-update",
+        "system-request-app-exit",
+        "desktop-resized",
+        "desktop-drag-drop",
+        "desktop-update-progress"
+      ],
+      "type": "object",
+      "patternProperties": {
+        "^ssh-data:[A-Za-z0-9_/.:\\-]+$": {
+          "type": "string"
+        }
+      },
+      "description": "Fixed renderer events plus dynamic per-session ssh-data event payloads."
+    },
+    "DownloadEvent": {
+      "anyOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "data": {
+              "additionalProperties": false,
+              "properties": {
+                "contentLength": {
+                  "type": "number"
+                }
+              },
+              "type": "object"
+            },
+            "event": {
+              "const": "Started",
+              "type": "string"
+            }
+          },
+          "required": ["event", "data"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "data": {
+              "additionalProperties": false,
+              "properties": {
+                "chunkLength": {
+                  "type": "number"
+                }
+              },
+              "required": ["chunkLength"],
+              "type": "object"
+            },
+            "event": {
+              "const": "Progress",
+              "type": "string"
+            }
+          },
+          "required": ["event", "data"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "event": {
+              "const": "Finished",
+              "type": "string"
+            }
+          },
+          "required": ["event"],
+          "type": "object"
+        }
+      ]
+    },
+    "DownloadProgressEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "completedSteps": {
+          "type": "number"
+        },
+        "currentPath": {
+          "type": "string"
+        },
+        "downloadedBytes": {
+          "type": "number"
+        },
+        "operationId": {
+          "type": "string"
+        },
+        "totalBytes": {
+          "type": "number"
+        },
+        "totalSteps": {
+          "type": "number"
+        }
+      },
+      "required": ["operationId", "totalBytes", "downloadedBytes", "totalSteps", "completedSteps"],
+      "type": "object"
+    },
+    "DragDropEvent": {
+      "anyOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "paths": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "position": {
+              "additionalProperties": false,
+              "properties": {
+                "x": {
+                  "type": "number"
+                },
+                "y": {
+                  "type": "number"
+                }
+              },
+              "required": ["x", "y"],
+              "type": "object"
+            },
+            "type": {
+              "enum": ["enter", "over"],
+              "type": "string"
+            }
+          },
+          "required": ["type", "position", "paths"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "const": "leave",
+              "type": "string"
+            }
+          },
+          "required": ["type"],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "paths": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "position": {
+              "additionalProperties": false,
+              "properties": {
+                "x": {
+                  "type": "number"
+                },
+                "y": {
+                  "type": "number"
+                }
+              },
+              "required": ["x", "y"],
+              "type": "object"
+            },
+            "type": {
+              "const": "drop",
+              "type": "string"
+            }
+          },
+          "required": ["type", "position", "paths"],
+          "type": "object"
+        }
+      ]
+    },
+    "LoadedSkill": {
+      "additionalProperties": false,
+      "properties": {
+        "instructions": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "provenance": {
+          "$ref": "#/definitions/SkillProvenance"
+        },
+        "rendered": {
+          "type": "string"
+        },
+        "renderedHash": {
+          "type": "string"
+        }
+      },
+      "required": ["name", "instructions", "provenance", "rendered", "renderedHash"],
+      "type": "object"
+    },
+    "ModelCompat": {
+      "additionalProperties": false,
+      "properties": {
+        "clearThinking": {
+          "type": "boolean"
+        },
+        "cumulativeStream": {
+          "type": "boolean"
+        },
+        "defaultThinking": {
+          "type": "boolean"
+        },
+        "nativeReasoning": {
+          "type": "boolean"
+        },
+        "parallelToolCalls": {
+          "type": "boolean"
+        },
+        "preservesReasoningAcrossTurns": {
+          "type": "boolean"
+        },
+        "protocol": {
+          "$ref": "#/definitions/AiProviderKind"
+        },
+        "reasoningEncoding": {
+          "enum": [
+            "none",
+            "responses",
+            "enableThinking",
+            "thinking",
+            "adaptive",
+            "thinkingEffort",
+            "effort",
+            "ollama",
+            "anthropicAdaptive"
+          ],
+          "type": "string"
+        },
+        "replayReasoningContent": {
+          "type": "boolean"
+        },
+        "splitReasoning": {
+          "type": "boolean"
+        },
+        "strictSchema": {
+          "type": "boolean"
+        },
+        "supportsStreamUsage": {
+          "type": "boolean"
+        },
+        "thinkTagFallback": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "protocol",
+        "cumulativeStream",
+        "supportsStreamUsage",
+        "nativeReasoning",
+        "splitReasoning",
+        "replayReasoningContent",
+        "thinkTagFallback",
+        "parallelToolCalls",
+        "strictSchema",
+        "preservesReasoningAcrossTurns",
+        "reasoningEncoding",
+        "clearThinking",
+        "defaultThinking"
+      ],
+      "type": "object"
+    },
+    "ModelDefinition": {
+      "additionalProperties": false,
+      "properties": {
+        "compat": {
+          "$ref": "#/definitions/ModelCompat"
+        },
+        "contextWindow": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "imageInput": {
+          "$ref": "#/definitions/Support"
+        },
+        "maxOutputTokens": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "reasoning": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "displayName": {
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": ["id", "displayName"],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "textInput": {
+          "$ref": "#/definitions/Support"
+        },
+        "toolCalling": {
+          "$ref": "#/definitions/Support"
+        },
+        "vision": {
+          "$ref": "#/definitions/VisionBudget"
+        }
+      },
+      "required": [
+        "contextWindow",
+        "maxOutputTokens",
+        "toolCalling",
+        "textInput",
+        "imageInput",
+        "reasoning",
+        "compat"
+      ],
+      "type": "object",
+      "x-serde-unknown-fields": "deny"
+    },
+    "PetdexConnectionStatus": {
+      "enum": ["notDetected", "connected", "notRunning", "connectionError"],
+      "type": "string",
+      "x-serde-unknown-fields": "ignore"
+    },
+    "PortForwardErrorCategory": {
+      "enum": [
+        "portInUse",
+        "hostKey",
+        "authentication",
+        "connection",
+        "invalidConfiguration",
+        "other"
+      ],
+      "type": "string"
+    },
+    "PortForwardKind": {
+      "enum": ["local", "remote"],
+      "type": "string"
+    },
+    "PortForwardRuntime": {
+      "additionalProperties": false,
+      "properties": {
+        "bytesReceived": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "bytesSent": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "configId": {
+          "type": "string"
+        },
+        "errorCategory": {
+          "$ref": "#/definitions/PortForwardErrorCategory"
+        },
+        "kind": {
+          "$ref": "#/definitions/PortForwardKind"
+        },
+        "lastError": {
+          "type": "string"
+        },
+        "mode": {
+          "$ref": "#/definitions/PortForwardStartMode"
+        },
+        "name": {
+          "type": "string"
+        },
+        "operationId": {
+          "type": "string"
+        },
+        "profileId": {
+          "type": "string"
+        },
+        "startedAt": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "status": {
+          "$ref": "#/definitions/PortForwardStatus"
+        },
+        "stoppedAt": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "operationId",
+        "profileId",
+        "configId",
+        "name",
+        "kind",
+        "mode",
+        "status",
+        "bytesSent",
+        "bytesReceived"
+      ],
+      "type": "object",
+      "x-serde-unknown-fields": "ignore"
+    },
+    "PortForwardStartMode": {
+      "enum": ["manual", "auto"],
+      "type": "string"
+    },
+    "PortForwardStatus": {
+      "enum": ["starting", "running", "stopping", "stopped", "failed"],
+      "type": "string"
+    },
+    "QuestionAnswer": {
+      "additionalProperties": false,
+      "properties": {
+        "custom": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "selected": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": ["id", "selected"],
+      "type": "object"
+    },
+    "QuestionIdentity": {
+      "additionalProperties": false,
+      "properties": {
+        "callId": {
+          "type": "string"
+        },
+        "questionRequestId": {
+          "type": "string"
+        },
+        "requestId": {
+          "type": "string"
+        },
+        "sessionId": {
+          "type": "string"
+        },
+        "stepId": {
+          "type": "string"
+        },
+        "turnId": {
+          "type": "string"
+        }
+      },
+      "required": ["sessionId", "turnId", "stepId", "requestId", "callId", "questionRequestId"],
+      "type": "object"
+    },
+    "RemoteCopyProgressEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "completedSteps": {
+          "type": "number"
+        },
+        "copiedBytes": {
+          "type": "number"
+        },
+        "currentPath": {
+          "type": "string"
+        },
+        "operationId": {
+          "type": "string"
+        },
+        "totalBytes": {
+          "type": "number"
+        },
+        "totalSteps": {
+          "type": "number"
+        }
+      },
+      "required": ["operationId", "totalBytes", "copiedBytes", "totalSteps", "completedSteps"],
+      "type": "object"
+    },
+    "SessionErrorEvent": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/SessionErrorEventHostKeyUnknown"
+        },
+        {
+          "$ref": "#/definitions/SessionErrorEventHostKeyMismatch"
+        }
+      ]
+    },
+    "SessionErrorEventHostKeyMismatch": {
+      "additionalProperties": false,
+      "properties": {
+        "payload": {
+          "additionalProperties": false,
+          "properties": {
+            "fingerprint": {
+              "type": "string"
+            },
+            "host": {
+              "type": "string"
+            },
+            "port": {
+              "type": "number"
+            },
+            "sessionId": {
+              "type": "string"
+            }
+          },
+          "required": ["sessionId", "host", "port"],
+          "type": "object"
+        },
+        "type": {
+          "const": "HostKeyMismatch",
+          "type": "string"
+        }
+      },
+      "required": ["type", "payload"],
+      "type": "object"
+    },
+    "SessionErrorEventHostKeyUnknown": {
+      "additionalProperties": false,
+      "properties": {
+        "payload": {
+          "additionalProperties": false,
+          "properties": {
+            "fingerprint": {
+              "type": "string"
+            },
+            "host": {
+              "type": "string"
+            },
+            "port": {
+              "type": "number"
+            },
+            "sessionId": {
+              "type": "string"
+            }
+          },
+          "required": ["sessionId", "host", "port"],
+          "type": "object"
+        },
+        "type": {
+          "const": "HostKeyUnknown",
+          "type": "string"
+        }
+      },
+      "required": ["type", "payload"],
+      "type": "object"
+    },
+    "SessionStatus": {
+      "enum": ["connecting", "connected", "disconnected", "error"],
+      "type": "string"
+    },
+    "SkillCatalogPublication": {
+      "additionalProperties": false,
+      "properties": {
+        "content": {
+          "type": "string"
+        },
+        "modelCatalogDigest": {
+          "type": "string"
+        },
+        "scope": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/SkillScope"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": ["scope", "modelCatalogDigest", "content"],
+      "type": "object"
+    },
+    "SkillDiagnostic": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        }
+      },
+      "required": ["path", "code", "message"],
+      "type": "object"
+    },
+    "SkillEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "extensions": {
+          "additionalProperties": false,
+          "type": "object"
+        },
+        "fileHash": {
+          "type": "string"
+        },
+        "instructionHash": {
+          "type": "string"
+        },
+        "modelInvocable": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string"
+        },
+        "relativePath": {
+          "type": "string"
+        },
+        "resourceBase": {
+          "type": "string"
+        },
+        "userInvocable": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "name",
+        "description",
+        "relativePath",
+        "resourceBase",
+        "modelInvocable",
+        "userInvocable",
+        "fileHash",
+        "instructionHash",
+        "extensions"
+      ],
+      "type": "object"
+    },
+    "SkillObservation": {
+      "additionalProperties": false,
+      "properties": {
+        "diagnostics": {
+          "items": {
+            "$ref": "#/definitions/SkillDiagnostic"
+          },
+          "type": "array"
+        },
+        "protocolVersion": {
+          "const": 1,
+          "type": "number"
+        },
+        "snapshot": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/SkillSnapshot"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "status": {
+          "enum": ["complete", "incomplete", "unavailable"],
+          "type": "string"
+        }
+      },
+      "required": ["protocolVersion", "status", "snapshot", "diagnostics"],
+      "type": "object"
+    },
+    "SkillProvenance": {
+      "additionalProperties": false,
+      "properties": {
+        "callId": {
+          "type": ["string", "null"]
+        },
+        "catalogRevision": {
+          "type": "string"
+        },
+        "fileHash": {
+          "type": "string"
+        },
+        "instructionHash": {
+          "type": "string"
+        },
+        "invocation": {
+          "enum": ["model", "user"],
+          "type": "string"
+        },
+        "messageIds": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "protocolVersion": {
+          "const": 1,
+          "type": "number"
+        },
+        "providerIdentity": {
+          "type": "string"
+        },
+        "relativePath": {
+          "type": "string"
+        },
+        "rendererVersion": {
+          "const": 1,
+          "type": "number"
+        },
+        "requestId": {
+          "type": ["string", "null"]
+        },
+        "resourceBase": {
+          "type": "string"
+        },
+        "scope": {
+          "$ref": "#/definitions/SkillScope"
+        }
+      },
+      "required": [
+        "protocolVersion",
+        "rendererVersion",
+        "providerIdentity",
+        "scope",
+        "relativePath",
+        "resourceBase",
+        "invocation",
+        "catalogRevision",
+        "fileHash",
+        "instructionHash",
+        "messageIds",
+        "requestId",
+        "callId"
+      ],
+      "type": "object"
+    },
+    "SkillScope": {
+      "additionalProperties": false,
+      "properties": {
+        "root": {
+          "type": "string"
+        },
+        "rootIdentity": {
+          "type": "string"
+        },
+        "target": {
+          "$ref": "#/definitions/AgentSessionTarget"
+        }
+      },
+      "required": ["target", "root", "rootIdentity"],
+      "type": "object"
+    },
+    "SkillSnapshot": {
+      "additionalProperties": false,
+      "properties": {
+        "entries": {
+          "items": {
+            "$ref": "#/definitions/SkillEntry"
+          },
+          "type": "array"
+        },
+        "protocolVersion": {
+          "const": 1,
+          "type": "number"
+        },
+        "scope": {
+          "$ref": "#/definitions/SkillScope"
+        },
+        "snapshotRevision": {
+          "type": "string"
+        }
+      },
+      "required": ["protocolVersion", "scope", "entries", "snapshotRevision"],
+      "type": "object"
+    },
+    "SkillStepPrepared": {
+      "additionalProperties": false,
+      "properties": {
+        "catalog": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/SkillCatalogPublication"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "messageIds": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "outcomes": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "error": {
+                "type": ["string", "null"]
+              },
+              "loaded": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/LoadedSkill"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "messageIds": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": ["name", "messageIds", "loaded", "error"],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "protocolVersion": {
+          "const": 1,
+          "type": "number"
+        }
+      },
+      "required": ["protocolVersion", "messageIds", "catalog", "outcomes"],
+      "type": "object"
+    },
+    "StatusEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "sessionId": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/definitions/SessionStatus"
+        }
+      },
+      "required": ["sessionId", "status"],
+      "type": "object",
+      "x-serde-unknown-fields": "ignore"
+    },
+    "Support": {
+      "enum": ["supported", "unsupported", "unknown"],
+      "type": "string"
+    },
+    "UploadProgressEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "completedSteps": {
+          "type": "number"
+        },
+        "currentPath": {
+          "type": "string"
+        },
+        "operationId": {
+          "type": "string"
+        },
+        "totalBytes": {
+          "type": "number"
+        },
+        "totalSteps": {
+          "type": "number"
+        },
+        "uploadedBytes": {
+          "type": "number"
+        }
+      },
+      "required": ["operationId", "totalBytes", "uploadedBytes", "totalSteps", "completedSteps"],
+      "type": "object"
+    },
+    "VisionBudget": {
+      "additionalProperties": false,
+      "properties": {
+        "imageTokenBudgetPolicy": {
+          "type": "string"
+        },
+        "maxRequestImageBytes": {
+          "type": "number"
+        },
+        "maxRequestImages": {
+          "type": "number"
+        },
+        "reservedTokensPerImage": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "maxRequestImages",
+        "maxRequestImageBytes",
+        "reservedTokensPerImage",
+        "imageTokenBudgetPolicy"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "https://shellspan.local/contracts/v1/event-payloads.schema.json",
+  "title": "ShellSpan desktop contract v1: DesktopEventPayloads",
+  "x-shellspan-contract-version": 1,
+  "x-shellspan-bootstrap-source": "src/lib/desktop/event-types.ts"
+}

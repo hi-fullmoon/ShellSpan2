@@ -3,16 +3,42 @@ require('node:child_process').execFileSync(
   ['electron/build-command-types.ts', '--check'],
   { stdio: 'inherit' },
 );
-require('node:child_process').execFileSync('python3', ['scripts/trace-boundary.py', '--check'], {
-  stdio: 'inherit',
-});
-// Verify the checked-in bridge, routing and source baseline without loading Electron.
+// Verify the checked-in schema, bridge, routing and frozen baseline without parsing Rust.
 const fs = require('node:fs');
 const assert = require('node:assert/strict');
+const { createHash } = require('node:crypto');
+const Ajv = require('ajv');
 const contract = require('../electron/contract.json');
-const names = require('../electron/commands.json');
+const generatedNames = require('../electron/commands.json');
+const argsSchema = require('../electron/contracts/v1/command-args.schema.json');
+const valuesSchema = require('../electron/contracts/v1/command-values.schema.json');
+const eventPayloadsSchema = require('../electron/contracts/v1/event-payloads.schema.json');
+const manifest = require('../electron/contracts/v1/manifest.json');
+const fixtureIndex = require('../electron/contracts/v1/fixtures.json');
+
+const names = Object.keys(argsSchema.definitions.CommandArgs.properties);
 
 assert.deepEqual([...new Set(names)].sort(), contract.map((c) => c.command).sort());
+assert.deepEqual(generatedNames, names);
+assert.deepEqual(names, Object.keys(valuesSchema.definitions.CommandValues.properties));
+assert.equal(manifest.schemaVersion, 1);
+assert.equal(manifest.commandCount, names.length);
+assert.deepEqual(
+  manifest.commands.map((command) => command.name),
+  names,
+);
+for (const schema of [argsSchema, valuesSchema, eventPayloadsSchema]) {
+  assert.equal(schema['x-shellspan-contract-version'], 1);
+  new Ajv({ allowUnionTypes: true, strict: false }).compile(schema);
+}
+for (const fixture of fixtureIndex.fixtures) {
+  const bytes = fs.readFileSync(fixture.path);
+  assert.equal(
+    createHash('sha256').update(bytes).digest('hex'),
+    fixture.sha256,
+    `Golden fixture drift: ${fixture.path}`,
+  );
+}
 const dispatch = fs.readFileSync('native/src/dispatch.rs', 'utf8');
 const main = fs.readFileSync('electron/main.ts', 'utf8');
 const preload = fs.readFileSync('dist-electron/preload.cjs', 'utf8');
@@ -35,7 +61,14 @@ console.log(
 const { rendererEvents, isRendererEvent } = require('../dist-electron/events.js');
 const events = require('../electron/event-contract.json');
 
+const fixedEventNames = Object.keys(
+  eventPayloadsSchema.definitions.DesktopEventPayloads.properties,
+);
+
 assert.equal(events.businessEvents.length, 15);
+assert.deepEqual(rendererEvents, fixedEventNames);
+assert.deepEqual(require('../electron/events.json'), fixedEventNames);
+
 for (const event of events.businessEvents)
   assert.ok(isRendererEvent(event.name.replace('${sessionId}', 'test-id')));
 for (const event of events.callbacks)

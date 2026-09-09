@@ -1,0 +1,157 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-09-09T04:48:31.660Z",
+  "core": {
+    "protocol": 1,
+    "terminalChannel": true,
+    "type": "ready",
+    "version": "2.0.56"
+  },
+  "environment": {
+    "platform": "darwin",
+    "architecture": "arm64",
+    "osRelease": "25.6.0",
+    "cpu": "Apple M4 Pro",
+    "logicalCpuCount": 12,
+    "totalMemoryBytes": 25769803776,
+    "node": "v24.15.0"
+  },
+  "metrics": {
+    "ready": {
+      "samples": 5,
+      "minMs": 7.657709000000068,
+      "medianMs": 10.182540999999901,
+      "p95Ms": 24.501832999999998,
+      "maxMs": 24.501832999999998
+    },
+    "residentSetBytes": 21872640,
+    "listProfiles": {
+      "samples": 20,
+      "minMs": 0.04429100000000119,
+      "medianMs": 0.06862499999999727,
+      "p95Ms": 0.13108299999998962,
+      "maxMs": 0.4382920000000041
+    },
+    "terminalRoundTrip": {
+      "samples": 10,
+      "minMs": 0.06762500000002092,
+      "medianMs": 0.09066700000005312,
+      "p95Ms": 0.3118329999999787,
+      "maxMs": 0.3118329999999787
+    },
+    "localCopy": {
+      "bytes": 16777216,
+      "elapsedMs": 0.7644169999999804,
+      "mebibytesPerSecond": 20930.9840048042
+    },
+    "remoteTransfer": {
+      "status": "captured",
+      "bytes": 16777216,
+      "upload": {
+        "elapsedMs": 330.77750000000003,
+        "mebibytesPerSecond": 48.370883751162026
+      },
+      "download": {
+        "elapsedMs": 159.72749999999996,
+        "mebibytesPerSecond": 100.17060305833374
+      }
+    }
+  },
+  "goldenBehavior": {
+    "extraTopLevelArgumentsIgnored": true,
+    "unitWireValue": null,
+    "optionalWorkspaceWireValue": null,
+    "unicodePreference": "汉字",
+    "invalidScalarResponse": {
+      "ok": false,
+      "error": "invalid args `data` for command `write_session`: invalid type: integer `1`, expected a string"
+    },
+    "terminalEventSequence": [
+      "ssh-status:connected",
+      "ssh-data:${sessionId}",
+      "ssh-status:disconnected",
+      "ssh-closed"
+    ],
+    "storage": {
+      "schemaVersions": [
+        {
+          "version": 1
+        },
+        {
+          "version": 2
+        },
+        {
+          "version": 3
+        },
+        {
+          "version": 4
+        },
+        {
+          "version": 5
+        },
+        {
+          "version": 6
+        },
+        {
+          "version": 7
+        }
+      ],
+      "objects": [
+        {
+          "type": "table",
+          "name": "key_credentials",
+          "tableName": "key_credentials",
+          "sql": "CREATE TABLE \"key_credentials\" (\n    id TEXT PRIMARY KEY,\n    label TEXT NOT NULL,\n    updated_at INTEGER NOT NULL,\n    key_type TEXT DEFAULT 'unknown',\n    kind TEXT NOT NULL DEFAULT 'keyFile',\n    public_key TEXT,\n    certificate TEXT,\n    service TEXT NOT NULL DEFAULT 'com.shellspan.key'\n)"
+        },
+        {
+          "type": "table",
+          "name": "preferences",
+          "tableName": "preferences",
+          "sql": "CREATE TABLE preferences (\n    key TEXT PRIMARY KEY,\n    value TEXT NOT NULL\n)"
+        },
+        {
+          "type": "table",
+          "name": "profiles",
+          "tableName": "profiles",
+          "sql": "CREATE TABLE profiles (\n    id TEXT PRIMARY KEY,\n    name TEXT NOT NULL,\n    host TEXT NOT NULL,\n    port INTEGER NOT NULL DEFAULT 22,\n    username TEXT NOT NULL,\n    auth_method TEXT NOT NULL CHECK(auth_method IN ('password', 'key')),\n    keychain_key_id TEXT,\n    jump_host_config TEXT,\n    created_at INTEGER NOT NULL,\n    updated_at INTEGER NOT NULL\n, organization_json TEXT)"
+        },
+        {
+          "type": "table",
+          "name": "recent_profiles",
+          "tableName": "recent_profiles",
+          "sql": "CREATE TABLE recent_profiles (\n    profile_id TEXT NOT NULL,\n    sort_order INTEGER NOT NULL,\n    PRIMARY KEY (profile_id),\n    FOREIGN KEY (profile_id) REFERENCES profiles(id) ON DELETE CASCADE\n)"
+        },
+        {
+          "type": "table",
+          "name": "schema_version",
+          "tableName": "schema_version",
+          "sql": "CREATE TABLE schema_version (\n    version INTEGER PRIMARY KEY,\n    applied_at TEXT NOT NULL DEFAULT (datetime('now'))\n)"
+        },
+        {
+          "type": "table",
+          "name": "sftp_bookmarks",
+          "tableName": "sftp_bookmarks",
+          "sql": "CREATE TABLE sftp_bookmarks (\n    id TEXT PRIMARY KEY,\n    host TEXT NOT NULL,\n    port INTEGER NOT NULL DEFAULT 22,\n    username TEXT NOT NULL,\n    path TEXT NOT NULL,\n    side TEXT NOT NULL CHECK(side IN ('local', 'remote')),\n    label TEXT,\n    created_at INTEGER NOT NULL\n)"
+        },
+        {
+          "type": "table",
+          "name": "sftp_workspace",
+          "tableName": "sftp_workspace",
+          "sql": "CREATE TABLE sftp_workspace (\n    id INTEGER PRIMARY KEY CHECK(id = 1),\n    workspace_json TEXT NOT NULL,\n    updated_at INTEGER NOT NULL\n)"
+        },
+        {
+          "type": "table",
+          "name": "terminal_workspace",
+          "tableName": "terminal_workspace",
+          "sql": "CREATE TABLE terminal_workspace (\n    id INTEGER PRIMARY KEY CHECK(id = 1),\n    sessions_json TEXT NOT NULL,\n    updated_at INTEGER NOT NULL\n)"
+        }
+      ],
+      "fixturePreferences": [
+        {
+          "key": "migration.baseline.unicode",
+          "value": "汉字"
+        }
+      ]
+    }
+  }
+}

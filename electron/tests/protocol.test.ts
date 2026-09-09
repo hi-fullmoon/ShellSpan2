@@ -28,14 +28,12 @@ test('rejects oversized, empty, malformed and truncated frames', () => {
 test('all baseline commands have one validated entry with camelCase arguments', () => {
   assert.equal(byName.size, 141);
   for (const value of byName.values())
-    for (const arg of value.args) assert.match(arg.name, /^[a-z][a-zA-Z0-9]*$/);
+    for (const name of Object.keys(value.properties || {}))
+      assert.match(name, /^[a-z][a-zA-Z0-9]*$/);
   validateCommand('resize_session', { sessionId: 's', cols: 80, rows: 24 });
   validateCommand('pick_local_folder', {});
   assert.throws(() => validateCommand('exec', {}));
-  // Native schema errors now come from the actual Serde route, tested by probe-contract.cjs.
-  assert.doesNotThrow(() =>
-    validateCommand('resize_session', { sessionId: 's', cols: -1, rows: 24 }),
-  );
-  assert.doesNotThrow(() => validateCommand('write_session', { sessionId: 's', data: 1 }));
+  assert.throws(() => validateCommand('resize_session', { sessionId: 's', cols: -1, rows: 24 }));
+  assert.throws(() => validateCommand('write_session', { sessionId: 's', data: 1 }));
   assert.doesNotThrow(() => validateCommand('list_profiles', { path: '/tmp' })); // Fixed B ignores extra top-level keys.
 });

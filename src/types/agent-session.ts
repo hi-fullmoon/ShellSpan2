@@ -1,3 +1,15 @@
+import type { ModelDefinition } from '@/lib/ai/provider-contract';
+import type { AiRetryPolicy } from '@/lib/ai/retry-policy';
+import type { AgentImageRef } from './agent-image';
+import type { AgentQuestion, AnswerQuestionInput, QuestionIdentity } from './agent-question';
+import type {
+  SkillCatalogPublication,
+  SkillObservation,
+  SkillScope,
+  SkillStepPrepared,
+} from './agent-skill';
+import type { ModelSelection } from './ai';
+
 export const AGENT_SESSION_EVENT_VERSION = 5 as const;
 
 export type AgentRequestSnapshot =
@@ -9,18 +21,18 @@ export type AgentRequestSnapshot =
       adapterId: string;
       modelId: string;
       catalogVersion: number;
-      capabilities: import('@/lib/ai/provider-contract').ModelDefinition;
+      capabilities: ModelDefinition;
       endpointIdentity: string;
       replayDomainId: string;
       reasoningEffort?: string;
       outputTokens: number;
-      retryPolicy: import('@/lib/ai/retry-policy').AiRetryPolicy;
+      retryPolicy: AiRetryPolicy;
       timeouts: { requestHeadersMs: number; firstByteMs: number; streamIdleMs: number };
       purpose: string;
       preparationVersion: number;
       projectionPolicy: string;
       contentHash: string;
-      images: readonly import('./agent-image').AgentImageRef[];
+      images: readonly AgentImageRef[];
     };
 
 export type AgentReplayEnvelope =
@@ -40,7 +52,7 @@ export type AgentReplayEnvelope =
         requestContentHash: string;
         preparationVersion: number;
         projectionPolicy: string;
-        imageProjectionRefs: readonly import('./agent-image').AgentImageRef[];
+        imageProjectionRefs: readonly AgentImageRef[];
         imageProjectionHash: string;
         assistantContentHash: string;
       };
@@ -110,7 +122,7 @@ export interface AgentSessionMessageSource {
 }
 
 export interface AgentSessionInboxMessage {
-  readonly images?: readonly import('./agent-image').AgentImageRef[];
+  readonly images?: readonly AgentImageRef[];
   readonly messageId: string;
   readonly clientSubmissionId?: string;
   readonly content: string;
@@ -434,22 +446,10 @@ export type AgentSessionEvent =
         stepMessages: readonly AgentSessionInboxMessage[];
       }
     >
-  | AgentSessionEventWithData<
-      'file_reference/scope_bound',
-      { scope: import('./agent-skill').SkillScope }
-    >
-  | AgentSessionEventWithData<
-      'skill/catalog_observed',
-      { observation: import('./agent-skill').SkillObservation }
-    >
-  | AgentSessionEventWithData<
-      'skill/catalog_published',
-      { catalog: import('./agent-skill').SkillCatalogPublication }
-    >
-  | AgentSessionEventWithData<
-      'skill/step_prepared',
-      { prepared: import('./agent-skill').SkillStepPrepared }
-    >
+  | AgentSessionEventWithData<'file_reference/scope_bound', { scope: SkillScope }>
+  | AgentSessionEventWithData<'skill/catalog_observed', { observation: SkillObservation }>
+  | AgentSessionEventWithData<'skill/catalog_published', { catalog: SkillCatalogPublication }>
+  | AgentSessionEventWithData<'skill/step_prepared', { prepared: SkillStepPrepared }>
   | AgentSessionEventWithData<'user/message', { message: AgentSessionInboxMessage }>
   | AgentSessionEventWithData<
       'assistant/chunk',
@@ -573,19 +573,16 @@ export type AgentSessionEvent =
   | AgentSessionEventWithData<
       'question/requested',
       {
-        identity: import('./agent-question').QuestionIdentity;
-        arguments: { questions: readonly import('./agent-question').AgentQuestion[] };
+        identity: QuestionIdentity;
+        arguments: { questions: readonly AgentQuestion[] };
         provider: AgentSubagentModel;
       }
     >
   | AgentSessionEventWithData<
       'question/answered',
-      { submission: import('./agent-question').AnswerQuestionInput; fingerprint: string }
+      { submission: AnswerQuestionInput; fingerprint: string }
     >
-  | AgentSessionEventWithData<
-      'question/cancelled',
-      { identity: import('./agent-question').QuestionIdentity }
-    >
+  | AgentSessionEventWithData<'question/cancelled', { identity: QuestionIdentity }>
   | AgentSessionEventWithData<
       'tool/approval',
       {
@@ -729,7 +726,7 @@ export type AgentModelSurfaceMessage =
       messageId: string;
       content: string;
       source: AgentSessionMessageSource;
-      images: readonly import('./agent-image').AgentImageRef[];
+      images: readonly AgentImageRef[];
     }>
   | Readonly<{
       role: 'user';
@@ -944,7 +941,7 @@ export interface AgentRuntimeInjectionInput extends AgentSessionMessageInput {
 
 export interface AgentRuntimeStartInput {
   readonly sessionId: string;
-  readonly selection: import('./ai').ModelSelection;
+  readonly selection: ModelSelection;
 }
 
 export interface AgentSessionIdInput {

@@ -52,22 +52,26 @@ test('business/window events allow dynamic IDs but keep lifecycle private', () =
 test('nested JSON and primitive boundaries do not silently coerce invalid input', () => {
   for (const entries of [[['k', NaN]], [['k', () => {}]], [['k', 1n]]])
     assert.throws(() => validateCommand('save_preferences', { entries }));
+  const cyclic: Record<string, unknown> = {};
+  cyclic.self = cyclic;
+  assert.throws(() => validateCommand('save_preferences', { entries: cyclic }));
   validateCommand('save_preferences', { entries: [['k', '值']] });
-  validateCommand('agent_runtime_get_events', {
-    request: { sessionId: 's', afterSeq: 9007199254740992 },
-  }); // Native u64/Serde remains authoritative.
+  assert.throws(() =>
+    validateCommand('agent_runtime_get_events', {
+      request: { sessionId: 's', cursor: 9007199254740992, limit: 1 },
+    }),
+  );
   validateCommand('pick_local_folder', { title: null });
-  assert.doesNotThrow(() =>
+  assert.throws(() =>
     validateCommand('resize_session', { sessionId: 's', cols: 2 ** 32, rows: 24 }),
   );
 });
 
-test('Electron-owned schema errors are delegated to the same native Serde decoder', () => {
-  // probe-contract.cjs asserts actual private validation errors and legal Option input.
+test('Electron-owned commands use the same versioned schema boundary', () => {
   for (const [name, args] of [
     ['export_log_file', { content: '' }],
     ['export_log_file', { name: null, content: '' }],
     ['pick_local_folder', { title: 2 }],
   ] as const)
-    assert.doesNotThrow(() => validateCommand(name, args));
+    assert.throws(() => validateCommand(name, args));
 });

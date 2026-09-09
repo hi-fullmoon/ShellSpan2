@@ -34,6 +34,7 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Run frontend review gate
         run: |
+          pnpm contract:check
           pnpm test
           pnpm build
 

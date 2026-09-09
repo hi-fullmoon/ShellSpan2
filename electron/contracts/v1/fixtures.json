@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "fixtures": [
+    {
+      "kind": "serde-arguments",
+      "path": "native/tests/fixtures/tauri-argument-cases.json",
+      "sha256": "ddba366db4454406bb29f41bc54f2469fb60d374be42c6db42f348d55d5f0300",
+      "cases": 24,
+      "covers": [
+        "missing-required",
+        "optional-missing-and-null",
+        "scalar-type-errors",
+        "integer-range",
+        "tuple-shape",
+        "unknown-outer-field",
+        "unknown-denied-nested-field"
+      ]
+    },
+    {
+      "kind": "desktop-command-baseline",
+      "path": "electron/baseline-contract.json",
+      "sha256": "13e7b2ae8480da64412fa2a09a153ae79140fe92872a134b6f869e74d37d03b3"
+    },
+    {
+      "kind": "desktop-event-baseline",
+      "path": "electron/event-contract.json",
+      "sha256": "7587ae8bda66c9683ce5e4b7288b83859c1aadd409746a6363ed76909a661186"
+    },
+    {
+      "kind": "rust-serde-type-baseline",
+      "path": "electron/type-contract.json",
+      "sha256": "a0606c7e683312fa31be88a315be63821c7704ec534a9afd690a2de79dd1aab7"
+    },
+    {
+      "kind": "agent-prompt-golden",
+      "path": "native/src/agent_runtime/testdata/prompt-scoped-autopilot.golden.txt",
+      "sha256": "6dbcf70bb266501d6f4632e55c3c1cf105cb7b031c13844501a8522a1ebf2c1e"
+    },
+    {
+      "kind": "agent-session-v5-cross-language",
+      "path": "src/test/fixtures/agent-session-v5.json",
+      "sha256": "d872e88ea32d671de8ae31300c8b64d3fbc7026d7c27cd00e539a3c482033ade"
+    },
+    {
+      "kind": "llm-retry-policy",
+      "path": "src/lib/ai/retry-policy.json",
+      "sha256": "16753e8d432d186146767c2e41e34e2965f16aceaa669bad519c78c06f248c76"
+    },
+    {
+      "kind": "image-wire-contract",
+      "path": "src/lib/ai/vision-contract.json",
+      "sha256": "c4d23800c377c3ea5914751c34681a0d0bde9fdf9d541100450782a28eea475a"
+    }
+  ]
+}
