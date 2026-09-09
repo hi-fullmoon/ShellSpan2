@@ -16,6 +16,7 @@ import { credentialCommands } from './credentials.ts';
 import type { NodeCoreEventSender } from './events.ts';
 import type { NodeCoreState } from './state.ts';
 import { llmCommands } from './llm-domain.ts';
+import { agentRuntimeCommands } from './agent-runtime.ts';
 
 export type NodeCoreContext = {
   state: NodeCoreState;
@@ -109,6 +110,10 @@ export async function dispatchNodeCommand(command: string, args: object, context
   if (llmCommands.has(command)) {
     if (!context.state.llm) throw new Error('LLM backend is not active');
     return context.state.llm.command(command, args as Record<string, unknown>, context.signal);
+  }
+  if (agentRuntimeCommands.has(command)) {
+    if (!context.state.agent) throw new Error('Agent Runtime backend is not active');
+    return context.state.agent.command(command, args as Record<string, unknown>, context.signal);
   }
   switch (command) {
     case 'check_host_key': {

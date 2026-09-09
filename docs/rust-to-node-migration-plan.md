@@ -32,7 +32,12 @@ E2E 和 macOS 打包证据记录在 `docs/migration/stage-4-completion.md`。Win
 阶段 5 已于 2026-09-09 完成实现与本地验收。`llm` 领域的 9 个命令已默认切换到
 Node；Provider/模型目录、路由 CAS 与凭据版本化、流式协议、错误/重试/取消、usage、
 原始 Provider 回放、Session v4→v5、图片规范化和 Electron 打包证据记录在
-`docs/migration/stage-5-completion.md`。Stage 6 的 Agent Runtime 命令仍完整由 Rust 持有。
+`docs/migration/stage-5-completion.md`。
+
+阶段 6 已于 2026-09-09 完成实现与本地 Node 验收。`agent-runtime` 领域的 42 个命令已
+默认切换到 Node；Session v5 事件存储与投影、Inbox、模型 Turn、工具审批与执行、用户
+问题、文件/SFTP/图片/artifact、压缩归档与恢复、子 Agent 和 Fleet 证据记录在
+`docs/migration/stage-6-completion.md`。Rust Core 继续随包保留，供阶段 7 整体回退。
 
 TypeScript 桌面类型、命令清单和事件清单现在从 Schema v1 生成；Electron 主进程使用同一 Schema 执行 Ajv 深层参数校验。常规契约生成与检查不再解析 Rust 源码。
 

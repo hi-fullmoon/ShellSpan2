@@ -97,6 +97,8 @@ jobs:
         run: cargo test --manifest-path native/Cargo.toml --all-features --no-fail-fast --locked
       - name: Run Stage 5 LLM differential gate
         run: pnpm test:core-stage5
+      - name: Run Stage 6 Agent Runtime differential gate
+        run: pnpm test:core-stage6
       - name: Report configured Node LLM live smoke result or explicit SKIP
         run: node --env-file-if-exists=.env.local scripts/node-llm-live-smoke.mjs
 

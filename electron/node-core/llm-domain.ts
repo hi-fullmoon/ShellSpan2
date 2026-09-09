@@ -16,7 +16,12 @@ import {
   type ModelSelection,
   type ProviderRoute,
 } from './llm-routes.ts';
-import { listProviderModels } from './llm-runtime.ts';
+import {
+  listProviderModels,
+  prepareRequestSnapshot,
+  streamProvider,
+  type StreamDelta,
+} from './llm-runtime.ts';
 
 export class LlmDomain {
   readonly routes: LlmRouteStore;
@@ -105,6 +110,105 @@ export class LlmDomain {
         throw new Error(`Unknown LLM command: ${name}`);
     }
   }
+
+  /** Secret-free preparation plus the Stage 5 streaming adapter used by Agent Runtime. */
+  async prepareAgent(
+    selection: ModelSelection,
+    body: Record<string, unknown>,
+    images: Parameters<typeof prepareRequestSnapshot>[4] = [],
+  ) {
+    await this.ready;
+    const route = this.routes.route(selection.routeId);
+    const provider = routeProvider(route, selection);
+    const providerBody = agentProviderBody(provider.kind, provider.model, body);
+    return {
+      provider,
+      route,
+      body: providerBody,
+      prepared: prepareRequestSnapshot(provider, route, providerBody, 'agent-turn', images),
+    };
+  }
+
+  /** Secret-free preparation plus the Stage 5 streaming adapter used by Agent Runtime. */
+  async streamAgent(
+    selection: ModelSelection,
+    body: Record<string, unknown>,
+    images: Parameters<typeof prepareRequestSnapshot>[4],
+    signal: AbortSignal,
+    emit: (delta: StreamDelta) => void,
+  ) {
+    await this.ready;
+    const preparedAgent = await this.prepareAgent(selection, body, images);
+    const { route, provider, prepared } = preparedAgent;
+    const apiKey = await this.routes.credential(route);
+    const response = await streamProvider({
+      provider,
+      apiKey,
+      body: preparedAgent.body,
+      signal,
+      timeouts: route.timeouts,
+      retryPolicy: route.retryPolicy,
+      emit,
+    });
+    return { provider, route, prepared, response };
+  }
+}
+
+function agentProviderBody(
+  kind: ProviderConfig['kind'],
+  model: string,
+  input: Record<string, unknown>,
+) {
+  const messages = Array.isArray(input.messages) ? input.messages : [];
+  const tools = Array.isArray(input.tools) ? input.tools : [];
+  if (kind === 'openAi') {
+    return {
+      model,
+      input: messages,
+      ...(tools.length
+        ? {
+            tools: tools.map((tool) => ({
+              type: 'function',
+              name: (tool as Record<string, unknown>).name,
+              description: (tool as Record<string, unknown>).description,
+              parameters: (tool as Record<string, unknown>).inputSchema,
+            })),
+          }
+        : {}),
+    };
+  }
+  if (kind === 'anthropicMessages') {
+    return {
+      model,
+      messages,
+      ...(tools.length
+        ? {
+            tools: tools.map((tool) => ({
+              name: (tool as Record<string, unknown>).name,
+              description: (tool as Record<string, unknown>).description,
+              input_schema: (tool as Record<string, unknown>).inputSchema,
+            })),
+          }
+        : {}),
+    };
+  }
+  return {
+    model,
+    messages,
+    stream: true,
+    ...(tools.length
+      ? {
+          tools: tools.map((tool) => ({
+            type: 'function',
+            function: {
+              name: (tool as Record<string, unknown>).name,
+              description: (tool as Record<string, unknown>).description,
+              parameters: (tool as Record<string, unknown>).inputSchema,
+            },
+          })),
+        }
+      : {}),
+  };
 }
 
 export const llmCommands = new Set([

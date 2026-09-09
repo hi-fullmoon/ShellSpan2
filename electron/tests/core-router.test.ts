@@ -10,6 +10,7 @@ import {
   stageThreeNodeDomains,
   stageFourNodeDomains,
   stageFiveNodeDomains,
+  stageSixNodeDomains,
   stageTwoNodeDomains,
 } from '../core-router.ts';
 import type { BackendKind, CoreBackendEvents, CoreRequestType } from '../core-backend.ts';
@@ -101,7 +102,7 @@ test('all Stage 2 commands have single Node ownership by default and domain roll
   await defaults.stop();
 
   const rollbackRoutes = parseBackendConfig(
-    stageTwoNodeDomains.map((domain) => `${domain}:rust`).join(','),
+    [...stageTwoNodeDomains.map((domain) => `${domain}:rust`), 'agent-runtime:rust'].join(','),
   );
   const rollback = new CoreBackendRouter(
     new FakeBackend('rust'),
@@ -125,7 +126,12 @@ test('all Stage 3 commands default to Node with whole-domain rollback', async ()
   await defaults.stop();
 
   const routes = parseBackendConfig(
-    [...stageThreeNodeDomains, ...stageFourNodeDomains, ...stageFiveNodeDomains]
+    [
+      ...stageThreeNodeDomains,
+      ...stageFourNodeDomains,
+      ...stageFiveNodeDomains,
+      ...stageSixNodeDomains,
+    ]
       .map((domain) => `${domain}:rust`)
       .join(','),
   );
@@ -169,7 +175,7 @@ test('all 9 Stage 5 LLM commands default to Node with whole-domain rollback', as
   const rollback = new CoreBackendRouter(
     new FakeBackend('rust'),
     new FakeBackend('node'),
-    parseBackendConfig('llm:rust'),
+    parseBackendConfig('llm:rust,agent-runtime:rust'),
   );
   for (const command of commands) assert.equal(rollback.backendFor(command.name).kind, 'rust');
   await rollback.stop();
@@ -179,12 +185,42 @@ test('all 9 Stage 5 LLM commands default to Node with whole-domain rollback', as
         new FakeBackend('rust'),
         new FakeBackend('node'),
         parseBackendConfig(
-          `storage:rust,credentials:rust,llm:node,${stageFourNodeDomains
+          `storage:rust,credentials:rust,llm:node,agent-runtime:rust,${stageFourNodeDomains
             .map((domain) => `${domain}:rust`)
             .join(',')}`,
         ),
       ),
     /requires Node storage and credentials/,
+  );
+});
+
+test('all 42 Stage 6 Agent Runtime commands default to Node with whole-domain rollback', async () => {
+  const rust = new FakeBackend('rust');
+  const node = new FakeBackend('node');
+  const defaults = new CoreBackendRouter(rust, node, parseBackendConfig());
+  const commands = [...commandMetadata.values()].filter((command) =>
+    (stageSixNodeDomains as readonly string[]).includes(command.domain),
+  );
+  assert.equal(commands.length, 42);
+  for (const command of commands) assert.equal(defaults.backendFor(command.name), node);
+  await defaults.stop();
+
+  const rollback = new CoreBackendRouter(
+    new FakeBackend('rust'),
+    new FakeBackend('node'),
+    parseBackendConfig('agent-runtime:rust'),
+  );
+  for (const command of commands) assert.equal(rollback.backendFor(command.name).kind, 'rust');
+  await rollback.stop();
+
+  assert.throws(
+    () =>
+      new CoreBackendRouter(
+        new FakeBackend('rust'),
+        new FakeBackend('node'),
+        parseBackendConfig('llm:rust'),
+      ),
+    /requires Node LLM, storage, credentials, local filesystem, and connection backends/,
   );
 });
 

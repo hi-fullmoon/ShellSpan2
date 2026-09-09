@@ -20,6 +20,7 @@ export const stageFourNodeDomains = [
   'port-forward',
 ] as const;
 export const stageFiveNodeDomains = ['llm'] as const;
+export const stageSixNodeDomains = ['agent-runtime'] as const;
 
 const domainNames = new Set(Object.keys(manifest.domains));
 const commandMetadata = new Map(manifest.commands.map((command) => [command.name, command]));
@@ -36,6 +37,7 @@ export function parseBackendConfig(value = '') {
       ...stageThreeNodeDomains,
       ...stageFourNodeDomains,
       ...stageFiveNodeDomains,
+      ...stageSixNodeDomains,
     ].map((domain) => [domain, 'node'] as const),
   );
   if (!value.trim()) return routes;
@@ -92,6 +94,17 @@ export class CoreBackendRouter extends EventEmitter<CoreBackendEvents> implement
         (this.routes.get('credentials') ?? 'rust') !== 'node')
     )
       throw new Error('Node LLM backend requires Node storage and credentials');
+    if (
+      (this.routes.get('agent-runtime') ?? 'rust') === 'node' &&
+      ((this.routes.get('llm') ?? 'rust') !== 'node' ||
+        (this.routes.get('storage') ?? 'rust') !== 'node' ||
+        (this.routes.get('credentials') ?? 'rust') !== 'node' ||
+        (this.routes.get('local-fs') ?? 'rust') !== 'node' ||
+        [...stageFourNodeDomains].some((domain) => (this.routes.get(domain) ?? 'rust') !== 'node'))
+    )
+      throw new Error(
+        'Node Agent Runtime requires Node LLM, storage, credentials, local filesystem, and connection backends',
+      );
     this.ready = Promise.all([rust.ready, node.ready]).then(() => ({
       type: 'ready',
       protocol: 1,

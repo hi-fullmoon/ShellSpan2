@@ -12,6 +12,7 @@ import { RemoteHealthManager } from './remote-health.ts';
 import { PortForwardManager } from './port-forward.ts';
 import { PreflightManager } from './preflight.ts';
 import { LlmDomain } from './llm-domain.ts';
+import { AgentRuntime } from './agent-runtime.ts';
 import type { NodeCoreEventSender } from './events.ts';
 
 export type NodeCoreLifecycle = 'starting' | 'ready' | 'stopping' | 'stopped';
@@ -34,11 +35,17 @@ export class NodeCoreState {
   portForwards?: PortForwardManager;
   preflight?: PreflightManager;
   llm?: LlmDomain;
+  agent?: AgentRuntime;
 
   constructor(readonly env: NodeJS.ProcessEnv) {
     this.paths = new NodeCorePaths(env);
     const domains = new Set((env.SHELLSPAN_NODE_DOMAINS || '').split(',').filter(Boolean));
-    if (domains.has('storage') || domains.has('credentials') || domains.has('llm'))
+    if (
+      domains.has('storage') ||
+      domains.has('credentials') ||
+      domains.has('llm') ||
+      domains.has('agent-runtime')
+    )
       this.storage = new StorageClient(this.paths.database);
   }
 
@@ -46,12 +53,12 @@ export class NodeCoreState {
     const domains = new Set((this.env.SHELLSPAN_NODE_DOMAINS || '').split(',').filter(Boolean));
     if (this.storage) {
       await this.storage.ready;
-      if (domains.has('credentials') || domains.has('llm')) {
+      if (domains.has('credentials') || domains.has('llm') || domains.has('agent-runtime')) {
         this.credentials = new CredentialManager(this.env, this.storage);
         await this.credentials.migrateInlineApiKeys();
       }
     }
-    if (domains.has('llm') && this.storage && this.credentials) {
+    if ((domains.has('llm') || domains.has('agent-runtime')) && this.storage && this.credentials) {
       this.llm = new LlmDomain(this.storage, this.credentials, this.paths.appData);
       await this.llm.ready;
     }
@@ -75,6 +82,18 @@ export class NodeCoreState {
       this.remoteHealth = new RemoteHealthManager(this.ssh);
     if (domains.has('port-forward') && this.ssh)
       this.portForwards = new PortForwardManager(this.ssh, events);
+    if (domains.has('agent-runtime') && this.llm) {
+      this.agent = new AgentRuntime(
+        this.paths.appData,
+        events,
+        this.llm,
+        this.llm.images,
+        this.remoteFs,
+        this.ssh,
+        this.storage,
+      );
+      await this.agent.ready;
+    }
   }
 
   begin(id: number) {
@@ -100,6 +119,7 @@ export class NodeCoreState {
     this.remoteHealth?.stop();
     this.preflight?.stop();
     await this.portForwards?.stopAll();
+    await this.agent?.stop();
     await this.storage?.stop();
   }
 }
