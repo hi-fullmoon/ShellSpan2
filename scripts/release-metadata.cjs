@@ -25,14 +25,6 @@ function metadata(tag, version, notes, changelog) {
 }
 if (require.main === module) {
   const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
-  const cargo = fs
-    .readFileSync('native/Cargo.toml', 'utf8')
-    .match(/^version\s*=\s*"([^"]+)"/m)?.[1];
-  const lock = fs
-    .readFileSync('native/Cargo.lock', 'utf8')
-    .match(/\[\[package\]\]\s*\nname = "ShellSpan"\s*\nversion = "([^"]+)"/)?.[1];
-  if (cargo !== pkg.version || lock !== pkg.version)
-    throw new Error('Package and native versions differ');
   const result = metadata(
     process.env.RELEASE_TAG,
     pkg.version,

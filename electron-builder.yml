@@ -7,23 +7,20 @@ files:
   - dist-electron/**/*
   - '!dist-electron/after-pack.js'
   - '!dist-electron/tests/**'
-  - native/icons/32x32.png
+  - resources/icons/32x32.png
   - package.json
-extraResources:
-  - from: native/target/release/
-    to: native
-    filter:
-      - shellspan-core
-      - shellspan-core.exe
 asar: true
+# keytar and node-pty ship N-API prebuilds for every supported target. Rebuilding would
+# reintroduce a host C++ toolchain requirement and can discard the exact lockfile artifacts.
+npmRebuild: false
 mac:
-  icon: native/icons/icon.icns
+  icon: resources/icons/icon.icns
   target: [dmg, zip]
   category: public.app-category.developer-tools
   extendInfo:
     CFBundleDevelopmentRegion: English
 win:
-  icon: native/icons/icon.ico
+  icon: resources/icons/icon.ico
   target: nsis
 nsis:
   oneClick: true

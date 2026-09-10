@@ -189,6 +189,30 @@ function validateTerminalWorkspace(raw: string) {
 
 function command(name: string, args: Record<string, unknown>) {
   switch (name) {
+    case '__migration_read': {
+      const key = args.key;
+      const offset = args.offset;
+      const validKey =
+        key === 'electron.webviewMigration.v1' ||
+        key === 'electron.webviewMigration.v2' ||
+        (typeof key === 'string' && /^electron\.webviewMigration\.chunk\.[0-9.]{0,31}$/.test(key));
+      if (
+        !validKey ||
+        !Number.isSafeInteger(offset) ||
+        (offset as number) < 0 ||
+        (offset as number) > 0x7fffffff
+      )
+        throw new Error('Invalid migration read');
+      const row = one(
+        'SELECT substr(value,?+1,262144) AS text,length(value) AS total FROM preferences WHERE key=?',
+        offset,
+        key,
+      );
+      if (!row) return null;
+      const text = String(row.text);
+      const next = (offset as number) + [...text].length;
+      return { text, next, done: next >= Number(row.total) };
+    }
     case 'list_profiles':
       return rows('SELECT * FROM profiles ORDER BY name').map(profile);
     case 'add_profile': {

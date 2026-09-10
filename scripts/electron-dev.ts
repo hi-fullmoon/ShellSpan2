@@ -4,14 +4,6 @@ import electron from 'electron';
 
 // The Node entry exports the executable path; Electron's declarations describe its runtime API.
 if (typeof electron !== 'string') throw new Error('Electron executable path is unavailable');
-const build = spawn('cargo', ['build', '--manifest-path', 'native/Cargo.toml'], {
-  stdio: 'inherit',
-});
-const status = await new Promise<number | null>((resolve, reject) => {
-  build.on('error', reject);
-  build.on('exit', resolve);
-});
-if (status !== 0) process.exit(status ?? 1);
 const server = await createServer();
 await server.listen();
 const env: NodeJS.ProcessEnv = { ...process.env, VITE_DEV_SERVER_URL: 'http://localhost:1420' };

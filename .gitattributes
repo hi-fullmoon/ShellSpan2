@@ -1,6 +1,9 @@
 # git-cliff --prepend 按字节匹配文件头,CRLF 会导致识别失败、头部重复
 CHANGELOG.md text eol=lf
 
-# Rust golden fixtures are compared with generated LF text. Keep checkout
-# bytes deterministic while the tests also tolerate an existing CRLF checkout.
-src-tauri/src/agent_runtime/testdata/*.golden.txt text eol=lf
+# Contract fixtures remain byte-for-byte stable across Windows and macOS checkouts.
+electron/tests/fixtures/*.json text eol=lf
+electron/tests/fixtures/*.golden.txt text eol=lf
+electron/*contract.json text eol=lf
+src/test/fixtures/*.json text eol=lf
+src/lib/ai/*.json text eol=lf

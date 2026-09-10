@@ -39,6 +39,11 @@ Node；Provider/模型目录、路由 CAS 与凭据版本化、流式协议、�
 问题、文件/SFTP/图片/artifact、压缩归档与恢复、子 Agent 和 Fleet 证据记录在
 `docs/migration/stage-6-completion.md`。Rust Core 继续随包保留，供阶段 7 整体回退。
 
+阶段 7 已于 2026-09-10 完成代码、构建和发布链路的 Node-only 切换。全部 134 个
+Core 命令固定由独立 Node Core 持有，七个桌面/窗口命令由 Electron Main 持有；Rust 源码、Cargo 工具链、双后端路由、差分脚本、
+CI 和安装包资源均已删除。上一稳定双 Core 版本作为发布级回滚点，Node-only 的升级读取、
+跨平台 CI、安装包内容门禁和发布流程记录在 `docs/migration/stage-7-completion.md`。
+
 TypeScript 桌面类型、命令清单和事件清单现在从 Schema v1 生成；Electron 主进程使用同一 Schema 执行 Ajv 深层参数校验。常规契约生成与检查不再解析 Rust 源码。
 
 ## 1. 目标与范围

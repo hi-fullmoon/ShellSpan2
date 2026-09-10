@@ -41,7 +41,7 @@ await copyFile(
   path.join(root, 'src/lib/ai/vision-contract.json'),
   path.join(output, 'node-core/vision-contract.json'),
 );
-await chmod(path.join(output, 'tests/fixtures/native-child.js'), 0o755);
+await chmod(path.join(output, 'tests/fixtures/core-child.js'), 0o755);
 await chmod(path.join(output, 'node-core/entry.js'), 0o755);
 await writeFile(path.join(output, 'package.json'), '{"type":"commonjs"}\n');
 // Sandboxed preloads cannot load local modules. Inline the JSON and event allowlist

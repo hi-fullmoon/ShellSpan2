@@ -3,7 +3,7 @@
   "fixtures": [
     {
       "kind": "serde-arguments",
-      "path": "native/tests/fixtures/tauri-argument-cases.json",
+      "path": "electron/tests/fixtures/serde-argument-cases.json",
       "sha256": "ddba366db4454406bb29f41bc54f2469fb60d374be42c6db42f348d55d5f0300",
       "cases": 24,
       "covers": [
@@ -33,7 +33,7 @@
     },
     {
       "kind": "agent-prompt-golden",
-      "path": "native/src/agent_runtime/testdata/prompt-scoped-autopilot.golden.txt",
+      "path": "electron/tests/fixtures/agent-prompt-scoped-autopilot.golden.txt",
       "sha256": "6dbcf70bb266501d6f4632e55c3c1cf105cb7b031c13844501a8522a1ebf2c1e"
     },
     {

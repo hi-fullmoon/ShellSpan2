@@ -16,6 +16,3 @@ export type CoreMessage =
   | { type: 'stopped' };
 
 // Kept as aliases while the Rust transport remains part of the migration.
-export type NativeResponse = CoreResponse;
-export type NativeReady = CoreReady;
-export type NativeMessage = CoreMessage;

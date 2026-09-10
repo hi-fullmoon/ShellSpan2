@@ -22,8 +22,6 @@ const backend = new NodeCoreBackend({
   SHELLSPAN_HOME: root,
   SHELLSPAN_APP_DATA: join(root, 'app'),
   SHELLSPAN_LOG_DIR: join(root, 'logs'),
-  SHELLSPAN_NODE_DOMAINS:
-    'storage,credentials,host-trust,terminal,remote-fs,remote-health,port-forward',
   SHELLSPAN_CREDENTIAL_TEST_MODE: '1',
 });
 

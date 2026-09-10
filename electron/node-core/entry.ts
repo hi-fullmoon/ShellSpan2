@@ -9,7 +9,7 @@ import { validateCommand as validateCommandForCore } from '../validation.ts';
 import { redactDiagnostic } from './redaction.ts';
 
 type RequestFrame = {
-  type: 'request' | 'validate';
+  type: 'request' | 'validate' | 'migration-read';
   id: number;
   command: string;
   args: object;
@@ -50,7 +50,7 @@ async function shutdown() {
 
 function protocolRequest(frame: InputFrame): asserts frame is RequestFrame {
   if (
-    (frame.type !== 'request' && frame.type !== 'validate') ||
+    (frame.type !== 'request' && frame.type !== 'validate' && frame.type !== 'migration-read') ||
     !Number.isSafeInteger(frame.id) ||
     typeof frame.command !== 'string' ||
     !frame.args ||

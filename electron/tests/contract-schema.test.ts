@@ -5,7 +5,7 @@ import argsSchema from '../contracts/v1/command-args.schema.json';
 import valuesSchema from '../contracts/v1/command-values.schema.json';
 import eventSchema from '../contracts/v1/event-payloads.schema.json';
 import manifest from '../contracts/v1/manifest.json';
-import serdeCases from '../../native/tests/fixtures/tauri-argument-cases.json';
+import serdeCases from './fixtures/serde-argument-cases.json';
 
 const ajv = new Ajv({ allErrors: true, allowUnionTypes: true, strict: false });
 

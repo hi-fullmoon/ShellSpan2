@@ -17,6 +17,28 @@ import type { NodeCoreEventSender } from './events.ts';
 
 export type NodeCoreLifecycle = 'starting' | 'ready' | 'stopping' | 'stopped';
 
+export const nodeCoreDomains = new Set([
+  'health',
+  'local-fs',
+  'logs',
+  'petdex',
+  'storage',
+  'credentials',
+  'llm',
+  'host-trust',
+  'terminal',
+  'remote-fs',
+  'remote-health',
+  'port-forward',
+  'agent-runtime',
+]);
+
+export function enabledNodeCoreDomains(env: NodeJS.ProcessEnv) {
+  if (env.SHELLSPAN_NODE_CORE_TEST_MODE === '1')
+    return new Set((env.SHELLSPAN_NODE_DOMAINS || '').split(',').filter(Boolean));
+  return nodeCoreDomains;
+}
+
 /** Process-owned state. Later domains add their registries here, never in Electron Main. */
 export class NodeCoreState {
   lifecycle: NodeCoreLifecycle = 'starting';
@@ -39,7 +61,7 @@ export class NodeCoreState {
 
   constructor(readonly env: NodeJS.ProcessEnv) {
     this.paths = new NodeCorePaths(env);
-    const domains = new Set((env.SHELLSPAN_NODE_DOMAINS || '').split(',').filter(Boolean));
+    const domains = enabledNodeCoreDomains(env);
     if (
       domains.has('storage') ||
       domains.has('credentials') ||
@@ -50,7 +72,7 @@ export class NodeCoreState {
   }
 
   async initialize(events: NodeCoreEventSender) {
-    const domains = new Set((this.env.SHELLSPAN_NODE_DOMAINS || '').split(',').filter(Boolean));
+    const domains = enabledNodeCoreDomains(this.env);
     if (this.storage) {
       await this.storage.ready;
       if (domains.has('credentials') || domains.has('llm') || domains.has('agent-runtime')) {

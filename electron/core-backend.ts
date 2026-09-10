@@ -1,7 +1,7 @@
 import type { EventEmitter } from 'node:events';
 import type { CoreReady, CoreResponse } from './types.ts';
 
-export type BackendKind = 'rust' | 'node';
+export type BackendKind = 'node';
 export type CoreRequestType = 'request' | 'migration-read';
 export type CoreExitInfo = {
   code: number | null;
@@ -18,9 +18,9 @@ export type CoreBackendEvents = {
   failure: [error: Error];
 };
 
-/** Stable Electron-to-Core boundary used by both migration backends. */
+/** Stable Electron-to-Node-Core process boundary. */
 export interface CoreBackend {
-  readonly kind: BackendKind | 'router';
+  readonly kind: BackendKind;
   readonly ready: Promise<CoreReady>;
   readonly stopping: boolean;
   invoke(command: string, args?: object, type?: CoreRequestType): Promise<CoreResponse>;

@@ -62,6 +62,10 @@ async function readTextFile(args: object, home: string) {
 
 /** Stage 1 dispatcher: only the deterministic, read-only canary is implemented. */
 export async function dispatchNodeCommand(command: string, args: object, context: NodeCoreContext) {
+  if (command === 'migration-read') {
+    if (!context.state.storage) throw new Error('Storage backend is not active');
+    return context.state.storage.invoke('__migration_read', args as Record<string, unknown>);
+  }
   if (command === '__petdex_notify') {
     const input = args as { kind: string; operationId: string };
     return context.state.petdex?.notify(input.kind, input.operationId) ?? null;

@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 """Regenerate the desktop icon set from the source artwork.
 
-The source artwork (native/icons/icon.png) is already full-bleed (see
+The source artwork (resources/icons/icon.png) is already full-bleed (see
 the git history for the original padded version); this script crops the
 opaque content just in case, re-centers it with a small margin (see
 CONTENT_FILL), renders a 1024px master, and box-downsamples it into:
 
-  - native/icons/icon.ico        (16,20,24,32,40,48,64,256 PNG entries)
-  - native/icons/32x32.png
-  - native/icons/64x64.png
-  - native/icons/128x128.png
-  - native/icons/128x128@2x.png
-  - native/icons/icon.icns       (macOS, PNG entries 32..1024)
+  - resources/icons/icon.ico        (16,20,24,32,40,48,64,256 PNG entries)
+  - resources/icons/32x32.png
+  - resources/icons/64x64.png
+  - resources/icons/128x128.png
+  - resources/icons/128x128@2x.png
+  - resources/icons/icon.icns       (macOS, PNG entries 32..1024)
 
 Pure stdlib (zlib/struct) so it runs anywhere Python 3 does.
 
@@ -23,7 +23,7 @@ import struct
 import zlib
 from pathlib import Path
 
-ICONS_DIR = Path(__file__).resolve().parent.parent / "native" / "icons"
+ICONS_DIR = Path(__file__).resolve().parent.parent / "resources" / "icons"
 SOURCE = ICONS_DIR / "icon.png"
 
 # Fraction of the canvas the opaque artwork should occupy after cropping.

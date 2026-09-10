@@ -11,8 +11,6 @@ export default [
       'dist-electron/**',
       'release/**',
       'artifacts/**',
-      'native/target/**',
-      'native/vendor/**',
       '.worktrees/**',
       '.agents/**',
       '.claude/**',

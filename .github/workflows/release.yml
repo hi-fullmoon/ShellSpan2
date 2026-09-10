@@ -36,6 +36,7 @@ jobs:
         env:
           RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
           RELEASE_NOTES: ${{ inputs.release_notes }}
+      - run: node scripts/check-node-only.mjs
       - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
         with:
           name: release-metadata
@@ -51,11 +52,9 @@ jobs:
         include:
           - os: macos-15
             platform: darwin-aarch64
-            rust_target: aarch64-apple-darwin
             args: --mac --arm64
           - os: windows-2025
             platform: windows-x86_64
-            rust_target: x86_64-pc-windows-msvc
             args: --win --x64
     runs-on: ${{ matrix.os }}
     steps:
@@ -67,15 +66,10 @@ jobs:
         with:
           node-version: 24
           cache: pnpm
-      - uses: dtolnay/rust-toolchain@4cda84d5c5c54efe2404f9d843567869ab1699d4
-        with:
-          toolchain: 1.95.0
-          targets: ${{ matrix.rust_target }}
       - run: pnpm install --frozen-lockfile
       - run: pnpm test:desktop
       - run: pnpm build
-      - run: node scripts/build-native-package.cjs ${{ matrix.rust_target }}
-      - name: Build signed installation and update artifacts
+      - name: Build signed Node-only installation and update artifacts
         shell: bash
         run: pnpm exec electron-builder ${{ matrix.args }} --publish never --config.forceCodeSigning=true --config.extraMetadata.version="$RELEASE_VERSION"
         env:
@@ -85,6 +79,9 @@ jobs:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      - run: node scripts/verify-node-only-package.mjs
+      - name: Exercise the signed packaged application
+        run: node scripts/electron-smoke.ts --packaged
       - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
         with:
           name: bundle-${{ matrix.platform }}

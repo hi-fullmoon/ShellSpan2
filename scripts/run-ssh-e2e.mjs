@@ -6,9 +6,6 @@ const workspace = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..
 const composeFile = path.join(workspace, 'tests', 'ssh-e2e', 'compose.yml');
 const projectName = process.env.SHELLSPAN_E2E_PROJECT || 'shellspan-e2e';
 const imageName = process.env.SHELLSPAN_E2E_IMAGE || 'shellspan-ssh-e2e:local';
-const testFilter = process.argv.includes('--agent-native')
-  ? 'isolated_ssh_sftp_end_to_end_agent_native_files'
-  : 'isolated_ssh_sftp_end_to_end';
 const fixtureEnv = {
   ...process.env,
   SHELLSPAN_E2E_SSH_FIXTURE: '1',
@@ -54,24 +51,7 @@ try {
     '--pull',
     'never',
   ]);
-  run(
-    'cargo',
-    [
-      'test',
-      '--manifest-path',
-      path.join(workspace, 'native', 'Cargo.toml'),
-      '--locked',
-      testFilter,
-      '--',
-      '--ignored',
-      '--nocapture',
-      '--test-threads=1',
-    ],
-    { env: fixtureEnv },
-  );
-  if (!process.argv.includes('--agent-native')) {
-    run(process.execPath, ['scripts/stage4-ssh-smoke.ts'], { env: fixtureEnv });
-  }
+  run(process.execPath, ['scripts/stage4-ssh-smoke.ts'], { env: fixtureEnv });
 } catch (error) {
   failure = error;
 } finally {

@@ -10,19 +10,30 @@ declare global {
 // Keep the real renderer bridge contract in this browser integration test.
 type SmokeWindow = Window & { shellspan: DesktopBridge };
 import { _electron as electron } from 'playwright';
-import { NativeHost } from '../electron/native.ts';
+import { createRequire } from 'node:module';
 import * as fs from 'node:fs/promises';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import * as assert from 'node:assert/strict';
+import type { NodeCoreBackend as NodeCoreBackendType } from '../electron/node-core-backend.ts';
+
+const require = createRequire(import.meta.url);
+const { NodeCoreBackend } = require('../dist-electron/node-core-backend.js') as {
+  NodeCoreBackend: typeof NodeCoreBackendType;
+};
 
 (async () => {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'shellspan-electron-ui-'));
   const canaryFile = path.join(root, 'renderer-core-canary.txt');
-  const canaryText = 'Renderer → Rust/Node Core 世界\n';
+  const canaryText = 'Renderer → Node Core 世界\n';
   await fs.writeFile(canaryFile, canaryText);
   const docWorkerFixture = path.join(root, 'legacy-invalid.doc');
   await fs.writeFile(docWorkerFixture, Buffer.from([0, 1, 2]));
+  const migrationSnapshot = JSON.stringify({
+    version: 1,
+    localStorage: { 'shellspan.aiPanelWidth': '480' },
+    drafts: [{ owner: 'agent:migration-smoke', revision: 1, text: '旧版草稿', images: [] }],
+  });
   const env: Record<string, string> = {
     ...Object.fromEntries(
       Object.entries(process.env).filter(
@@ -33,42 +44,50 @@ import * as assert from 'node:assert/strict';
     SHELLSPAN_APP_DATA: path.join(root, 'app'),
     SHELLSPAN_LOG_DIR: path.join(root, 'logs'),
     SHELLSPAN_CHROMIUM_DATA: path.join(root, 'chromium'),
-    SHELLSPAN_CORE_CANARY: 'compare',
     SHELLSPAN_CREDENTIAL_TEST_MODE: '1',
   };
   delete env.ELECTRON_RUN_AS_NODE;
   const packaged = process.argv.includes('--packaged');
-  const seed = new NativeHost(
-    path.resolve(
-      'native/target',
-      packaged ? 'release' : 'debug',
-      process.platform === 'win32' ? 'shellspan-core.exe' : 'shellspan-core',
-    ),
-    env,
-  );
+  const seed = new NodeCoreBackend({
+    ...env,
+    SHELLSPAN_BUILD_MODE: packaged ? 'production' : 'development',
+    SHELLSPAN_NODE_CORE_TEST_MODE: '1',
+    SHELLSPAN_NODE_DOMAINS: 'storage',
+  });
   try {
     await seed.ready;
     const result = await seed.invoke('save_preferences', {
       entries: [
         ['startupUpdateCheck', 'false'],
-        [
-          'electron.webviewMigration.v1',
-          JSON.stringify({
-            version: 1,
-            localStorage: { 'shellspan.aiPanelWidth': '480' },
-            drafts: [{ owner: 'agent:migration-smoke', revision: 1, text: '旧版草稿', images: [] }],
-          }),
-        ],
+        ['electron.webviewMigration.v1', migrationSnapshot],
       ],
     });
     assert.equal(result.ok, true);
+    assert.deepEqual(
+      await seed.invoke(
+        'migration-read',
+        { key: 'electron.webviewMigration.v1', offset: 0 },
+        'migration-read',
+      ),
+      {
+        ok: true,
+        value: { text: migrationSnapshot, next: [...migrationSnapshot].length, done: true },
+      },
+    );
   } finally {
     await seed.stop();
   }
+  const packagedExecutable =
+    process.platform === 'win32'
+      ? 'release/win-unpacked/ShellSpan.exe'
+      : process.platform === 'darwin'
+        ? `release/${process.arch === 'arm64' ? 'mac-arm64' : 'mac'}/ShellSpan.app/Contents/MacOS/ShellSpan`
+        : undefined;
+  if (packaged) assert.ok(packagedExecutable, 'packaged smoke supports Windows and macOS');
   const application = await electron.launch(
     packaged
       ? {
-          executablePath: path.resolve('release/mac-arm64/ShellSpan.app/Contents/MacOS/ShellSpan'),
+          executablePath: path.resolve(packagedExecutable!),
           args: [],
           env,
           timeout: 60000,
@@ -151,7 +170,17 @@ import * as assert from 'node:assert/strict';
     await page.screenshot({
       path: `artifacts/migration/${packaged ? 'packaged' : 'electron'}-main.png`,
     });
-    assert.equal(await page.evaluate(() => localStorage.getItem('shellspan.aiPanelWidth')), '480');
+    const migrationState = await page.evaluate(async () => ({
+      width: localStorage.getItem('shellspan.aiPanelWidth'),
+      source: await (window as SmokeWindow).shellspan.migrationRead(
+        'electron.webviewMigration.v1',
+        0,
+      ),
+    }));
+    assert.deepEqual(migrationState, {
+      width: '480',
+      source: { text: migrationSnapshot, next: [...migrationSnapshot].length, done: true },
+    });
     const migrated = await page.evaluate(
       () =>
         new Promise<{ text: string }>((resolve, reject) => {
@@ -189,7 +218,11 @@ import * as assert from 'node:assert/strict';
     const terminal = page.locator('.xterm-helper-textarea');
     await terminal.waitFor({ state: 'attached' });
     await terminal.focus();
-    await page.keyboard.type("printf 'ELECTRON_UI_%s\\n' 'OK'");
+    await page.keyboard.type(
+      process.platform === 'win32'
+        ? "Write-Output 'ELECTRON_UI_OK'"
+        : "printf 'ELECTRON_UI_%s\\n' 'OK'",
+    );
     await page.keyboard.press('Enter');
     await page.waitForFunction(() => window.__smokeOutput.includes('ELECTRON_UI_OK'), null, {
       timeout: 15000,
@@ -265,11 +298,9 @@ import * as assert from 'node:assert/strict';
             'actual Electron window',
             'isolated preload',
             '141-command bridge',
-            'real native IPC',
-            'Renderer-to-Rust/Node exact canary',
-            'four default Node Stage 2 domains via Renderer',
-            'Node storage and credential domains via Renderer',
-            'Node LLM domain via the unchanged Renderer bridge',
+            'isolated Node Core IPC',
+            'Renderer-to-Node exact read',
+            'all Node Core domains via the unchanged Renderer bridge',
             'unchanged window constraints',
             'no page exceptions',
             'legacy width and IndexedDB draft import',
@@ -286,7 +317,7 @@ import * as assert from 'node:assert/strict';
     await application.evaluate(({ app }) => {
       app.emit('window-all-closed');
     });
-    // Use the same acknowledged native shutdown as the application's exit action.
+    // Use the same acknowledged Core shutdown as the application's exit action.
     const page = application.windows()[0];
     if (page)
       await page

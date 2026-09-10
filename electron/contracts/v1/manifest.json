@@ -6,84 +6,98 @@
   "domains": {
     "agent-runtime": {
       "wave": 6,
+      "source": "electron/node-core/agent-runtime.ts",
       "resources": ["agentSessions", "eventStore", "artifacts", "toolRuntime"],
       "dependencies": ["llm", "terminal", "remote-fs", "local-fs", "credentials"],
-      "tests": ["native/src/agent_runtime/*_tests.rs", "src/lib/ai/__tests__"]
+      "tests": ["electron/tests/node-core-stage6.test.ts", "src/lib/ai/__tests__"]
     },
     "llm": {
       "wave": 5,
+      "source": "electron/node-core/llm-domain.ts",
       "resources": ["httpClients", "routeStore", "providerStreams", "imageStore"],
       "dependencies": ["storage", "credentials"],
-      "tests": ["native/src/llm/tests.rs", "native/src/llm/catalog_tests.rs"]
+      "tests": ["electron/tests/node-core-stage5.test.ts", "src/lib/ai/__tests__"]
     },
     "terminal": {
       "wave": 4,
+      "source": "electron/node-core/terminal.ts",
       "resources": ["sshSessions", "localPtys", "terminalGuard"],
       "dependencies": ["host-trust", "credentials"],
-      "tests": ["native/src/session.rs", "scripts/native-smoke.ts"]
+      "tests": ["electron/tests/node-core-stage4.test.ts", "scripts/stage4-ssh-smoke.ts"]
     },
     "remote-fs": {
       "wave": 4,
+      "source": "electron/node-core/remote-fs.ts",
       "resources": ["sftpPool", "transferRegistry", "directoryRequests"],
       "dependencies": ["host-trust", "credentials"],
-      "tests": ["native/src/remote_fs.rs", "tests/ssh-e2e"]
+      "tests": ["electron/tests/node-core-stage4.test.ts", "tests/ssh-e2e"]
     },
     "remote-health": {
       "wave": 4,
+      "source": "electron/node-core/remote-health.ts",
       "resources": ["remoteHealthRequests", "sshConnections"],
       "dependencies": ["host-trust", "credentials"],
-      "tests": ["native/src/remote_health.rs", "tests/ssh-e2e"]
+      "tests": ["electron/tests/node-core-stage4.test.ts", "tests/ssh-e2e"]
     },
     "port-forward": {
       "wave": 4,
+      "source": "electron/node-core/port-forward.ts",
       "resources": ["portForwards", "listeners", "sshConnections"],
       "dependencies": ["host-trust", "credentials"],
-      "tests": ["native/src/port_forward.rs", "tests/ssh-e2e"]
+      "tests": ["electron/tests/node-core-stage4.test.ts", "tests/ssh-e2e"]
     },
     "host-trust": {
       "wave": 4,
+      "source": "electron/node-core/host-trust.ts",
       "resources": ["knownHosts", "preflightRequests"],
       "dependencies": ["credentials"],
-      "tests": ["native/src/known_hosts.rs", "native/src/connection.rs"]
+      "tests": ["electron/tests/node-core-stage4.test.ts", "tests/ssh-e2e"]
     },
     "storage": {
       "wave": 3,
+      "source": "electron/node-core/storage.ts",
       "resources": ["sqlite", "workspaceFiles"],
       "dependencies": [],
-      "tests": ["native/src/db.rs", "native/src/data_migration.rs"]
+      "tests": ["electron/tests/node-core-stage3.test.ts"]
     },
     "credentials": {
       "wave": 3,
+      "source": "electron/node-core/credentials.ts",
       "resources": ["systemKeychain", "sqliteMetadata"],
       "dependencies": ["storage"],
-      "tests": ["native/src/keychain.rs"]
+      "tests": ["electron/tests/node-core-stage3.test.ts", "scripts/platform-credential-smoke.ts"]
     },
     "local-fs": {
       "wave": 2,
+      "source": "electron/node-core/local-fs.ts",
       "resources": ["localFilesystem", "trash"],
       "dependencies": [],
-      "tests": ["native/src/local_fs.rs"]
+      "tests": ["electron/tests/node-core-stage2.test.ts"]
     },
     "logs": {
       "wave": 2,
+      "source": "electron/node-core/log-domain.ts",
       "resources": ["logDirectory"],
       "dependencies": ["local-fs"],
       "tests": ["electron/tests/logs.test.ts"]
     },
     "health": {
       "wave": 2,
+      "source": "electron/node-core/health.ts",
       "resources": ["systemMetrics"],
       "dependencies": [],
-      "tests": ["native/src/health.rs"]
+      "tests": ["electron/tests/node-core-stage2.test.ts"]
     },
     "petdex": {
       "wave": 2,
+      "source": "electron/node-core/petdex.ts",
       "resources": ["petdexSocket"],
       "dependencies": [],
-      "tests": ["native/tests/petdex_contract_probe.rs"]
+      "tests": ["electron/tests/node-core-stage2.test.ts"]
     },
     "desktop": {
       "wave": 1,
+      "source": "electron/main.ts",
       "resources": ["electronApp", "nativeDialogs"],
       "dependencies": [],
       "tests": ["electron/tests/preload.test.ts", "electron/tests/boundary.test.ts"]
@@ -92,8 +106,8 @@
   "commands": [
     {
       "name": "add_profile",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/storage.ts",
       "domain": "storage",
       "migrationWave": 3,
       "stateful": true,
@@ -103,12 +117,12 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/add_profile",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/add_profile",
-      "testEvidence": ["native/src/db.rs", "native/src/data_migration.rs"]
+      "testEvidence": ["electron/tests/node-core-stage3.test.ts"]
     },
     {
       "name": "add_sftp_bookmark",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/storage.ts",
       "domain": "storage",
       "migrationWave": 3,
       "stateful": true,
@@ -118,12 +132,12 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/add_sftp_bookmark",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/add_sftp_bookmark",
-      "testEvidence": ["native/src/db.rs", "native/src/data_migration.rs"]
+      "testEvidence": ["electron/tests/node-core-stage3.test.ts"]
     },
     {
       "name": "agent_runtime_abort_recovery",
-      "currentOwner": "native",
-      "source": "native/src/agent_runtime/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/agent-runtime.ts",
       "domain": "agent-runtime",
       "migrationWave": 6,
       "stateful": true,
@@ -133,12 +147,12 @@
       "emits": ["agent-runtime-session-event"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/agent_runtime_abort_recovery",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/agent_runtime_abort_recovery",
-      "testEvidence": ["native/src/agent_runtime/*_tests.rs", "src/lib/ai/__tests__"]
+      "testEvidence": ["electron/tests/node-core-stage6.test.ts", "src/lib/ai/__tests__"]
     },
     {
       "name": "agent_runtime_answer_question",
-      "currentOwner": "native",
-      "source": "native/src/agent_runtime/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/agent-runtime.ts",
       "domain": "agent-runtime",
       "migrationWave": 6,
       "stateful": true,
@@ -148,12 +162,12 @@
       "emits": ["agent-runtime-session-event"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/agent_runtime_answer_question",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/agent_runtime_answer_question",
-      "testEvidence": ["native/src/agent_runtime/*_tests.rs", "src/lib/ai/__tests__"]
+      "testEvidence": ["electron/tests/node-core-stage6.test.ts", "src/lib/ai/__tests__"]
     },
     {
       "name": "agent_runtime_approve_tool",
-      "currentOwner": "native",
-      "source": "native/src/agent_runtime/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/agent-runtime.ts",
       "domain": "agent-runtime",
       "migrationWave": 6,
       "stateful": true,
@@ -163,12 +177,12 @@
       "emits": ["agent-runtime-session-event"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/agent_runtime_approve_tool",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/agent_runtime_approve_tool",
-      "testEvidence": ["native/src/agent_runtime/*_tests.rs", "src/lib/ai/__tests__"]
+      "testEvidence": ["electron/tests/node-core-stage6.test.ts", "src/lib/ai/__tests__"]
     },
     {
       "name": "agent_runtime_archive_session",
-      "currentOwner": "native",
-      "source": "native/src/agent_runtime/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/agent-runtime.ts",
       "domain": "agent-runtime",
       "migrationWave": 6,
       "stateful": true,
@@ -178,12 +192,12 @@
       "emits": ["agent-runtime-session-event"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/agent_runtime_archive_session",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/agent_runtime_archive_session",
-      "testEvidence": ["native/src/agent_runtime/*_tests.rs", "src/lib/ai/__tests__"]
+      "testEvidence": ["electron/tests/node-core-stage6.test.ts", "src/lib/ai/__tests__"]
     },
     {
       "name": "agent_runtime_cancel",
-      "currentOwner": "native",
-      "source": "native/src/agent_runtime/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/agent-runtime.ts",
       "domain": "agent-runtime",
       "migrationWave": 6,
       "stateful": true,
@@ -193,12 +207,12 @@
       "emits": ["agent-runtime-session-event"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/agent_runtime_cancel",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/agent_runtime_cancel",
-      "testEvidence": ["native/src/agent_runtime/*_tests.rs", "src/lib/ai/__tests__"]
+      "testEvidence": ["electron/tests/node-core-stage6.test.ts", "src/lib/ai/__tests__"]
     },
     {
       "name": "agent_runtime_cancel_child_agent",
-      "currentOwner": "native",
-      "source": "native/src/agent_runtime/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/agent-runtime.ts",
       "domain": "agent-runtime",
       "migrationWave": 6,
       "stateful": true,
@@ -208,12 +222,12 @@
       "emits": ["agent-runtime-session-event"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/agent_runtime_cancel_child_agent",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/agent_runtime_cancel_child_agent",
-      "testEvidence": ["native/src/agent_runtime/*_tests.rs", "src/lib/ai/__tests__"]
+      "testEvidence": ["electron/tests/node-core-stage6.test.ts", "src/lib/ai/__tests__"]
     },
     {
       "name": "agent_runtime_cancel_file_references",
-      "currentOwner": "native",
-      "source": "native/src/agent_runtime/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/agent-runtime.ts",
       "domain": "agent-runtime",
       "migrationWave": 6,
       "stateful": true,
@@ -223,12 +237,12 @@
       "emits": ["agent-runtime-session-event"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/agent_runtime_cancel_file_references",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/agent_runtime_cancel_file_references",
-      "testEvidence": ["native/src/agent_runtime/*_tests.rs", "src/lib/ai/__tests__"]
+      "testEvidence": ["electron/tests/node-core-stage6.test.ts", "src/lib/ai/__tests__"]
     },
     {
       "name": "agent_runtime_cancel_image_submission",
-      "currentOwner": "native",
-      "source": "native/src/agent_runtime/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/agent-runtime.ts",
       "domain": "agent-runtime",
       "migrationWave": 6,
       "stateful": true,
@@ -238,12 +252,12 @@
       "emits": ["agent-runtime-session-event"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/agent_runtime_cancel_image_submission",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/agent_runtime_cancel_image_submission",
-      "testEvidence": ["native/src/agent_runtime/*_tests.rs", "src/lib/ai/__tests__"]
+      "testEvidence": ["electron/tests/node-core-stage6.test.ts", "src/lib/ai/__tests__"]
     },
     {
       "name": "agent_runtime_create_session",
-      "currentOwner": "native",
-      "source": "native/src/agent_runtime/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/agent-runtime.ts",
       "domain": "agent-runtime",
       "migrationWave": 6,
       "stateful": true,
@@ -253,12 +267,12 @@
       "emits": ["agent-runtime-session-event"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/agent_runtime_create_session",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/agent_runtime_create_session",
-      "testEvidence": ["native/src/agent_runtime/*_tests.rs", "src/lib/ai/__tests__"]
+      "testEvidence": ["electron/tests/node-core-stage6.test.ts", "src/lib/ai/__tests__"]
     },
     {
       "name": "agent_runtime_fleet_abort",
-      "currentOwner": "native",
-      "source": "native/src/agent_runtime/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/agent-runtime.ts",
       "domain": "agent-runtime",
       "migrationWave": 6,
       "stateful": true,
@@ -268,12 +282,12 @@
       "emits": ["agent-runtime-session-event"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/agent_runtime_fleet_abort",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/agent_runtime_fleet_abort",
-      "testEvidence": ["native/src/agent_runtime/*_tests.rs", "src/lib/ai/__tests__"]
+      "testEvidence": ["electron/tests/node-core-stage6.test.ts", "src/lib/ai/__tests__"]
     },
     {
       "name": "agent_runtime_fleet_pause",
-      "currentOwner": "native",
-      "source": "native/src/agent_runtime/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/agent-runtime.ts",
       "domain": "agent-runtime",
       "migrationWave": 6,
       "stateful": true,
@@ -283,12 +297,12 @@
       "emits": ["agent-runtime-session-event"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/agent_runtime_fleet_pause",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/agent_runtime_fleet_pause",
-      "testEvidence": ["native/src/agent_runtime/*_tests.rs", "src/lib/ai/__tests__"]
+      "testEvidence": ["electron/tests/node-core-stage6.test.ts", "src/lib/ai/__tests__"]
     },
     {
       "name": "agent_runtime_fleet_plan",
-      "currentOwner": "native",
-      "source": "native/src/agent_runtime/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/agent-runtime.ts",
       "domain": "agent-runtime",
       "migrationWave": 6,
       "stateful": true,
@@ -298,12 +312,12 @@
       "emits": ["agent-runtime-session-event"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/agent_runtime_fleet_plan",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/agent_runtime_fleet_plan",
-      "testEvidence": ["native/src/agent_runtime/*_tests.rs", "src/lib/ai/__tests__"]
+      "testEvidence": ["electron/tests/node-core-stage6.test.ts", "src/lib/ai/__tests__"]
     },
     {
       "name": "agent_runtime_fleet_reconcile",
-      "currentOwner": "native",
-      "source": "native/src/agent_runtime/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/agent-runtime.ts",
       "domain": "agent-runtime",
       "migrationWave": 6,
       "stateful": true,
@@ -313,12 +327,12 @@
       "emits": ["agent-runtime-session-event"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/agent_runtime_fleet_reconcile",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/agent_runtime_fleet_reconcile",
-      "testEvidence": ["native/src/agent_runtime/*_tests.rs", "src/lib/ai/__tests__"]
+      "testEvidence": ["electron/tests/node-core-stage6.test.ts", "src/lib/ai/__tests__"]
     },
     {
       "name": "agent_runtime_fleet_resume",
-      "currentOwner": "native",
-      "source": "native/src/agent_runtime/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/agent-runtime.ts",
       "domain": "agent-runtime",
       "migrationWave": 6,
       "stateful": true,
@@ -328,12 +342,12 @@
       "emits": ["agent-runtime-session-event"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/agent_runtime_fleet_resume",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/agent_runtime_fleet_resume",
-      "testEvidence": ["native/src/agent_runtime/*_tests.rs", "src/lib/ai/__tests__"]
+      "testEvidence": ["electron/tests/node-core-stage6.test.ts", "src/lib/ai/__tests__"]
     },
     {
       "name": "agent_runtime_fleet_start",
-      "currentOwner": "native",
-      "source": "native/src/agent_runtime/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/agent-runtime.ts",
       "domain": "agent-runtime",
       "migrationWave": 6,
       "stateful": true,
@@ -343,12 +357,12 @@
       "emits": ["agent-runtime-session-event"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/agent_runtime_fleet_start",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/agent_runtime_fleet_start",
-      "testEvidence": ["native/src/agent_runtime/*_tests.rs", "src/lib/ai/__tests__"]
+      "testEvidence": ["electron/tests/node-core-stage6.test.ts", "src/lib/ai/__tests__"]
     },
     {
       "name": "agent_runtime_followup",
-      "currentOwner": "native",
-      "source": "native/src/agent_runtime/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/agent-runtime.ts",
       "domain": "agent-runtime",
       "migrationWave": 6,
       "stateful": true,
@@ -358,12 +372,12 @@
       "emits": ["agent-runtime-session-event"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/agent_runtime_followup",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/agent_runtime_followup",
-      "testEvidence": ["native/src/agent_runtime/*_tests.rs", "src/lib/ai/__tests__"]
+      "testEvidence": ["electron/tests/node-core-stage6.test.ts", "src/lib/ai/__tests__"]
     },
     {
       "name": "agent_runtime_get_artifact",
-      "currentOwner": "native",
-      "source": "native/src/agent_runtime/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/agent-runtime.ts",
       "domain": "agent-runtime",
       "migrationWave": 6,
       "stateful": true,
@@ -373,12 +387,12 @@
       "emits": ["agent-runtime-session-event"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/agent_runtime_get_artifact",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/agent_runtime_get_artifact",
-      "testEvidence": ["native/src/agent_runtime/*_tests.rs", "src/lib/ai/__tests__"]
+      "testEvidence": ["electron/tests/node-core-stage6.test.ts", "src/lib/ai/__tests__"]
     },
     {
       "name": "agent_runtime_get_committed_events",
-      "currentOwner": "native",
-      "source": "native/src/agent_runtime/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/agent-runtime.ts",
       "domain": "agent-runtime",
       "migrationWave": 6,
       "stateful": true,
@@ -388,12 +402,12 @@
       "emits": ["agent-runtime-session-event"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/agent_runtime_get_committed_events",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/agent_runtime_get_committed_events",
-      "testEvidence": ["native/src/agent_runtime/*_tests.rs", "src/lib/ai/__tests__"]
+      "testEvidence": ["electron/tests/node-core-stage6.test.ts", "src/lib/ai/__tests__"]
     },
     {
       "name": "agent_runtime_get_events",
-      "currentOwner": "native",
-      "source": "native/src/agent_runtime/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/agent-runtime.ts",
       "domain": "agent-runtime",
       "migrationWave": 6,
       "stateful": true,
@@ -403,12 +417,12 @@
       "emits": ["agent-runtime-session-event"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/agent_runtime_get_events",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/agent_runtime_get_events",
-      "testEvidence": ["native/src/agent_runtime/*_tests.rs", "src/lib/ai/__tests__"]
+      "testEvidence": ["electron/tests/node-core-stage6.test.ts", "src/lib/ai/__tests__"]
     },
     {
       "name": "agent_runtime_get_session",
-      "currentOwner": "native",
-      "source": "native/src/agent_runtime/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/agent-runtime.ts",
       "domain": "agent-runtime",
       "migrationWave": 6,
       "stateful": true,
@@ -418,12 +432,12 @@
       "emits": ["agent-runtime-session-event"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/agent_runtime_get_session",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/agent_runtime_get_session",
-      "testEvidence": ["native/src/agent_runtime/*_tests.rs", "src/lib/ai/__tests__"]
+      "testEvidence": ["electron/tests/node-core-stage6.test.ts", "src/lib/ai/__tests__"]
     },
     {
       "name": "agent_runtime_image_preview",
-      "currentOwner": "native",
-      "source": "native/src/agent_runtime/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/agent-runtime.ts",
       "domain": "agent-runtime",
       "migrationWave": 6,
       "stateful": true,
@@ -433,12 +447,12 @@
       "emits": ["agent-runtime-session-event"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/agent_runtime_image_preview",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/agent_runtime_image_preview",
-      "testEvidence": ["native/src/agent_runtime/*_tests.rs", "src/lib/ai/__tests__"]
+      "testEvidence": ["electron/tests/node-core-stage6.test.ts", "src/lib/ai/__tests__"]
     },
     {
       "name": "agent_runtime_inject",
-      "currentOwner": "native",
-      "source": "native/src/agent_runtime/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/agent-runtime.ts",
       "domain": "agent-runtime",
       "migrationWave": 6,
       "stateful": true,
@@ -448,12 +462,12 @@
       "emits": ["agent-runtime-session-event"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/agent_runtime_inject",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/agent_runtime_inject",
-      "testEvidence": ["native/src/agent_runtime/*_tests.rs", "src/lib/ai/__tests__"]
+      "testEvidence": ["electron/tests/node-core-stage6.test.ts", "src/lib/ai/__tests__"]
     },
     {
       "name": "agent_runtime_inspect_child_agent",
-      "currentOwner": "native",
-      "source": "native/src/agent_runtime/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/agent-runtime.ts",
       "domain": "agent-runtime",
       "migrationWave": 6,
       "stateful": true,
@@ -463,12 +477,12 @@
       "emits": ["agent-runtime-session-event"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/agent_runtime_inspect_child_agent",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/agent_runtime_inspect_child_agent",
-      "testEvidence": ["native/src/agent_runtime/*_tests.rs", "src/lib/ai/__tests__"]
+      "testEvidence": ["electron/tests/node-core-stage6.test.ts", "src/lib/ai/__tests__"]
     },
     {
       "name": "agent_runtime_inspect_recovery",
-      "currentOwner": "native",
-      "source": "native/src/agent_runtime/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/agent-runtime.ts",
       "domain": "agent-runtime",
       "migrationWave": 6,
       "stateful": true,
@@ -478,12 +492,12 @@
       "emits": ["agent-runtime-session-event"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/agent_runtime_inspect_recovery",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/agent_runtime_inspect_recovery",
-      "testEvidence": ["native/src/agent_runtime/*_tests.rs", "src/lib/ai/__tests__"]
+      "testEvidence": ["electron/tests/node-core-stage6.test.ts", "src/lib/ai/__tests__"]
     },
     {
       "name": "agent_runtime_interrupt",
-      "currentOwner": "native",
-      "source": "native/src/agent_runtime/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/agent-runtime.ts",
       "domain": "agent-runtime",
       "migrationWave": 6,
       "stateful": true,
@@ -493,12 +507,12 @@
       "emits": ["agent-runtime-session-event"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/agent_runtime_interrupt",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/agent_runtime_interrupt",
-      "testEvidence": ["native/src/agent_runtime/*_tests.rs", "src/lib/ai/__tests__"]
+      "testEvidence": ["electron/tests/node-core-stage6.test.ts", "src/lib/ai/__tests__"]
     },
     {
       "name": "agent_runtime_list_file_references",
-      "currentOwner": "native",
-      "source": "native/src/agent_runtime/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/agent-runtime.ts",
       "domain": "agent-runtime",
       "migrationWave": 6,
       "stateful": true,
@@ -508,12 +522,12 @@
       "emits": ["agent-runtime-session-event"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/agent_runtime_list_file_references",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/agent_runtime_list_file_references",
-      "testEvidence": ["native/src/agent_runtime/*_tests.rs", "src/lib/ai/__tests__"]
+      "testEvidence": ["electron/tests/node-core-stage6.test.ts", "src/lib/ai/__tests__"]
     },
     {
       "name": "agent_runtime_list_sessions",
-      "currentOwner": "native",
-      "source": "native/src/agent_runtime/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/agent-runtime.ts",
       "domain": "agent-runtime",
       "migrationWave": 6,
       "stateful": true,
@@ -523,12 +537,12 @@
       "emits": ["agent-runtime-session-event"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/agent_runtime_list_sessions",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/agent_runtime_list_sessions",
-      "testEvidence": ["native/src/agent_runtime/*_tests.rs", "src/lib/ai/__tests__"]
+      "testEvidence": ["electron/tests/node-core-stage6.test.ts", "src/lib/ai/__tests__"]
     },
     {
       "name": "agent_runtime_list_skills",
-      "currentOwner": "native",
-      "source": "native/src/agent_runtime/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/agent-runtime.ts",
       "domain": "agent-runtime",
       "migrationWave": 6,
       "stateful": true,
@@ -538,12 +552,12 @@
       "emits": ["agent-runtime-session-event"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/agent_runtime_list_skills",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/agent_runtime_list_skills",
-      "testEvidence": ["native/src/agent_runtime/*_tests.rs", "src/lib/ai/__tests__"]
+      "testEvidence": ["electron/tests/node-core-stage6.test.ts", "src/lib/ai/__tests__"]
     },
     {
       "name": "agent_runtime_mutate_inbox",
-      "currentOwner": "native",
-      "source": "native/src/agent_runtime/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/agent-runtime.ts",
       "domain": "agent-runtime",
       "migrationWave": 6,
       "stateful": true,
@@ -553,12 +567,12 @@
       "emits": ["agent-runtime-session-event"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/agent_runtime_mutate_inbox",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/agent_runtime_mutate_inbox",
-      "testEvidence": ["native/src/agent_runtime/*_tests.rs", "src/lib/ai/__tests__"]
+      "testEvidence": ["electron/tests/node-core-stage6.test.ts", "src/lib/ai/__tests__"]
     },
     {
       "name": "agent_runtime_prepare_images",
-      "currentOwner": "native",
-      "source": "native/src/agent_runtime/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/agent-runtime.ts",
       "domain": "agent-runtime",
       "migrationWave": 6,
       "stateful": true,
@@ -568,12 +582,12 @@
       "emits": ["agent-runtime-session-event"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/agent_runtime_prepare_images",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/agent_runtime_prepare_images",
-      "testEvidence": ["native/src/agent_runtime/*_tests.rs", "src/lib/ai/__tests__"]
+      "testEvidence": ["electron/tests/node-core-stage6.test.ts", "src/lib/ai/__tests__"]
     },
     {
       "name": "agent_runtime_reconcile_recovery",
-      "currentOwner": "native",
-      "source": "native/src/agent_runtime/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/agent-runtime.ts",
       "domain": "agent-runtime",
       "migrationWave": 6,
       "stateful": true,
@@ -583,12 +597,12 @@
       "emits": ["agent-runtime-session-event"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/agent_runtime_reconcile_recovery",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/agent_runtime_reconcile_recovery",
-      "testEvidence": ["native/src/agent_runtime/*_tests.rs", "src/lib/ai/__tests__"]
+      "testEvidence": ["electron/tests/node-core-stage6.test.ts", "src/lib/ai/__tests__"]
     },
     {
       "name": "agent_runtime_reject_tool",
-      "currentOwner": "native",
-      "source": "native/src/agent_runtime/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/agent-runtime.ts",
       "domain": "agent-runtime",
       "migrationWave": 6,
       "stateful": true,
@@ -598,12 +612,12 @@
       "emits": ["agent-runtime-session-event"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/agent_runtime_reject_tool",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/agent_runtime_reject_tool",
-      "testEvidence": ["native/src/agent_runtime/*_tests.rs", "src/lib/ai/__tests__"]
+      "testEvidence": ["electron/tests/node-core-stage6.test.ts", "src/lib/ai/__tests__"]
     },
     {
       "name": "agent_runtime_rename_session",
-      "currentOwner": "native",
-      "source": "native/src/agent_runtime/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/agent-runtime.ts",
       "domain": "agent-runtime",
       "migrationWave": 6,
       "stateful": true,
@@ -613,12 +627,12 @@
       "emits": ["agent-runtime-session-event"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/agent_runtime_rename_session",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/agent_runtime_rename_session",
-      "testEvidence": ["native/src/agent_runtime/*_tests.rs", "src/lib/ai/__tests__"]
+      "testEvidence": ["electron/tests/node-core-stage6.test.ts", "src/lib/ai/__tests__"]
     },
     {
       "name": "agent_runtime_resume",
-      "currentOwner": "native",
-      "source": "native/src/agent_runtime/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/agent-runtime.ts",
       "domain": "agent-runtime",
       "migrationWave": 6,
       "stateful": true,
@@ -628,12 +642,12 @@
       "emits": ["agent-runtime-session-event"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/agent_runtime_resume",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/agent_runtime_resume",
-      "testEvidence": ["native/src/agent_runtime/*_tests.rs", "src/lib/ai/__tests__"]
+      "testEvidence": ["electron/tests/node-core-stage6.test.ts", "src/lib/ai/__tests__"]
     },
     {
       "name": "agent_runtime_resume_recovery",
-      "currentOwner": "native",
-      "source": "native/src/agent_runtime/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/agent-runtime.ts",
       "domain": "agent-runtime",
       "migrationWave": 6,
       "stateful": true,
@@ -643,12 +657,12 @@
       "emits": ["agent-runtime-session-event"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/agent_runtime_resume_recovery",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/agent_runtime_resume_recovery",
-      "testEvidence": ["native/src/agent_runtime/*_tests.rs", "src/lib/ai/__tests__"]
+      "testEvidence": ["electron/tests/node-core-stage6.test.ts", "src/lib/ai/__tests__"]
     },
     {
       "name": "agent_runtime_select_model",
-      "currentOwner": "native",
-      "source": "native/src/agent_runtime/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/agent-runtime.ts",
       "domain": "agent-runtime",
       "migrationWave": 6,
       "stateful": true,
@@ -658,12 +672,12 @@
       "emits": ["agent-runtime-session-event"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/agent_runtime_select_model",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/agent_runtime_select_model",
-      "testEvidence": ["native/src/agent_runtime/*_tests.rs", "src/lib/ai/__tests__"]
+      "testEvidence": ["electron/tests/node-core-stage6.test.ts", "src/lib/ai/__tests__"]
     },
     {
       "name": "agent_runtime_send_child_input",
-      "currentOwner": "native",
-      "source": "native/src/agent_runtime/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/agent-runtime.ts",
       "domain": "agent-runtime",
       "migrationWave": 6,
       "stateful": true,
@@ -673,12 +687,12 @@
       "emits": ["agent-runtime-session-event"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/agent_runtime_send_child_input",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/agent_runtime_send_child_input",
-      "testEvidence": ["native/src/agent_runtime/*_tests.rs", "src/lib/ai/__tests__"]
+      "testEvidence": ["electron/tests/node-core-stage6.test.ts", "src/lib/ai/__tests__"]
     },
     {
       "name": "agent_runtime_set_permission",
-      "currentOwner": "native",
-      "source": "native/src/agent_runtime/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/agent-runtime.ts",
       "domain": "agent-runtime",
       "migrationWave": 6,
       "stateful": true,
@@ -688,12 +702,12 @@
       "emits": ["agent-runtime-session-event"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/agent_runtime_set_permission",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/agent_runtime_set_permission",
-      "testEvidence": ["native/src/agent_runtime/*_tests.rs", "src/lib/ai/__tests__"]
+      "testEvidence": ["electron/tests/node-core-stage6.test.ts", "src/lib/ai/__tests__"]
     },
     {
       "name": "agent_runtime_spawn_subagent",
-      "currentOwner": "native",
-      "source": "native/src/agent_runtime/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/agent-runtime.ts",
       "domain": "agent-runtime",
       "migrationWave": 6,
       "stateful": true,
@@ -703,12 +717,12 @@
       "emits": ["agent-runtime-session-event"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/agent_runtime_spawn_subagent",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/agent_runtime_spawn_subagent",
-      "testEvidence": ["native/src/agent_runtime/*_tests.rs", "src/lib/ai/__tests__"]
+      "testEvidence": ["electron/tests/node-core-stage6.test.ts", "src/lib/ai/__tests__"]
     },
     {
       "name": "agent_runtime_start",
-      "currentOwner": "native",
-      "source": "native/src/agent_runtime/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/agent-runtime.ts",
       "domain": "agent-runtime",
       "migrationWave": 6,
       "stateful": true,
@@ -718,12 +732,12 @@
       "emits": ["agent-runtime-session-event"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/agent_runtime_start",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/agent_runtime_start",
-      "testEvidence": ["native/src/agent_runtime/*_tests.rs", "src/lib/ai/__tests__"]
+      "testEvidence": ["electron/tests/node-core-stage6.test.ts", "src/lib/ai/__tests__"]
     },
     {
       "name": "agent_runtime_steer",
-      "currentOwner": "native",
-      "source": "native/src/agent_runtime/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/agent-runtime.ts",
       "domain": "agent-runtime",
       "migrationWave": 6,
       "stateful": true,
@@ -733,12 +747,12 @@
       "emits": ["agent-runtime-session-event"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/agent_runtime_steer",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/agent_runtime_steer",
-      "testEvidence": ["native/src/agent_runtime/*_tests.rs", "src/lib/ai/__tests__"]
+      "testEvidence": ["electron/tests/node-core-stage6.test.ts", "src/lib/ai/__tests__"]
     },
     {
       "name": "agent_runtime_submit_images",
-      "currentOwner": "native",
-      "source": "native/src/agent_runtime/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/agent-runtime.ts",
       "domain": "agent-runtime",
       "migrationWave": 6,
       "stateful": true,
@@ -748,12 +762,12 @@
       "emits": ["agent-runtime-session-event"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/agent_runtime_submit_images",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/agent_runtime_submit_images",
-      "testEvidence": ["native/src/agent_runtime/*_tests.rs", "src/lib/ai/__tests__"]
+      "testEvidence": ["electron/tests/node-core-stage6.test.ts", "src/lib/ai/__tests__"]
     },
     {
       "name": "ai_convert_session_v4_to_v5",
-      "currentOwner": "native",
-      "source": "native/src/ai.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/llm-domain.ts",
       "domain": "llm",
       "migrationWave": 5,
       "stateful": true,
@@ -763,12 +777,12 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/ai_convert_session_v4_to_v5",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/ai_convert_session_v4_to_v5",
-      "testEvidence": ["native/src/llm/tests.rs", "native/src/llm/catalog_tests.rs"]
+      "testEvidence": ["electron/tests/node-core-stage5.test.ts", "src/lib/ai/__tests__"]
     },
     {
       "name": "ai_list_models",
-      "currentOwner": "native",
-      "source": "native/src/ai.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/llm-domain.ts",
       "domain": "llm",
       "migrationWave": 5,
       "stateful": true,
@@ -778,12 +792,12 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/ai_list_models",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/ai_list_models",
-      "testEvidence": ["native/src/llm/tests.rs", "native/src/llm/catalog_tests.rs"]
+      "testEvidence": ["electron/tests/node-core-stage5.test.ts", "src/lib/ai/__tests__"]
     },
     {
       "name": "ai_list_route_models",
-      "currentOwner": "native",
-      "source": "native/src/ai.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/llm-domain.ts",
       "domain": "llm",
       "migrationWave": 5,
       "stateful": true,
@@ -793,12 +807,12 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/ai_list_route_models",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/ai_list_route_models",
-      "testEvidence": ["native/src/llm/tests.rs", "native/src/llm/catalog_tests.rs"]
+      "testEvidence": ["electron/tests/node-core-stage5.test.ts", "src/lib/ai/__tests__"]
     },
     {
       "name": "ai_list_routes",
-      "currentOwner": "native",
-      "source": "native/src/ai.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/llm-domain.ts",
       "domain": "llm",
       "migrationWave": 5,
       "stateful": true,
@@ -808,12 +822,12 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/ai_list_routes",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/ai_list_routes",
-      "testEvidence": ["native/src/llm/tests.rs", "native/src/llm/catalog_tests.rs"]
+      "testEvidence": ["electron/tests/node-core-stage5.test.ts", "src/lib/ai/__tests__"]
     },
     {
       "name": "ai_list_session_migrations",
-      "currentOwner": "native",
-      "source": "native/src/ai.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/llm-domain.ts",
       "domain": "llm",
       "migrationWave": 5,
       "stateful": true,
@@ -823,12 +837,12 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/ai_list_session_migrations",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/ai_list_session_migrations",
-      "testEvidence": ["native/src/llm/tests.rs", "native/src/llm/catalog_tests.rs"]
+      "testEvidence": ["electron/tests/node-core-stage5.test.ts", "src/lib/ai/__tests__"]
     },
     {
       "name": "ai_model_declaration_template",
-      "currentOwner": "native",
-      "source": "native/src/ai.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/llm-domain.ts",
       "domain": "llm",
       "migrationWave": 5,
       "stateful": true,
@@ -838,12 +852,12 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/ai_model_declaration_template",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/ai_model_declaration_template",
-      "testEvidence": ["native/src/llm/tests.rs", "native/src/llm/catalog_tests.rs"]
+      "testEvidence": ["electron/tests/node-core-stage5.test.ts", "src/lib/ai/__tests__"]
     },
     {
       "name": "ai_resolve_model",
-      "currentOwner": "native",
-      "source": "native/src/ai.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/llm-domain.ts",
       "domain": "llm",
       "migrationWave": 5,
       "stateful": true,
@@ -853,12 +867,12 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/ai_resolve_model",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/ai_resolve_model",
-      "testEvidence": ["native/src/llm/tests.rs", "native/src/llm/catalog_tests.rs"]
+      "testEvidence": ["electron/tests/node-core-stage5.test.ts", "src/lib/ai/__tests__"]
     },
     {
       "name": "ai_resolve_selection",
-      "currentOwner": "native",
-      "source": "native/src/ai.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/llm-domain.ts",
       "domain": "llm",
       "migrationWave": 5,
       "stateful": true,
@@ -868,12 +882,12 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/ai_resolve_selection",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/ai_resolve_selection",
-      "testEvidence": ["native/src/llm/tests.rs", "native/src/llm/catalog_tests.rs"]
+      "testEvidence": ["electron/tests/node-core-stage5.test.ts", "src/lib/ai/__tests__"]
     },
     {
       "name": "ai_save_routes",
-      "currentOwner": "native",
-      "source": "native/src/ai.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/llm-domain.ts",
       "domain": "llm",
       "migrationWave": 5,
       "stateful": true,
@@ -883,12 +897,12 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/ai_save_routes",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/ai_save_routes",
-      "testEvidence": ["native/src/llm/tests.rs", "native/src/llm/catalog_tests.rs"]
+      "testEvidence": ["electron/tests/node-core-stage5.test.ts", "src/lib/ai/__tests__"]
     },
     {
       "name": "cancel_connection_preflight",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/host-trust.ts",
       "domain": "host-trust",
       "migrationWave": 4,
       "stateful": true,
@@ -898,12 +912,12 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/cancel_connection_preflight",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/cancel_connection_preflight",
-      "testEvidence": ["native/src/known_hosts.rs", "native/src/connection.rs"]
+      "testEvidence": ["electron/tests/node-core-stage4.test.ts", "tests/ssh-e2e"]
     },
     {
       "name": "cancel_delete",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/remote-fs.ts",
       "domain": "remote-fs",
       "migrationWave": 4,
       "stateful": true,
@@ -913,12 +927,12 @@
       "emits": ["delete-progress"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/cancel_delete",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/cancel_delete",
-      "testEvidence": ["native/src/remote_fs.rs", "tests/ssh-e2e"]
+      "testEvidence": ["electron/tests/node-core-stage4.test.ts", "tests/ssh-e2e"]
     },
     {
       "name": "cancel_download",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/remote-fs.ts",
       "domain": "remote-fs",
       "migrationWave": 4,
       "stateful": true,
@@ -928,12 +942,12 @@
       "emits": ["download-progress"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/cancel_download",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/cancel_download",
-      "testEvidence": ["native/src/remote_fs.rs", "tests/ssh-e2e"]
+      "testEvidence": ["electron/tests/node-core-stage4.test.ts", "tests/ssh-e2e"]
     },
     {
       "name": "cancel_remote_copy",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/remote-fs.ts",
       "domain": "remote-fs",
       "migrationWave": 4,
       "stateful": true,
@@ -943,12 +957,12 @@
       "emits": ["remote-copy-progress"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/cancel_remote_copy",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/cancel_remote_copy",
-      "testEvidence": ["native/src/remote_fs.rs", "tests/ssh-e2e"]
+      "testEvidence": ["electron/tests/node-core-stage4.test.ts", "tests/ssh-e2e"]
     },
     {
       "name": "cancel_remote_file_read",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/remote-fs.ts",
       "domain": "remote-fs",
       "migrationWave": 4,
       "stateful": true,
@@ -958,12 +972,12 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/cancel_remote_file_read",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/cancel_remote_file_read",
-      "testEvidence": ["native/src/remote_fs.rs", "tests/ssh-e2e"]
+      "testEvidence": ["electron/tests/node-core-stage4.test.ts", "tests/ssh-e2e"]
     },
     {
       "name": "cancel_remote_health_snapshot",
-      "currentOwner": "native",
-      "source": "native/src/remote_health.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/remote-health.ts",
       "domain": "remote-health",
       "migrationWave": 4,
       "stateful": true,
@@ -973,12 +987,12 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/cancel_remote_health_snapshot",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/cancel_remote_health_snapshot",
-      "testEvidence": ["native/src/remote_health.rs", "tests/ssh-e2e"]
+      "testEvidence": ["electron/tests/node-core-stage4.test.ts", "tests/ssh-e2e"]
     },
     {
       "name": "cancel_upload",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/remote-fs.ts",
       "domain": "remote-fs",
       "migrationWave": 4,
       "stateful": true,
@@ -988,12 +1002,12 @@
       "emits": ["upload-progress"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/cancel_upload",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/cancel_upload",
-      "testEvidence": ["native/src/remote_fs.rs", "tests/ssh-e2e"]
+      "testEvidence": ["electron/tests/node-core-stage4.test.ts", "tests/ssh-e2e"]
     },
     {
       "name": "check_host_key",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/host-trust.ts",
       "domain": "host-trust",
       "migrationWave": 4,
       "stateful": true,
@@ -1003,12 +1017,12 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/check_host_key",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/check_host_key",
-      "testEvidence": ["native/src/known_hosts.rs", "native/src/connection.rs"]
+      "testEvidence": ["electron/tests/node-core-stage4.test.ts", "tests/ssh-e2e"]
     },
     {
       "name": "clear_sftp_workspace",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/storage.ts",
       "domain": "storage",
       "migrationWave": 3,
       "stateful": true,
@@ -1018,12 +1032,12 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/clear_sftp_workspace",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/clear_sftp_workspace",
-      "testEvidence": ["native/src/db.rs", "native/src/data_migration.rs"]
+      "testEvidence": ["electron/tests/node-core-stage3.test.ts"]
     },
     {
       "name": "clear_terminal_workspace",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/storage.ts",
       "domain": "storage",
       "migrationWave": 3,
       "stateful": true,
@@ -1033,12 +1047,12 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/clear_terminal_workspace",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/clear_terminal_workspace",
-      "testEvidence": ["native/src/db.rs", "native/src/data_migration.rs"]
+      "testEvidence": ["electron/tests/node-core-stage3.test.ts"]
     },
     {
       "name": "close_session",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/terminal.ts",
       "domain": "terminal",
       "migrationWave": 4,
       "stateful": true,
@@ -1048,12 +1062,12 @@
       "emits": ["ssh-status", "ssh-closed", "ssh-session-error", "ssh-data:${sessionId}"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/close_session",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/close_session",
-      "testEvidence": ["native/src/session.rs", "scripts/native-smoke.ts"]
+      "testEvidence": ["electron/tests/node-core-stage4.test.ts", "scripts/stage4-ssh-smoke.ts"]
     },
     {
       "name": "collect_remote_health_snapshot",
-      "currentOwner": "native",
-      "source": "native/src/remote_health.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/remote-health.ts",
       "domain": "remote-health",
       "migrationWave": 4,
       "stateful": true,
@@ -1063,12 +1077,12 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/collect_remote_health_snapshot",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/collect_remote_health_snapshot",
-      "testEvidence": ["native/src/remote_health.rs", "tests/ssh-e2e"]
+      "testEvidence": ["electron/tests/node-core-stage4.test.ts", "tests/ssh-e2e"]
     },
     {
       "name": "copy_local_paths",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/local-fs.ts",
       "domain": "local-fs",
       "migrationWave": 2,
       "stateful": false,
@@ -1078,12 +1092,12 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/copy_local_paths",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/copy_local_paths",
-      "testEvidence": ["native/src/local_fs.rs"]
+      "testEvidence": ["electron/tests/node-core-stage2.test.ts"]
     },
     {
       "name": "copy_remote_path",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/remote-fs.ts",
       "domain": "remote-fs",
       "migrationWave": 4,
       "stateful": true,
@@ -1093,12 +1107,12 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/copy_remote_path",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/copy_remote_path",
-      "testEvidence": ["native/src/remote_fs.rs", "tests/ssh-e2e"]
+      "testEvidence": ["electron/tests/node-core-stage4.test.ts", "tests/ssh-e2e"]
     },
     {
       "name": "copy_remote_to_remote",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/remote-fs.ts",
       "domain": "remote-fs",
       "migrationWave": 4,
       "stateful": true,
@@ -1108,12 +1122,12 @@
       "emits": ["remote-copy-progress"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/copy_remote_to_remote",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/copy_remote_to_remote",
-      "testEvidence": ["native/src/remote_fs.rs", "tests/ssh-e2e"]
+      "testEvidence": ["electron/tests/node-core-stage4.test.ts", "tests/ssh-e2e"]
     },
     {
       "name": "create_local_session",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/terminal.ts",
       "domain": "terminal",
       "migrationWave": 4,
       "stateful": true,
@@ -1123,12 +1137,12 @@
       "emits": ["ssh-status", "ssh-closed", "ssh-session-error", "ssh-data:${sessionId}"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/create_local_session",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/create_local_session",
-      "testEvidence": ["native/src/session.rs", "scripts/native-smoke.ts"]
+      "testEvidence": ["electron/tests/node-core-stage4.test.ts", "scripts/stage4-ssh-smoke.ts"]
     },
     {
       "name": "create_remote_entry",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/remote-fs.ts",
       "domain": "remote-fs",
       "migrationWave": 4,
       "stateful": true,
@@ -1138,12 +1152,12 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/create_remote_entry",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/create_remote_entry",
-      "testEvidence": ["native/src/remote_fs.rs", "tests/ssh-e2e"]
+      "testEvidence": ["electron/tests/node-core-stage4.test.ts", "tests/ssh-e2e"]
     },
     {
       "name": "create_session",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/terminal.ts",
       "domain": "terminal",
       "migrationWave": 4,
       "stateful": true,
@@ -1153,12 +1167,12 @@
       "emits": ["ssh-status", "ssh-closed", "ssh-session-error", "ssh-data:${sessionId}"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/create_session",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/create_session",
-      "testEvidence": ["native/src/session.rs", "scripts/native-smoke.ts"]
+      "testEvidence": ["electron/tests/node-core-stage4.test.ts", "scripts/stage4-ssh-smoke.ts"]
     },
     {
       "name": "delete_key_credential",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/credentials.ts",
       "domain": "credentials",
       "migrationWave": 3,
       "stateful": true,
@@ -1168,12 +1182,15 @@
       "emits": ["delete-progress"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/delete_key_credential",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/delete_key_credential",
-      "testEvidence": ["native/src/keychain.rs"]
+      "testEvidence": [
+        "electron/tests/node-core-stage3.test.ts",
+        "scripts/platform-credential-smoke.ts"
+      ]
     },
     {
       "name": "delete_profile_password",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/credentials.ts",
       "domain": "credentials",
       "migrationWave": 3,
       "stateful": true,
@@ -1183,12 +1200,15 @@
       "emits": ["delete-progress"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/delete_profile_password",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/delete_profile_password",
-      "testEvidence": ["native/src/keychain.rs"]
+      "testEvidence": [
+        "electron/tests/node-core-stage3.test.ts",
+        "scripts/platform-credential-smoke.ts"
+      ]
     },
     {
       "name": "delete_profile_secret",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/credentials.ts",
       "domain": "credentials",
       "migrationWave": 3,
       "stateful": true,
@@ -1198,12 +1218,15 @@
       "emits": ["delete-progress"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/delete_profile_secret",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/delete_profile_secret",
-      "testEvidence": ["native/src/keychain.rs"]
+      "testEvidence": [
+        "electron/tests/node-core-stage3.test.ts",
+        "scripts/platform-credential-smoke.ts"
+      ]
     },
     {
       "name": "delete_profile_secrets",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/credentials.ts",
       "domain": "credentials",
       "migrationWave": 3,
       "stateful": true,
@@ -1213,12 +1236,15 @@
       "emits": ["delete-progress"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/delete_profile_secrets",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/delete_profile_secrets",
-      "testEvidence": ["native/src/keychain.rs"]
+      "testEvidence": [
+        "electron/tests/node-core-stage3.test.ts",
+        "scripts/platform-credential-smoke.ts"
+      ]
     },
     {
       "name": "delete_remote_path",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/remote-fs.ts",
       "domain": "remote-fs",
       "migrationWave": 4,
       "stateful": true,
@@ -1228,12 +1254,12 @@
       "emits": ["delete-progress"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/delete_remote_path",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/delete_remote_path",
-      "testEvidence": ["native/src/remote_fs.rs", "tests/ssh-e2e"]
+      "testEvidence": ["electron/tests/node-core-stage4.test.ts", "tests/ssh-e2e"]
     },
     {
       "name": "disconnect_sftp",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/remote-fs.ts",
       "domain": "remote-fs",
       "migrationWave": 4,
       "stateful": true,
@@ -1243,12 +1269,12 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/disconnect_sftp",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/disconnect_sftp",
-      "testEvidence": ["native/src/remote_fs.rs", "tests/ssh-e2e"]
+      "testEvidence": ["electron/tests/node-core-stage4.test.ts", "tests/ssh-e2e"]
     },
     {
       "name": "download_remote_paths",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/remote-fs.ts",
       "domain": "remote-fs",
       "migrationWave": 4,
       "stateful": true,
@@ -1258,12 +1284,12 @@
       "emits": ["download-progress"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/download_remote_paths",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/download_remote_paths",
-      "testEvidence": ["native/src/remote_fs.rs", "tests/ssh-e2e"]
+      "testEvidence": ["electron/tests/node-core-stage4.test.ts", "tests/ssh-e2e"]
     },
     {
       "name": "export_log_file",
       "currentOwner": "electron",
-      "source": "native/src/commands.rs",
+      "source": "electron/node-core/log-domain.ts",
       "domain": "logs",
       "migrationWave": 2,
       "stateful": false,
@@ -1277,8 +1303,8 @@
     },
     {
       "name": "get_session_status",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/terminal.ts",
       "domain": "terminal",
       "migrationWave": 4,
       "stateful": true,
@@ -1288,12 +1314,12 @@
       "emits": ["ssh-status", "ssh-closed", "ssh-session-error", "ssh-data:${sessionId}"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/get_session_status",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/get_session_status",
-      "testEvidence": ["native/src/session.rs", "scripts/native-smoke.ts"]
+      "testEvidence": ["electron/tests/node-core-stage4.test.ts", "scripts/stage4-ssh-smoke.ts"]
     },
     {
       "name": "get_system_health",
-      "currentOwner": "native",
-      "source": "native/src/health.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/health.ts",
       "domain": "health",
       "migrationWave": 2,
       "stateful": false,
@@ -1303,12 +1329,12 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/get_system_health",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/get_system_health",
-      "testEvidence": ["native/src/health.rs"]
+      "testEvidence": ["electron/tests/node-core-stage2.test.ts"]
     },
     {
       "name": "list_key_credentials",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/credentials.ts",
       "domain": "credentials",
       "migrationWave": 3,
       "stateful": true,
@@ -1318,12 +1344,15 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/list_key_credentials",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/list_key_credentials",
-      "testEvidence": ["native/src/keychain.rs"]
+      "testEvidence": [
+        "electron/tests/node-core-stage3.test.ts",
+        "scripts/platform-credential-smoke.ts"
+      ]
     },
     {
       "name": "list_known_hosts",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/host-trust.ts",
       "domain": "host-trust",
       "migrationWave": 4,
       "stateful": true,
@@ -1333,12 +1362,12 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/list_known_hosts",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/list_known_hosts",
-      "testEvidence": ["native/src/known_hosts.rs", "native/src/connection.rs"]
+      "testEvidence": ["electron/tests/node-core-stage4.test.ts", "tests/ssh-e2e"]
     },
     {
       "name": "list_local_directory",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/local-fs.ts",
       "domain": "local-fs",
       "migrationWave": 2,
       "stateful": false,
@@ -1348,12 +1377,12 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/list_local_directory",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/list_local_directory",
-      "testEvidence": ["native/src/local_fs.rs"]
+      "testEvidence": ["electron/tests/node-core-stage2.test.ts"]
     },
     {
       "name": "list_log_files",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/log-domain.ts",
       "domain": "logs",
       "migrationWave": 2,
       "stateful": false,
@@ -1367,8 +1396,8 @@
     },
     {
       "name": "list_port_forwards",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/port-forward.ts",
       "domain": "port-forward",
       "migrationWave": 4,
       "stateful": true,
@@ -1378,12 +1407,12 @@
       "emits": ["port-forward-event"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/list_port_forwards",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/list_port_forwards",
-      "testEvidence": ["native/src/port_forward.rs", "tests/ssh-e2e"]
+      "testEvidence": ["electron/tests/node-core-stage4.test.ts", "tests/ssh-e2e"]
     },
     {
       "name": "list_profiles",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/storage.ts",
       "domain": "storage",
       "migrationWave": 3,
       "stateful": true,
@@ -1393,12 +1422,12 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/list_profiles",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/list_profiles",
-      "testEvidence": ["native/src/db.rs", "native/src/data_migration.rs"]
+      "testEvidence": ["electron/tests/node-core-stage3.test.ts"]
     },
     {
       "name": "list_recent_profiles",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/storage.ts",
       "domain": "storage",
       "migrationWave": 3,
       "stateful": true,
@@ -1408,12 +1437,12 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/list_recent_profiles",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/list_recent_profiles",
-      "testEvidence": ["native/src/db.rs", "native/src/data_migration.rs"]
+      "testEvidence": ["electron/tests/node-core-stage3.test.ts"]
     },
     {
       "name": "list_remote_directory",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/remote-fs.ts",
       "domain": "remote-fs",
       "migrationWave": 4,
       "stateful": true,
@@ -1423,12 +1452,12 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/list_remote_directory",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/list_remote_directory",
-      "testEvidence": ["native/src/remote_fs.rs", "tests/ssh-e2e"]
+      "testEvidence": ["electron/tests/node-core-stage4.test.ts", "tests/ssh-e2e"]
     },
     {
       "name": "list_sftp_bookmarks",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/storage.ts",
       "domain": "storage",
       "migrationWave": 3,
       "stateful": true,
@@ -1438,12 +1467,12 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/list_sftp_bookmarks",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/list_sftp_bookmarks",
-      "testEvidence": ["native/src/db.rs", "native/src/data_migration.rs"]
+      "testEvidence": ["electron/tests/node-core-stage3.test.ts"]
     },
     {
       "name": "load_preferences",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/storage.ts",
       "domain": "storage",
       "migrationWave": 3,
       "stateful": true,
@@ -1453,12 +1482,12 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/load_preferences",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/load_preferences",
-      "testEvidence": ["native/src/db.rs", "native/src/data_migration.rs"]
+      "testEvidence": ["electron/tests/node-core-stage3.test.ts"]
     },
     {
       "name": "load_sftp_workspace",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/storage.ts",
       "domain": "storage",
       "migrationWave": 3,
       "stateful": true,
@@ -1468,12 +1497,12 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/load_sftp_workspace",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/load_sftp_workspace",
-      "testEvidence": ["native/src/db.rs", "native/src/data_migration.rs"]
+      "testEvidence": ["electron/tests/node-core-stage3.test.ts"]
     },
     {
       "name": "load_terminal_workspace",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/storage.ts",
       "domain": "storage",
       "migrationWave": 3,
       "stateful": true,
@@ -1483,12 +1512,12 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/load_terminal_workspace",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/load_terminal_workspace",
-      "testEvidence": ["native/src/db.rs", "native/src/data_migration.rs"]
+      "testEvidence": ["electron/tests/node-core-stage3.test.ts"]
     },
     {
       "name": "mark_session_ready",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/terminal.ts",
       "domain": "terminal",
       "migrationWave": 4,
       "stateful": true,
@@ -1498,12 +1527,12 @@
       "emits": ["ssh-status", "ssh-closed", "ssh-session-error", "ssh-data:${sessionId}"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/mark_session_ready",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/mark_session_ready",
-      "testEvidence": ["native/src/session.rs", "scripts/native-smoke.ts"]
+      "testEvidence": ["electron/tests/node-core-stage4.test.ts", "scripts/stage4-ssh-smoke.ts"]
     },
     {
       "name": "open_path",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/local-fs.ts",
       "domain": "local-fs",
       "migrationWave": 2,
       "stateful": false,
@@ -1513,12 +1542,12 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/open_path",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/open_path",
-      "testEvidence": ["native/src/local_fs.rs"]
+      "testEvidence": ["electron/tests/node-core-stage2.test.ts"]
     },
     {
       "name": "open_remote_file",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/remote-fs.ts",
       "domain": "remote-fs",
       "migrationWave": 4,
       "stateful": true,
@@ -1528,12 +1557,12 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/open_remote_file",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/open_remote_file",
-      "testEvidence": ["native/src/remote_fs.rs", "tests/ssh-e2e"]
+      "testEvidence": ["electron/tests/node-core-stage4.test.ts", "tests/ssh-e2e"]
     },
     {
       "name": "open_url",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "electron",
+      "source": "electron/main.ts",
       "domain": "desktop",
       "migrationWave": 1,
       "stateful": false,
@@ -1547,8 +1576,8 @@
     },
     {
       "name": "paste_local_paths",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/local-fs.ts",
       "domain": "local-fs",
       "migrationWave": 2,
       "stateful": false,
@@ -1558,12 +1587,12 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/paste_local_paths",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/paste_local_paths",
-      "testEvidence": ["native/src/local_fs.rs"]
+      "testEvidence": ["electron/tests/node-core-stage2.test.ts"]
     },
     {
       "name": "petdex_get_status",
-      "currentOwner": "native",
-      "source": "native/src/petdex.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/petdex.ts",
       "domain": "petdex",
       "migrationWave": 2,
       "stateful": false,
@@ -1573,12 +1602,12 @@
       "emits": ["petdex-status"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/petdex_get_status",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/petdex_get_status",
-      "testEvidence": ["native/tests/petdex_contract_probe.rs"]
+      "testEvidence": ["electron/tests/node-core-stage2.test.ts"]
     },
     {
       "name": "petdex_set_enabled",
-      "currentOwner": "native",
-      "source": "native/src/petdex.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/petdex.ts",
       "domain": "petdex",
       "migrationWave": 2,
       "stateful": false,
@@ -1588,12 +1617,12 @@
       "emits": ["petdex-status"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/petdex_set_enabled",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/petdex_set_enabled",
-      "testEvidence": ["native/tests/petdex_contract_probe.rs"]
+      "testEvidence": ["electron/tests/node-core-stage2.test.ts"]
     },
     {
       "name": "petdex_test_connection",
-      "currentOwner": "native",
-      "source": "native/src/petdex.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/petdex.ts",
       "domain": "petdex",
       "migrationWave": 2,
       "stateful": false,
@@ -1603,12 +1632,12 @@
       "emits": ["petdex-status"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/petdex_test_connection",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/petdex_test_connection",
-      "testEvidence": ["native/tests/petdex_contract_probe.rs"]
+      "testEvidence": ["electron/tests/node-core-stage2.test.ts"]
     },
     {
       "name": "pick_local_files",
       "currentOwner": "electron",
-      "source": "native/src/commands.rs",
+      "source": "electron/main.ts",
       "domain": "desktop",
       "migrationWave": 1,
       "stateful": false,
@@ -1623,7 +1652,7 @@
     {
       "name": "pick_local_folder",
       "currentOwner": "electron",
-      "source": "native/src/commands.rs",
+      "source": "electron/main.ts",
       "domain": "desktop",
       "migrationWave": 1,
       "stateful": false,
@@ -1638,7 +1667,7 @@
     {
       "name": "pick_private_key_file",
       "currentOwner": "electron",
-      "source": "native/src/commands.rs",
+      "source": "electron/main.ts",
       "domain": "desktop",
       "migrationWave": 1,
       "stateful": false,
@@ -1652,8 +1681,8 @@
     },
     {
       "name": "preflight_connection",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/host-trust.ts",
       "domain": "host-trust",
       "migrationWave": 4,
       "stateful": true,
@@ -1663,12 +1692,12 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/preflight_connection",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/preflight_connection",
-      "testEvidence": ["native/src/known_hosts.rs", "native/src/connection.rs"]
+      "testEvidence": ["electron/tests/node-core-stage4.test.ts", "tests/ssh-e2e"]
     },
     {
       "name": "preview_local_file",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/local-fs.ts",
       "domain": "local-fs",
       "migrationWave": 2,
       "stateful": false,
@@ -1678,12 +1707,12 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/preview_local_file",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/preview_local_file",
-      "testEvidence": ["native/src/local_fs.rs"]
+      "testEvidence": ["electron/tests/node-core-stage2.test.ts"]
     },
     {
       "name": "preview_remote_file",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/remote-fs.ts",
       "domain": "remote-fs",
       "migrationWave": 4,
       "stateful": true,
@@ -1693,12 +1722,12 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/preview_remote_file",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/preview_remote_file",
-      "testEvidence": ["native/src/remote_fs.rs", "tests/ssh-e2e"]
+      "testEvidence": ["electron/tests/node-core-stage4.test.ts", "tests/ssh-e2e"]
     },
     {
       "name": "read_log_file",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/log-domain.ts",
       "domain": "logs",
       "migrationWave": 2,
       "stateful": false,
@@ -1712,8 +1741,8 @@
     },
     {
       "name": "read_text_file",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/local-fs.ts",
       "domain": "local-fs",
       "migrationWave": 2,
       "stateful": false,
@@ -1723,12 +1752,12 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/read_text_file",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/read_text_file",
-      "testEvidence": ["native/src/local_fs.rs"]
+      "testEvidence": ["electron/tests/node-core-stage2.test.ts"]
     },
     {
       "name": "remove_known_host",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/host-trust.ts",
       "domain": "host-trust",
       "migrationWave": 4,
       "stateful": true,
@@ -1738,12 +1767,12 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/remove_known_host",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/remove_known_host",
-      "testEvidence": ["native/src/known_hosts.rs", "native/src/connection.rs"]
+      "testEvidence": ["electron/tests/node-core-stage4.test.ts", "tests/ssh-e2e"]
     },
     {
       "name": "remove_profile",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/storage.ts",
       "domain": "storage",
       "migrationWave": 3,
       "stateful": true,
@@ -1753,12 +1782,12 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/remove_profile",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/remove_profile",
-      "testEvidence": ["native/src/db.rs", "native/src/data_migration.rs"]
+      "testEvidence": ["electron/tests/node-core-stage3.test.ts"]
     },
     {
       "name": "remove_recent_profile",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/storage.ts",
       "domain": "storage",
       "migrationWave": 3,
       "stateful": true,
@@ -1768,12 +1797,12 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/remove_recent_profile",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/remove_recent_profile",
-      "testEvidence": ["native/src/db.rs", "native/src/data_migration.rs"]
+      "testEvidence": ["electron/tests/node-core-stage3.test.ts"]
     },
     {
       "name": "remove_sftp_bookmark",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/storage.ts",
       "domain": "storage",
       "migrationWave": 3,
       "stateful": true,
@@ -1783,12 +1812,12 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/remove_sftp_bookmark",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/remove_sftp_bookmark",
-      "testEvidence": ["native/src/db.rs", "native/src/data_migration.rs"]
+      "testEvidence": ["electron/tests/node-core-stage3.test.ts"]
     },
     {
       "name": "rename_local_path",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/local-fs.ts",
       "domain": "local-fs",
       "migrationWave": 2,
       "stateful": false,
@@ -1798,12 +1827,12 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/rename_local_path",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/rename_local_path",
-      "testEvidence": ["native/src/local_fs.rs"]
+      "testEvidence": ["electron/tests/node-core-stage2.test.ts"]
     },
     {
       "name": "rename_remote_path",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/remote-fs.ts",
       "domain": "remote-fs",
       "migrationWave": 4,
       "stateful": true,
@@ -1813,12 +1842,12 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/rename_remote_path",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/rename_remote_path",
-      "testEvidence": ["native/src/remote_fs.rs", "tests/ssh-e2e"]
+      "testEvidence": ["electron/tests/node-core-stage4.test.ts", "tests/ssh-e2e"]
     },
     {
       "name": "request_app_exit",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "electron",
+      "source": "electron/main.ts",
       "domain": "desktop",
       "migrationWave": 1,
       "stateful": false,
@@ -1832,8 +1861,8 @@
     },
     {
       "name": "request_app_restart",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "electron",
+      "source": "electron/main.ts",
       "domain": "desktop",
       "migrationWave": 1,
       "stateful": false,
@@ -1847,8 +1876,8 @@
     },
     {
       "name": "resize_session",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/terminal.ts",
       "domain": "terminal",
       "migrationWave": 4,
       "stateful": true,
@@ -1858,12 +1887,12 @@
       "emits": ["ssh-status", "ssh-closed", "ssh-session-error", "ssh-data:${sessionId}"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/resize_session",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/resize_session",
-      "testEvidence": ["native/src/session.rs", "scripts/native-smoke.ts"]
+      "testEvidence": ["electron/tests/node-core-stage4.test.ts", "scripts/stage4-ssh-smoke.ts"]
     },
     {
       "name": "resolve_remote_entry_owners",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/remote-fs.ts",
       "domain": "remote-fs",
       "migrationWave": 4,
       "stateful": true,
@@ -1873,12 +1902,12 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/resolve_remote_entry_owners",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/resolve_remote_entry_owners",
-      "testEvidence": ["native/src/remote_fs.rs", "tests/ssh-e2e"]
+      "testEvidence": ["electron/tests/node-core-stage4.test.ts", "tests/ssh-e2e"]
     },
     {
       "name": "retrieve_key_credential",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/credentials.ts",
       "domain": "credentials",
       "migrationWave": 3,
       "stateful": true,
@@ -1888,12 +1917,15 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/retrieve_key_credential",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/retrieve_key_credential",
-      "testEvidence": ["native/src/keychain.rs"]
+      "testEvidence": [
+        "electron/tests/node-core-stage3.test.ts",
+        "scripts/platform-credential-smoke.ts"
+      ]
     },
     {
       "name": "retrieve_profile_password",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/credentials.ts",
       "domain": "credentials",
       "migrationWave": 3,
       "stateful": true,
@@ -1903,12 +1935,15 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/retrieve_profile_password",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/retrieve_profile_password",
-      "testEvidence": ["native/src/keychain.rs"]
+      "testEvidence": [
+        "electron/tests/node-core-stage3.test.ts",
+        "scripts/platform-credential-smoke.ts"
+      ]
     },
     {
       "name": "retrieve_profile_secret",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/credentials.ts",
       "domain": "credentials",
       "migrationWave": 3,
       "stateful": true,
@@ -1918,12 +1953,15 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/retrieve_profile_secret",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/retrieve_profile_secret",
-      "testEvidence": ["native/src/keychain.rs"]
+      "testEvidence": [
+        "electron/tests/node-core-stage3.test.ts",
+        "scripts/platform-credential-smoke.ts"
+      ]
     },
     {
       "name": "save_preferences",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/storage.ts",
       "domain": "storage",
       "migrationWave": 3,
       "stateful": true,
@@ -1933,12 +1971,12 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/save_preferences",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/save_preferences",
-      "testEvidence": ["native/src/db.rs", "native/src/data_migration.rs"]
+      "testEvidence": ["electron/tests/node-core-stage3.test.ts"]
     },
     {
       "name": "save_sftp_workspace",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/storage.ts",
       "domain": "storage",
       "migrationWave": 3,
       "stateful": true,
@@ -1948,12 +1986,12 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/save_sftp_workspace",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/save_sftp_workspace",
-      "testEvidence": ["native/src/db.rs", "native/src/data_migration.rs"]
+      "testEvidence": ["electron/tests/node-core-stage3.test.ts"]
     },
     {
       "name": "save_terminal_workspace",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/storage.ts",
       "domain": "storage",
       "migrationWave": 3,
       "stateful": true,
@@ -1963,12 +2001,12 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/save_terminal_workspace",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/save_terminal_workspace",
-      "testEvidence": ["native/src/db.rs", "native/src/data_migration.rs"]
+      "testEvidence": ["electron/tests/node-core-stage3.test.ts"]
     },
     {
       "name": "set_session_output_paused",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/terminal.ts",
       "domain": "terminal",
       "migrationWave": 4,
       "stateful": true,
@@ -1978,12 +2016,12 @@
       "emits": ["ssh-status", "ssh-closed", "ssh-session-error", "ssh-data:${sessionId}"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/set_session_output_paused",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/set_session_output_paused",
-      "testEvidence": ["native/src/session.rs", "scripts/native-smoke.ts"]
+      "testEvidence": ["electron/tests/node-core-stage4.test.ts", "scripts/stage4-ssh-smoke.ts"]
     },
     {
       "name": "start_port_forward",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/port-forward.ts",
       "domain": "port-forward",
       "migrationWave": 4,
       "stateful": true,
@@ -1993,12 +2031,12 @@
       "emits": ["port-forward-event"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/start_port_forward",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/start_port_forward",
-      "testEvidence": ["native/src/port_forward.rs", "tests/ssh-e2e"]
+      "testEvidence": ["electron/tests/node-core-stage4.test.ts", "tests/ssh-e2e"]
     },
     {
       "name": "stop_all_port_forwards",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/port-forward.ts",
       "domain": "port-forward",
       "migrationWave": 4,
       "stateful": true,
@@ -2008,12 +2046,12 @@
       "emits": ["port-forward-event"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/stop_all_port_forwards",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/stop_all_port_forwards",
-      "testEvidence": ["native/src/port_forward.rs", "tests/ssh-e2e"]
+      "testEvidence": ["electron/tests/node-core-stage4.test.ts", "tests/ssh-e2e"]
     },
     {
       "name": "stop_port_forward",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/port-forward.ts",
       "domain": "port-forward",
       "migrationWave": 4,
       "stateful": true,
@@ -2023,12 +2061,12 @@
       "emits": ["port-forward-event"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/stop_port_forward",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/stop_port_forward",
-      "testEvidence": ["native/src/port_forward.rs", "tests/ssh-e2e"]
+      "testEvidence": ["electron/tests/node-core-stage4.test.ts", "tests/ssh-e2e"]
     },
     {
       "name": "store_key_credential",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/credentials.ts",
       "domain": "credentials",
       "migrationWave": 3,
       "stateful": true,
@@ -2038,12 +2076,15 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/store_key_credential",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/store_key_credential",
-      "testEvidence": ["native/src/keychain.rs"]
+      "testEvidence": [
+        "electron/tests/node-core-stage3.test.ts",
+        "scripts/platform-credential-smoke.ts"
+      ]
     },
     {
       "name": "store_profile_password",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/credentials.ts",
       "domain": "credentials",
       "migrationWave": 3,
       "stateful": true,
@@ -2053,12 +2094,15 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/store_profile_password",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/store_profile_password",
-      "testEvidence": ["native/src/keychain.rs"]
+      "testEvidence": [
+        "electron/tests/node-core-stage3.test.ts",
+        "scripts/platform-credential-smoke.ts"
+      ]
     },
     {
       "name": "store_profile_secret",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/credentials.ts",
       "domain": "credentials",
       "migrationWave": 3,
       "stateful": true,
@@ -2068,12 +2112,15 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/store_profile_secret",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/store_profile_secret",
-      "testEvidence": ["native/src/keychain.rs"]
+      "testEvidence": [
+        "electron/tests/node-core-stage3.test.ts",
+        "scripts/platform-credential-smoke.ts"
+      ]
     },
     {
       "name": "supersede_remote_directory_request",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/remote-fs.ts",
       "domain": "remote-fs",
       "migrationWave": 4,
       "stateful": true,
@@ -2083,12 +2130,12 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/supersede_remote_directory_request",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/supersede_remote_directory_request",
-      "testEvidence": ["native/src/remote_fs.rs", "tests/ssh-e2e"]
+      "testEvidence": ["electron/tests/node-core-stage4.test.ts", "tests/ssh-e2e"]
     },
     {
       "name": "touch_recent_profile",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/storage.ts",
       "domain": "storage",
       "migrationWave": 3,
       "stateful": true,
@@ -2098,12 +2145,12 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/touch_recent_profile",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/touch_recent_profile",
-      "testEvidence": ["native/src/db.rs", "native/src/data_migration.rs"]
+      "testEvidence": ["electron/tests/node-core-stage3.test.ts"]
     },
     {
       "name": "trash_local_paths",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/local-fs.ts",
       "domain": "local-fs",
       "migrationWave": 2,
       "stateful": false,
@@ -2113,12 +2160,12 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/trash_local_paths",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/trash_local_paths",
-      "testEvidence": ["native/src/local_fs.rs"]
+      "testEvidence": ["electron/tests/node-core-stage2.test.ts"]
     },
     {
       "name": "trust_host",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/host-trust.ts",
       "domain": "host-trust",
       "migrationWave": 4,
       "stateful": true,
@@ -2128,12 +2175,12 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/trust_host",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/trust_host",
-      "testEvidence": ["native/src/known_hosts.rs", "native/src/connection.rs"]
+      "testEvidence": ["electron/tests/node-core-stage4.test.ts", "tests/ssh-e2e"]
     },
     {
       "name": "update_profile",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/storage.ts",
       "domain": "storage",
       "migrationWave": 3,
       "stateful": true,
@@ -2143,12 +2190,12 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/update_profile",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/update_profile",
-      "testEvidence": ["native/src/db.rs", "native/src/data_migration.rs"]
+      "testEvidence": ["electron/tests/node-core-stage3.test.ts"]
     },
     {
       "name": "update_remote_permissions",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/remote-fs.ts",
       "domain": "remote-fs",
       "migrationWave": 4,
       "stateful": true,
@@ -2158,12 +2205,12 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/update_remote_permissions",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/update_remote_permissions",
-      "testEvidence": ["native/src/remote_fs.rs", "tests/ssh-e2e"]
+      "testEvidence": ["electron/tests/node-core-stage4.test.ts", "tests/ssh-e2e"]
     },
     {
       "name": "upload_local_paths",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/remote-fs.ts",
       "domain": "remote-fs",
       "migrationWave": 4,
       "stateful": true,
@@ -2173,12 +2220,12 @@
       "emits": ["upload-progress"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/upload_local_paths",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/upload_local_paths",
-      "testEvidence": ["native/src/remote_fs.rs", "tests/ssh-e2e"]
+      "testEvidence": ["electron/tests/node-core-stage4.test.ts", "tests/ssh-e2e"]
     },
     {
       "name": "warm_remote_connection",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/remote-fs.ts",
       "domain": "remote-fs",
       "migrationWave": 4,
       "stateful": true,
@@ -2188,12 +2235,12 @@
       "emits": [],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/warm_remote_connection",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/warm_remote_connection",
-      "testEvidence": ["native/src/remote_fs.rs", "tests/ssh-e2e"]
+      "testEvidence": ["electron/tests/node-core-stage4.test.ts", "tests/ssh-e2e"]
     },
     {
       "name": "write_session",
-      "currentOwner": "native",
-      "source": "native/src/commands.rs",
+      "currentOwner": "node",
+      "source": "electron/node-core/terminal.ts",
       "domain": "terminal",
       "migrationWave": 4,
       "stateful": true,
@@ -2203,7 +2250,7 @@
       "emits": ["ssh-status", "ssh-closed", "ssh-session-error", "ssh-data:${sessionId}"],
       "argsSchema": "command-args.schema.json#/definitions/CommandArgs/properties/write_session",
       "valueSchema": "command-values.schema.json#/definitions/CommandValues/properties/write_session",
-      "testEvidence": ["native/src/session.rs", "scripts/native-smoke.ts"]
+      "testEvidence": ["electron/tests/node-core-stage4.test.ts", "scripts/stage4-ssh-smoke.ts"]
     }
   ],
   "securityBoundaries": [

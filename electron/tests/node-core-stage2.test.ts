@@ -12,7 +12,7 @@ import {
   writeFile,
 } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
 import { test } from 'node:test';
 import * as assert from 'node:assert/strict';
 import Ajv from 'ajv';
@@ -68,7 +68,7 @@ test(
         path: string;
         entries: Array<{ name: string; kind: string }>;
       };
-      assert.equal(listing.path, await realpath(source));
+      assert.equal(listing.path, portablePath(await realpath(source)));
       assert.equal(listing.entries[0].name, 'folder');
       assert.deepEqual(
         listing.entries.slice(1).map((entry) => entry.name),
@@ -82,7 +82,7 @@ test(
       assert.deepEqual(
         await value(fixture.backend, 'preview_local_file', { path: join(source, 'a.txt') }),
         {
-          path: join(source, 'a.txt'),
+          path: portablePath(join(source, 'a.txt')),
           name: 'a.txt',
           content: 'alpha 世界',
           size: Buffer.byteLength('alpha 世界'),
@@ -373,5 +373,5 @@ test('portable paths preserve long Windows and UNC identities without truncation
   const long = `C:\\Users\\shellspan\\${'nested\\'.repeat(80)}file.txt`;
   assert.equal(portablePath(long), long.replaceAll('\\', '/'));
   assert.equal(portablePath('\\\\server\\share\\目录'), '//server/share/目录');
-  assert.equal(expandHomePath('~/file.txt', '/Users/test'), '/Users/test/file.txt');
+  assert.equal(expandHomePath('~/file.txt', '/Users/test'), resolve('/Users/test', 'file.txt'));
 });

@@ -1,17 +1,17 @@
 # Desktop contract v1
 
-This directory is the authoritative migration boundary between Electron and the application core.
-It freezes the public desktop wire contract before Rust domains are replaced by Node implementations.
+This directory is the authoritative boundary between Electron and the application core. It preserves
+the public desktop wire contract after the Node-only Core cutover.
 
 ## Authoritative files
 
 - `command-args.schema.json`: input shape for all 141 desktop commands.
-- `command-values.schema.json`: successful wire value for all 141 commands. Rust `()` is represented as JSON `null`.
+- `command-values.schema.json`: successful wire value for all 141 commands. Legacy unit values remain JSON `null`.
 - `event-payloads.schema.json`: payloads for 17 fixed renderer events and the dynamic `ssh-data:${sessionId}` event.
 - `manifest.json`: command ownership, migration domain, resource ownership, dependencies, events, and test evidence.
 - `fixtures.json`: immutable baseline and golden-fixture inventory with SHA-256 checksums.
 
-`src/lib/desktop/generated-contract-types.ts`, `src/lib/desktop/contract.ts`, `electron/commands.json`, and `electron/events.json` are generated from these schemas. Runtime command validation also reads `command-args.schema.json`; Rust Serde is no longer the only deep validation boundary.
+`src/lib/desktop/generated-contract-types.ts`, `src/lib/desktop/contract.ts`, `electron/commands.json`, and `electron/events.json` are generated from these schemas. Runtime command validation also reads `command-args.schema.json` inside Node Core.
 
 ## Making a contract change
 
@@ -21,7 +21,7 @@ It freezes the public desktop wire contract before Rust domains are replaced by 
 4. Run `pnpm contract:check`, `pnpm test:desktop`, and `pnpm check:desktop`.
 5. If compatibility is intentionally broken, create `contracts/v2` instead of silently changing v1.
 
-Top-level command argument objects intentionally allow unrelated keys to preserve the established Tauri command behavior. Nested records carry `x-serde-unknown-fields` where the Rust snapshot established whether unknown fields are ignored or denied.
+Top-level command argument objects intentionally allow unrelated keys to preserve the established desktop behavior. Nested records retain `x-serde-unknown-fields` as frozen compatibility metadata.
 
 ## Bootstrap provenance
 

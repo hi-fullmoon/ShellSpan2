@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { format } from 'prettier';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const contractDirectory = path.join(root, 'electron/contracts/v1');
@@ -21,84 +22,98 @@ const commandNames = Object.keys(argsSchema.definitions.CommandArgs.properties);
 const domainDefinitions = {
   'agent-runtime': {
     wave: 6,
+    source: 'electron/node-core/agent-runtime.ts',
     resources: ['agentSessions', 'eventStore', 'artifacts', 'toolRuntime'],
     dependencies: ['llm', 'terminal', 'remote-fs', 'local-fs', 'credentials'],
-    tests: ['native/src/agent_runtime/*_tests.rs', 'src/lib/ai/__tests__'],
+    tests: ['electron/tests/node-core-stage6.test.ts', 'src/lib/ai/__tests__'],
   },
   llm: {
     wave: 5,
+    source: 'electron/node-core/llm-domain.ts',
     resources: ['httpClients', 'routeStore', 'providerStreams', 'imageStore'],
     dependencies: ['storage', 'credentials'],
-    tests: ['native/src/llm/tests.rs', 'native/src/llm/catalog_tests.rs'],
+    tests: ['electron/tests/node-core-stage5.test.ts', 'src/lib/ai/__tests__'],
   },
   terminal: {
     wave: 4,
+    source: 'electron/node-core/terminal.ts',
     resources: ['sshSessions', 'localPtys', 'terminalGuard'],
     dependencies: ['host-trust', 'credentials'],
-    tests: ['native/src/session.rs', 'scripts/native-smoke.ts'],
+    tests: ['electron/tests/node-core-stage4.test.ts', 'scripts/stage4-ssh-smoke.ts'],
   },
   'remote-fs': {
     wave: 4,
+    source: 'electron/node-core/remote-fs.ts',
     resources: ['sftpPool', 'transferRegistry', 'directoryRequests'],
     dependencies: ['host-trust', 'credentials'],
-    tests: ['native/src/remote_fs.rs', 'tests/ssh-e2e'],
+    tests: ['electron/tests/node-core-stage4.test.ts', 'tests/ssh-e2e'],
   },
   'remote-health': {
     wave: 4,
+    source: 'electron/node-core/remote-health.ts',
     resources: ['remoteHealthRequests', 'sshConnections'],
     dependencies: ['host-trust', 'credentials'],
-    tests: ['native/src/remote_health.rs', 'tests/ssh-e2e'],
+    tests: ['electron/tests/node-core-stage4.test.ts', 'tests/ssh-e2e'],
   },
   'port-forward': {
     wave: 4,
+    source: 'electron/node-core/port-forward.ts',
     resources: ['portForwards', 'listeners', 'sshConnections'],
     dependencies: ['host-trust', 'credentials'],
-    tests: ['native/src/port_forward.rs', 'tests/ssh-e2e'],
+    tests: ['electron/tests/node-core-stage4.test.ts', 'tests/ssh-e2e'],
   },
   'host-trust': {
     wave: 4,
+    source: 'electron/node-core/host-trust.ts',
     resources: ['knownHosts', 'preflightRequests'],
     dependencies: ['credentials'],
-    tests: ['native/src/known_hosts.rs', 'native/src/connection.rs'],
+    tests: ['electron/tests/node-core-stage4.test.ts', 'tests/ssh-e2e'],
   },
   storage: {
     wave: 3,
+    source: 'electron/node-core/storage.ts',
     resources: ['sqlite', 'workspaceFiles'],
     dependencies: [],
-    tests: ['native/src/db.rs', 'native/src/data_migration.rs'],
+    tests: ['electron/tests/node-core-stage3.test.ts'],
   },
   credentials: {
     wave: 3,
+    source: 'electron/node-core/credentials.ts',
     resources: ['systemKeychain', 'sqliteMetadata'],
     dependencies: ['storage'],
-    tests: ['native/src/keychain.rs'],
+    tests: ['electron/tests/node-core-stage3.test.ts', 'scripts/platform-credential-smoke.ts'],
   },
   'local-fs': {
     wave: 2,
+    source: 'electron/node-core/local-fs.ts',
     resources: ['localFilesystem', 'trash'],
     dependencies: [],
-    tests: ['native/src/local_fs.rs'],
+    tests: ['electron/tests/node-core-stage2.test.ts'],
   },
   logs: {
     wave: 2,
+    source: 'electron/node-core/log-domain.ts',
     resources: ['logDirectory'],
     dependencies: ['local-fs'],
     tests: ['electron/tests/logs.test.ts'],
   },
   health: {
     wave: 2,
+    source: 'electron/node-core/health.ts',
     resources: ['systemMetrics'],
     dependencies: [],
-    tests: ['native/src/health.rs'],
+    tests: ['electron/tests/node-core-stage2.test.ts'],
   },
   petdex: {
     wave: 2,
+    source: 'electron/node-core/petdex.ts',
     resources: ['petdexSocket'],
     dependencies: [],
-    tests: ['native/tests/petdex_contract_probe.rs'],
+    tests: ['electron/tests/node-core-stage2.test.ts'],
   },
   desktop: {
     wave: 1,
+    source: 'electron/main.ts',
     resources: ['electronApp', 'nativeDialogs'],
     dependencies: [],
     tests: ['electron/tests/preload.test.ts', 'electron/tests/boundary.test.ts'],
@@ -222,8 +237,8 @@ const commands = commandNames.map((name) => {
   const definition = domainDefinitions[domain];
   return {
     name,
-    currentOwner: baseline.owner,
-    source: baseline.source,
+    currentOwner: domain === 'desktop' || baseline.owner === 'electron' ? 'electron' : 'node',
+    source: definition.source,
     domain,
     migrationWave: definition.wave,
     stateful: definition.resources.some((resource) =>
@@ -305,9 +320,9 @@ if (process.argv.includes('--check')) {
       `Matrix missing ${command.name}`,
     );
 } else {
-  await writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
+  await writeFile(manifestPath, await format(JSON.stringify(manifest), { parser: 'json' }));
   await mkdir(path.dirname(matrixPath), { recursive: true });
-  await writeFile(matrixPath, `${lines.join('\n')}\n`);
+  await writeFile(matrixPath, await format(lines.join('\n'), { parser: 'markdown' }));
 }
 
 console.log(

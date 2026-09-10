@@ -261,6 +261,26 @@ export class TerminalManager {
   }
 
   private kill(session: Session) {
+    const pid = session.process.pid;
+    if (process.platform === 'win32' && pid !== undefined) {
+      let settled = false;
+      const finish = () => {
+        if (settled) return;
+        settled = true;
+        try {
+          session.process.kill();
+        } catch {}
+        session.guardian?.kill();
+      };
+      const killer = spawn('taskkill.exe', ['/PID', String(pid), '/T', '/F'], {
+        windowsHide: true,
+        stdio: 'ignore',
+      });
+      killer.once('error', finish);
+      killer.once('close', finish);
+      setTimeout(finish, 1000).unref();
+      return;
+    }
     if (process.platform !== 'win32' && session.process.pid !== undefined) {
       try {
         process.kill(-session.process.pid, 'SIGTERM');
@@ -270,7 +290,6 @@ export class TerminalManager {
       session.process.kill();
     } catch {}
     session.guardian?.kill();
-    const pid = session.process.pid;
     setTimeout(() => {
       if (process.platform !== 'win32' && pid !== undefined) {
         try {

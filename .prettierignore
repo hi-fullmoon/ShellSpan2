@@ -4,7 +4,6 @@ dist/
 dist-electron/
 release/
 artifacts/
-native/target/
 .worktrees/
 
 # Installed skills and dependency patches

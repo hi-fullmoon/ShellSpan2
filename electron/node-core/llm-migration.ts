@@ -178,7 +178,7 @@ export async function convertV4ToV5(
       throw new Error('MIGRATION_SOURCE: source must be a regular file');
     if (!(await exists(backup))) {
       await copyFile(source, backup, 0x1 /* COPYFILE_EXCL */);
-      const backupHandle = await open(backup, 'r');
+      const backupHandle = await open(backup, 'r+');
       await backupHandle.sync();
       await backupHandle.close();
     }
@@ -210,7 +210,7 @@ export async function convertV4ToV5(
     const temporary = join(parent, `.${basename(destination)}.${randomUUID()}.tmp`);
     const output = `${events.map((event) => JSON.stringify(event)).join('\n')}\n`;
     await writeFile(temporary, output, { flag: 'wx', mode: 0o600 });
-    const temporaryHandle = await open(temporary, 'r');
+    const temporaryHandle = await open(temporary, 'r+');
     await temporaryHandle.sync();
     await temporaryHandle.close();
     try {

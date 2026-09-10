@@ -1,4 +1,4 @@
-import { mkdtemp, rm } from 'node:fs/promises';
+import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { once } from 'node:events';
@@ -72,10 +72,12 @@ test(
   { timeout: 15000 },
   async () => {
     const root = await mkdtemp(join(tmpdir(), 'shellspan-stage4-pty-'));
+    const childPidPath = join(root, 'child.pid');
     const backend = new NodeCoreBackend({
       ...process.env,
       SHELLSPAN_HOME: root,
       SHELLSPAN_NODE_DOMAINS: 'terminal',
+      SHELLSPAN_NODE_CORE_TEST_MODE: '1',
     });
     let output = '';
     backend.on('event', (event, payload) => {
@@ -93,14 +95,18 @@ test(
         sessionId,
         data:
           process.platform === 'win32'
-            ? `$child = Start-Process powershell.exe -ArgumentList '-NoProfile','-Command','Start-Sleep 30' -PassThru; Write-Output \"CHILD_PID=$($child.Id)\"; Write-Output 'EXEC_MARKER'\r`
-            : "sleep 30 & printf 'CHILD_PID=%s\\n' $!; printf 'EXEC_%s\\n' 'MARKER'\n",
+            ? `$child = Start-Process powershell.exe -ArgumentList '-NoProfile','-Command','Start-Sleep 30' -PassThru; Set-Content -LiteralPath '${childPidPath}' -Value $child.Id; Write-Output ('EXEC_' + 'MARKER')\r`
+            : `sleep 30 & printf '%s' $! > '${childPidPath}'; printf 'EXEC_%s\\n' 'MARKER'\n`,
       });
       await new Promise((resolve) => setTimeout(resolve, 150));
       assert.equal(output.includes('EXEC_MARKER'), false);
       await backend.invoke('set_session_output_paused', { sessionId, paused: false });
       await waitFor(() => output.includes('EXEC_MARKER'));
-      const childPid = Number(output.match(/CHILD_PID=(\d+)/)?.[1]);
+      const childPid = Number(
+        await readFile(childPidPath, 'utf8').catch((error) => {
+          throw new Error(`${String(error)}; output=${JSON.stringify(output)}`);
+        }),
+      );
       assert.ok(childPid > 0, JSON.stringify(output));
       const closed = once(backend, 'event');
       await backend.invoke('close_session', { sessionId });

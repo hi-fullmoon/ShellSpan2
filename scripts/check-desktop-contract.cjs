@@ -39,7 +39,11 @@ for (const fixture of fixtureIndex.fixtures) {
     `Golden fixture drift: ${fixture.path}`,
   );
 }
-const dispatch = fs.readFileSync('native/src/dispatch.rs', 'utf8');
+const coreSources = fs
+  .readdirSync('electron/node-core', { recursive: true, withFileTypes: true })
+  .filter((entry) => entry.isFile() && entry.name.endsWith('.ts'))
+  .map((entry) => fs.readFileSync(`${entry.parentPath}/${entry.name}`, 'utf8'))
+  .join('\n');
 const main = fs.readFileSync('electron/main.ts', 'utf8');
 const preload = fs.readFileSync('dist-electron/preload.cjs', 'utf8');
 for (const command of contract) {
@@ -48,14 +52,16 @@ for (const command of contract) {
     `preload missing ${command.command}`,
   );
   assert.ok(
-    (command.owner === 'native' ? dispatch : main).includes(command.command),
+    (manifest.commands.find((entry) => entry.name === command.command).currentOwner === 'node'
+      ? coreSources
+      : main
+    ).includes(command.command),
     `dispatcher missing ${command.command}`,
   );
 }
-for (const file of ['package.json', 'native/Cargo.toml', 'native/Cargo.lock'])
-  assert.doesNotMatch(fs.readFileSync(file, 'utf8'), /(?:@tauri-apps\/|name = "tauri(?:-|"))/);
+assert.doesNotMatch(fs.readFileSync('package.json', 'utf8'), /@tauri-apps\//);
 console.log(
-  `Verified ${names.length} commands: ${contract.filter((c) => c.owner === 'native').length} native, ${contract.filter((c) => c.owner === 'electron').length} Electron.`,
+  `Verified ${names.length} commands: ${manifest.commands.filter((c) => c.currentOwner === 'node').length} Node Core, ${manifest.commands.filter((c) => c.currentOwner === 'electron').length} Electron.`,
 );
 
 const { rendererEvents, isRendererEvent } = require('../dist-electron/events.js');
@@ -85,5 +91,5 @@ require('node:vm').runInNewContext(preload, {
 
 assert.deepEqual(Object.keys(bridge.commands).sort(), [...names].sort());
 console.log(
-  'Verified executable preload surface, fixed-B signatures, Rust argument routing and event visibility.',
+  'Verified executable preload surface, fixed-B signatures, Node Core routing and event visibility.',
 );

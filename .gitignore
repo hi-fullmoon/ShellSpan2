@@ -1,6 +1,5 @@
 node_modules
 dist
-native/target
 .DS_Store
 .env
 .env.local

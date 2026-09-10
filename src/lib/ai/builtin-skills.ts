@@ -1,4 +1,4 @@
-import catalog from '../../../native/skills/catalog.json';
+import catalog from './skills/catalog.json';
 import type { SkillUserList } from '@/types/agent-skill';
 
 /** Metadata only: instructions stay in the native binary and are loaded at invocation. */

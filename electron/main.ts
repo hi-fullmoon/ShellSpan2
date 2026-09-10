@@ -16,9 +16,7 @@ import { pathToFileURL } from 'node:url';
 import { isRendererEvent } from './events.ts';
 import { trustedURL, verifySender } from './security.ts';
 import { fontResponse } from './fonts.ts';
-import { RustCoreBackend } from './rust-core-backend.ts';
 import { NodeCoreBackend } from './node-core-backend.ts';
-import { CoreBackendRouter, parseBackendConfig, parseCanaryMode } from './core-router.ts';
 import { TerminalFlow } from './terminal-flow.ts';
 import { validateCommand } from './validation.ts';
 import { createLogs } from './logs.ts';
@@ -37,7 +35,7 @@ import type { UpdateInfo } from 'electron-updater';
 
 let win: BrowserWindow;
 let tray: Tray;
-let core: CoreBackendRouter;
+let core: NodeCoreBackend;
 let terminalFlow: TerminalFlow;
 let logs: ReturnType<typeof createLogs>;
 let quitting = false;
@@ -135,12 +133,14 @@ async function fatal(error: unknown) {
 const dialogTitle = (title: string) =>
   process.platform === 'darwin' ? { message: title } : { title };
 const portable = (value: string) => value.replaceAll('\\', '/');
-type NativeDesktopRequest =
+type LocalDesktopRequest =
   | { command: 'pick_local_files' | 'pick_private_key_file'; args: object }
   | { command: 'pick_local_folder'; args: { title?: string | null } }
-  | { command: 'export_log_file'; args: { name: string; content: string } };
+  | { command: 'export_log_file'; args: { name: string; content: string } }
+  | { command: 'open_url'; args: { url: string } }
+  | { command: 'request_app_exit' | 'request_app_restart'; args: object };
 
-async function desktopCommand({ command, args }: NativeDesktopRequest) {
+async function desktopCommand({ command, args }: LocalDesktopRequest) {
   switch (command) {
     case 'pick_local_files': {
       const result = await dialog.showOpenDialog(win, {
@@ -178,6 +178,29 @@ async function desktopCommand({ command, args }: NativeDesktopRequest) {
       }
       return portable(result.filePath);
     }
+    case 'open_url': {
+      const lower = args.url.toLowerCase();
+      if (
+        !(
+          lower.startsWith('https://') ||
+          lower.startsWith('http://') ||
+          lower.startsWith('mailto:')
+        )
+      )
+        throw new Error(`refused to open URL with disallowed scheme: ${args.url}`);
+      if (/[\r\n]/.test(args.url))
+        throw new Error('refused to open URL containing newline characters');
+      if (/[&|<>()^"%!]/.test(args.url))
+        throw new Error(`refused to open URL containing shell metacharacters: ${args.url}`);
+      await shell.openExternal(args.url);
+      return null;
+    }
+    case 'request_app_exit':
+      setImmediate(() => void quit());
+      return null;
+    case 'request_app_restart':
+      setImmediate(() => void quit(true));
+      return null;
     default:
       return undefined;
   }
@@ -207,21 +230,24 @@ function installIPC() {
     }
     terminalFlow?.ack(id);
   });
-  const nativeDesktop = new Set([
+  const localDesktop = new Set([
     'pick_local_files',
     'pick_local_folder',
     'pick_private_key_file',
     'export_log_file',
+    'open_url',
+    'request_app_exit',
+    'request_app_restart',
   ]);
   ipcMain.handle('desktop:command', async (event, command, args = {}) => {
     verify(event);
     try {
       validateCommand(command, args);
-      if (nativeDesktop.has(command)) {
+      if (localDesktop.has(command)) {
         const validated = await core.validate(command, args);
         if (!validated.ok) return validated;
-        // Rust Serde has validated the fields for this specific dialog command.
-        return { ok: true, value: await desktopCommand({ command, args } as NativeDesktopRequest) };
+        // Schema v1 has validated the fields for this local desktop command.
+        return { ok: true, value: await desktopCommand({ command, args } as LocalDesktopRequest) };
       }
       const result = await core.invoke(command, args);
       return result;
@@ -349,7 +375,7 @@ function setupMenus() {
     );
   } else {
     Menu.setApplicationMenu(null);
-    tray = new Tray(path.join(__dirname, '../native/icons/32x32.png'));
+    tray = new Tray(path.join(__dirname, '../resources/icons/32x32.png'));
     tray.setToolTip('ShellSpan');
     tray.setContextMenu(
       Menu.buildFromTemplate([
@@ -399,47 +425,23 @@ else {
       protocol.handle('shellspan-font', (request) => fontResponse(request));
       await fs.mkdir(appData, { recursive: true });
       logs = createLogs(logDir);
-      const binary = app.isPackaged
-        ? path.join(
-            process.resourcesPath,
-            'native',
-            process.platform === 'win32' ? 'shellspan-core.exe' : 'shellspan-core',
-          )
-        : path.join(
-            __dirname,
-            '../native/target/debug',
-            process.platform === 'win32' ? 'shellspan-core.exe' : 'shellspan-core',
-          );
-      const backendRoutes = parseBackendConfig(process.env.SHELLSPAN_CORE_BACKENDS);
       const coreEnv = {
         ...process.env,
         SHELLSPAN_APP_DATA: appData,
         SHELLSPAN_LOG_DIR: logDir,
         SHELLSPAN_APP_VERSION: app.getVersion(),
         SHELLSPAN_BUILD_MODE: app.isPackaged ? 'production' : 'development',
-        SHELLSPAN_NODE_DOMAINS: [...backendRoutes]
-          .filter(([, backend]) => backend === 'node')
-          .map(([domain]) => domain)
-          .join(','),
       };
       await recoverInterruptedDatabase(new NodeCorePaths(coreEnv).database);
-      const rustBackend = new RustCoreBackend(binary, coreEnv);
-      // Rust performs the existing migration guard before ready. Opening Node's
-      // storage worker afterwards prevents startup races on legacy data.
+      core = new NodeCoreBackend(coreEnv);
       const startupLog = (record: { level: string; message: string; target?: string }) =>
         logs.write('backend', record.level, record.message, record.target);
-      rustBackend.on('log', startupLog);
+      core.on('log', startupLog);
       try {
-        await rustBackend.ready;
+        await core.ready;
       } finally {
-        rustBackend.off('log', startupLog);
+        core.off('log', startupLog);
       }
-      core = new CoreBackendRouter(
-        rustBackend,
-        new NodeCoreBackend(coreEnv),
-        backendRoutes,
-        parseCanaryMode(process.env.SHELLSPAN_CORE_CANARY),
-      );
       terminalFlow = new TerminalFlow(
         (event, payload, id) => {
           if (win && !win.isDestroyed() && !core.stopping)

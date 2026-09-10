@@ -12,24 +12,11 @@ The baseline captures:
 - A 16 MiB upload and download against the isolated SSH/SFTP fixture.
 - Stable wire behaviors and the SQLite v7 schema/data snapshot.
 
-## Capture without SSH
+## Archived evidence
 
-```sh
-pnpm native:build
-pnpm baseline:native
-```
-
-The resulting `remoteTransfer.status` is `not-configured`.
-
-## Capture with the isolated SSH fixture
-
-Start `tests/ssh-e2e/compose.yml`, then run:
-
-```sh
-SHELLSPAN_BASELINE_SSH=1 pnpm baseline:native
-```
-
-Always stop the Compose project and remove its volumes after capture. The fixture uses only the local loopback ports configured in the Compose file.
+The capture utility and Rust toolchain were removed at the Stage 7 Node-only cutover. The checked-in
+JSON is immutable historical evidence; do not regenerate it with the current application. Current
+performance and compatibility regressions are measured by the Node Core platform and SSH/SFTP gates.
 
 ## Comparison budgets
 
